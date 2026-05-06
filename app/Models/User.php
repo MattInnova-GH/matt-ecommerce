@@ -12,12 +12,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'document_type', 'document_number', 'phone', 'role', 'image', 'is_blocked', 'last_name'])]
+#[Fillable(['name', 'email', 'password', 'document_type', 'document_number', 'phone',  'image', 'is_blocked', 'last_name'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
+
+    protected $appends = ['role'];
 
     /**
      * Get the attributes that should be cast.
@@ -30,12 +32,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'email_verified' => 'boolean',
+            'is_blocked' => 'boolean',
         ];
     }
-protected $casts = [
-        'email_verified' => 'boolean',
-        'is_blocked' => 'boolean',
-    ];
+
+    public function getRoleAttribute(): string
+    {
+        return strtoupper($this->roles->first()?->name ?? 'USER');
+    }
 
     public function products()
     {

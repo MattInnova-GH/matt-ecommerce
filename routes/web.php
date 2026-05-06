@@ -7,13 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
 
-Route::get('/login', function () {
-    return Inertia\Inertia::render('Auth/Login');
-})->name('login');
 
-Route::get('/register', function () {
-    return Inertia\Inertia::render('Auth/Register');
-})->name('register');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
@@ -28,3 +22,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/seller.php';
+require __DIR__.'/auth.php';
