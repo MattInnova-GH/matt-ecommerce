@@ -1,0 +1,12 @@
+<?php
+
+
+enum TicketCategory: string
+{
+    case FEATURE_PRODUCT = 'FEATURE_PRODUCT';
+    case ORDER_PROBLEM = 'ORDER_PROBLEM';
+    case PAYMENT_VALIDATION = 'PAYMENT_VALIDATION';
+    case SHIPPING_ISSUE = 'SHIPPING_ISSUE';
+    case PRODUCT_ISSUE = 'PRODUCT_ISSUE';
+    case OTHER = 'OTHER';
+}
