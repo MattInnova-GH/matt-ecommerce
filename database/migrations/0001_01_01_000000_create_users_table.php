@@ -18,10 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->boolean('email_verified')->default(false);
             $table->text('image')->nullable();
-
-            $table->enum('role', ['USER', 'SELLER', 'ADMIN'])->default('USER');
             $table->enum('document_type', ['DNI', 'RUC', 'CE', 'PASAPORTE'])->nullable();
-
             $table->string('document_number')->nullable()->unique();
             $table->string('phone')->nullable();
 

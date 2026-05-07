@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 import { LoginForm } from '../Auth/LoginForm';
 
@@ -9,11 +10,11 @@ type AuthModalProps = {
 };
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
-    if (!isOpen) {
+    if (!isOpen || typeof document === 'undefined') {
         return null;
     }
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -32,6 +33,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </h2>
                 <LoginForm onSuccess={onClose} />
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

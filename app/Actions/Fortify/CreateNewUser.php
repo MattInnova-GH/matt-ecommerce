@@ -48,11 +48,10 @@ class CreateNewUser implements CreatesNewUsers
                 'password' => $input['password'],
                 'document_type' => $input['document_type'] ?? null,
                 'document_number' => $input['document_number'] ?? null,
-                'role' => $input['registration_type'] === 'seller' ? 'SELLER' : 'USER',
             ]);
 
             if ($input['registration_type'] === 'seller') {
-                $user->assignRole('SELLER');
+                $user->assignRole('seller');
                 
                 SellerRequest::create([
                     'user_id' => $user->id,
@@ -65,7 +64,7 @@ class CreateNewUser implements CreatesNewUsers
                     'experience' => $input['experience'],
                 ]);
             } else {
-                $user->assignRole('USER');
+                $user->assignRole('user');
             }
 
             return $user;

@@ -8,13 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\User\FavoriteController;
 
-Route::get('/login', function () {
-    return Inertia\Inertia::render('Auth/Login');
-})->name('login');
 
-Route::get('/register', function () {
-    return Inertia\Inertia::render('Auth/Register');
-})->name('register');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');

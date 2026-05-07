@@ -1,10 +1,5 @@
 import { createInertiaApp } from '@inertiajs/react';
-import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { initializeTheme } from '@/hooks/use-appearance';
-import AppLayout from '@/layouts/app-layout';
-import AuthLayout from '@/layouts/auth-layout';
-import SettingsLayout from '@/layouts/settings/layout';
 
 import AdminLayout from '@/layouts/AdminLayout';
 import SellerLayout from '@/layouts/SellerLayout';
@@ -17,6 +12,8 @@ createInertiaApp({
     layout: (name) => {
         // User Pages
         if (name.startsWith('User/')) {
+            // Check if name is 'User/Home' or similar, you might want UserLayout
+            // For now, if you want manual control in the page, keep null
             return null;
         }
 
@@ -34,27 +31,20 @@ createInertiaApp({
             case name === 'welcome':
                 return null;
             case name.startsWith('auth/'):
-                return AuthLayout;
+                // Since AuthLayout was deleted/not found in your new layouts,
+                // using AppLayout as fallback or you might need to create it.
+                return AppLayout;
             case name.startsWith('settings/'):
-                // Settings might still need the default layout or we could refactor them too
-                return [AppLayout, SettingsLayout];
+                return AppLayout;
             default:
                 return AppLayout;
         }
     },
     strictMode: true,
     withApp(app) {
-        return (
-            <TooltipProvider delayDuration={0}>
-                {app}
-                <Toaster />
-            </TooltipProvider>
-        );
+        return <TooltipProvider delayDuration={0}>{app}</TooltipProvider>;
     },
     progress: {
         color: '#4B5563',
     },
 });
-
-// This will set light / dark mode on load...
-initializeTheme();
