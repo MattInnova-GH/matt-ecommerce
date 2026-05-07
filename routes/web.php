@@ -6,6 +6,7 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\User\FavoriteController;
 
 Route::get('/login', function () {
     return Inertia\Inertia::render('Auth/Login');
@@ -28,3 +29,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/seller.php';
+require __DIR__.'/user.php';

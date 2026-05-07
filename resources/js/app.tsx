@@ -8,6 +8,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 import AdminLayout from '@/layouts/AdminLayout';
 import SellerLayout from '@/layouts/SellerLayout';
+import 'leaflet/dist/leaflet.css';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

@@ -2,13 +2,21 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Search, ShoppingCart, Menu, X, User } from 'lucide-react';
 import { AuthModal } from './AuthModal';
+import CartDrawer from '@/Components/User/Cart';
+import { useCartStore } from '@/stores/cartStore';
 
 export default function Navbar() {
     const { url, props } = usePage();
+
     const { auth } = props as any;
+
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [cartCount, setCartCount] = useState(0);
+
+    const { openCart, totalItems } = useCartStore();
+
+    const cartCount = totalItems();
 
     return (
         <>
@@ -27,12 +35,14 @@ export default function Navbar() {
                             <NavLink href="/" active={url === '/'}>
                                 INICIO
                             </NavLink>
+
                             <NavLink
                                 href="/productos"
                                 active={url.startsWith('/productos')}
                             >
                                 PRODUCTOS
                             </NavLink>
+
                             <NavLink
                                 href="/tiendas"
                                 active={url.startsWith('/tiendas')}
@@ -46,8 +56,13 @@ export default function Navbar() {
                                 <Search size={20} />
                             </button>
 
-                            <button className="relative transition hover:opacity-60 dark:text-white">
+                            {/* CART BUTTON */}
+                            <button
+                                onClick={openCart}
+                                className="relative transition hover:opacity-60 dark:text-white"
+                            >
                                 <ShoppingCart size={20} />
+
                                 {cartCount > 0 && (
                                     <span className="absolute -top-2 -right-2 min-w-4 rounded-full bg-black px-1.5 text-center text-[10px] text-white dark:bg-white dark:text-black">
                                         {cartCount}
@@ -82,6 +97,9 @@ export default function Navbar() {
                 </div>
             </nav>
 
+            {/* DRAWER DEL CARRITO */}
+            <CartDrawer />
+
             <AuthModal
                 isOpen={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
@@ -103,7 +121,9 @@ function NavLink({
     children,
 }: {
     href: string;
+
     active: boolean;
+
     children: React.ReactNode;
 }) {
     return (
@@ -125,12 +145,24 @@ function MobileDrawer({
     currentUrl,
 }: {
     onClose: () => void;
+
     currentUrl: string;
 }) {
     const menuItems = [
-        { href: '/', label: 'Inicio' },
-        { href: '/productos', label: 'Productos' },
-        { href: '/tiendas', label: 'Tiendas' },
+        {
+            href: '/',
+            label: 'Inicio',
+        },
+
+        {
+            href: '/productos',
+            label: 'Productos',
+        },
+
+        {
+            href: '/tiendas',
+            label: 'Tiendas',
+        },
     ];
 
     return (
@@ -139,6 +171,7 @@ function MobileDrawer({
                 className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
             />
+
             <div className="fixed top-0 right-0 bottom-0 z-50 flex w-80 flex-col bg-white shadow-xl dark:bg-zinc-950">
                 <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-zinc-800">
                     <img
@@ -146,6 +179,7 @@ function MobileDrawer({
                         alt="Logo"
                         className="h-8 w-auto object-contain"
                     />
+
                     <button
                         onClick={onClose}
                         className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-zinc-900"

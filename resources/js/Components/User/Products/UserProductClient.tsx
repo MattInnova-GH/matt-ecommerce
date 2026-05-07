@@ -1,56 +1,32 @@
-import { Head } from '@inertiajs/react';
-import UserLayout from '@/layouts/UserLayout';
+import ProductGrid from './ProductGrid';
+import ProductSearchBar from './ProductSearchBar';
 
-import ProductGrid from '@/Components/User/Products/ProductGrid';
-import ProductSearchBar from '@/Components/User/Products/ProductSearchBar';
+import { Category, PublicProduct } from './types';
 
-interface ProductVariant {
-    type: string;
-    value: string;
-}
+type Props = {
+    initialProducts: PublicProduct[];
+    initialCategories: Category[];
+};
 
-interface Product {
-    id: number;
-    slug: string;
-    name: string;
-    description?: string;
-    price: number;
-    stock: number;
-    category: string;
-    imageUrl?: string;
-    colors?: string[];
-    sizes?: string[];
-    variants?: ProductVariant[];
-}
-
-interface Category {
-    id: string | number;
-    name: string;
-    productCount: number;
-}
-
-interface ProductsPageProps {
-    products: Product[];
-    categories: Category[];
-}
-
-export default function Index({
-    products = [],
-    categories = [],
-}: ProductsPageProps) {
+export default function UserProductClient({
+    initialProducts,
+    initialCategories,
+}: Props) {
     const filterCategories = [
         {
             id: 'all',
             name: 'Todos',
-            productCount: products.length,
+            productCount: initialProducts.length,
         },
-        ...categories,
+        ...initialCategories.map((category) => ({
+            id: category.id,
+            name: category.name,
+            productCount: category.productCount,
+        })),
     ];
 
     return (
-        <UserLayout>
-            <Head title="Productos | Matt" />
-
+        <main className="min-h-screen bg-white">
             {/* Hero */}
             <section className="relative overflow-hidden bg-gray-50">
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100" />
@@ -77,17 +53,17 @@ export default function Index({
             {/* Search */}
             <div className="sticky top-0 z-30 border-b border-gray-100 bg-white/95 backdrop-blur">
                 <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-                    <ProductSearchBar products={products} />
+                    <ProductSearchBar products={initialProducts} />
                 </div>
             </div>
 
             {/* Grid */}
             <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                 <ProductGrid
-                    initialProducts={products}
+                    initialProducts={initialProducts}
                     categories={filterCategories}
                 />
             </section>
-        </UserLayout>
+        </main>
     );
 }
