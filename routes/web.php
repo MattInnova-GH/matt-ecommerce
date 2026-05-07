@@ -1,14 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
-
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
-use App\Http\Controllers\User\FavoriteController;
-
-
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/productos', [ProductController::class, 'index'])->name('products.index');
@@ -24,3 +19,9 @@ require __DIR__.'/settings.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/seller.php';
 require __DIR__.'/user.php';
+require __DIR__.'/auth.php';
+
+Route::fallback(function () {
+    return redirect()->back()->with('error', 'La página que buscas no existe o no tienes acceso.');
+});
+

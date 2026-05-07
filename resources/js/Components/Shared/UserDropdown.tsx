@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { logout } from '@/routes';
 import { ConfirmModal } from '../Auth/logout/ConfirmModal';
+import favorites from '@/routes/favorites';
+import configuration from '@/routes/configuration';
 
 type User = {
     name: string;
@@ -33,8 +35,8 @@ export default function UserDropdown({ user, onClose }: Props) {
 
     const commonLinks = [
         { href: '/mis-compras', label: 'Mis Compras', icon: ShoppingBag },
-        { href: '/favoritos', label: 'Favoritos', icon: Heart },
-        { href: '/configuracion', label: 'Configuración', icon: Settings },
+        { href: favorites.index(), label: 'Favoritos', icon: Heart },
+        { href: configuration.index(), label: 'Configuración', icon: Settings },
     ];
 
     const roleLinks = {
@@ -79,7 +81,7 @@ export default function UserDropdown({ user, onClose }: Props) {
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-900 text-white">
                             {user.image ? (
                                 <img
-                                    src={user.image}
+                                    src={'/storage/' + user.image}
                                     alt={displayName}
                                     className="h-full w-full rounded-full object-cover"
                                 />

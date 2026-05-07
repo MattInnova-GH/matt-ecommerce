@@ -1,4 +1,3 @@
-// resources/js/components/Header/Navbar.tsx
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
@@ -17,15 +16,11 @@ type AuthUser = {
 
 export default function Navbar() {
     const { url, props } = usePage();
-
-    const { auth } = props as any;
-
+    const auth = (props as any).auth as { user: AuthUser };
+    const user = auth?.user ?? null;
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
     const { openCart, totalItems } = useCartStore();
-
     const cartCount = totalItems();
 
     return (

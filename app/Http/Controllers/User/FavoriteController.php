@@ -8,32 +8,11 @@ use Inertia\Inertia;
 
 class FavoriteController extends Controller
 {
-    // LISTAR FAVORITOS
     public function index()
     {
         $user = auth()->user();
 
-        $favorites = $user->favorites()
-            ->with('category')
-            ->latest('favorites.created_at')
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'price' => $product->price,
-                    'stock' => $product->stock,
-                    'category' => $product->category?->name,
-                    'imageUrl' => $product->image_url,
-                    'colors' => $product->colors ?? [],
-                    'favoritedAt' => $product->pivot->created_at,
-                ];
-            });
-
-        return Inertia::render('Favorites/UserFavoriteClient', [
-            'favorites' => $favorites,
-        ]);
+        return Inertia::render('User/Favorites/UserFavoriteClient', []);
     }
 
     // TOGGLE FAVORITO (agregar / quitar)

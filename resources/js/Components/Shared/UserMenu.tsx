@@ -44,7 +44,7 @@ export default function UserMenu({ user, onOpenLogin }: Props) {
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-gray-100">
                     {user.image ? (
                         <img
-                            src={user.image}
+                            src={'/storage/' + user.image}
                             alt={user.name}
                             className="h-full w-full object-cover"
                         />

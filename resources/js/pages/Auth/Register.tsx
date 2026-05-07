@@ -1,8 +1,8 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { Loader2, Check, Shield, DollarSign, Truck } from 'lucide-react';
-import register from '@/routes/register';
 import SellerRegisterForm from './SellerRegisterForm';
+import register from '@/routes/register';
 
 // ============================================
 // COMPONENTE PRINCIPAL - REGISTER PAGE
