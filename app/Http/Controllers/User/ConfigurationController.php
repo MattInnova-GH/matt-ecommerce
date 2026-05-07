@@ -147,74 +147,75 @@ class ConfigurationController extends Controller
      * Crear solicitud de vendedor
      */
     public function createSellerRequest(Request $request)
-{
-    $request->validate([
-        'business_name' => 'required|string|max:255',
-        'business_type' => 'required|string|max:255',
-        'address' => 'required|string|max:500',
-        'phone' => 'required|string|max:20',
-        'tax_id_type' => 'required|in:DNI,RUC,CE,PASAPORTE',
-        'tax_id_number' => 'required|string|max:20',
-        'experience' => 'required|string|min:20',
-        'message' => 'required|string|min:20',
-    ]);
-
-    $user = $request->user();
-
-    // Verificar que el usuario no tenga ya una solicitud PENDING o APPROVED
-    $existing = SellerRequest::where('user_id', $user->id)
-        ->whereIn('status', ['PENDING', 'APPROVED'])
-        ->first();
-
-    if ($existing) {
-        if ($existing->status === 'APPROVED') {
-            return redirect()->back()->with('error', 'Tu cuenta ya fue aprobada como vendedor');
-        }
-        if ($existing->status === 'PENDING') {
-            return redirect()->back()->with('error', 'Ya tienes una solicitud pendiente. El equipo la revisará pronto.');
-        }
-    }
-
-    // Verificar que el número de documento no esté en uso por otro usuario
-    $docInUse = User::where('document_number', $request->tax_id_number)
-        ->where('id', '!=', $user->id)
-        ->exists();
-
-    if ($docInUse) {
-        return redirect()->back()->with('error', 'El número de documento ya está en uso por otra cuenta');
-    }
-
-    DB::beginTransaction();
-
-    try {
-        // Actualizar datos del usuario
-        $user->update([
-            'phone' => $request->phone,
-            'document_type' => $request->tax_id_type,
-            'document_number' => $request->tax_id_number,
+    {
+        $request->validate([
+            'business_name' => 'required|string|max:255',
+            'business_type' => 'required|string|max:255',
+            'address' => 'required|string|max:500',
+            'phone' => 'required|string|max:20',
+            'tax_id_type' => 'required|in:DNI,RUC,CE,PASAPORTE',
+            'tax_id_number' => 'required|string|max:20',
+            'experience' => 'required|string|min:20',
+            'message' => 'required|string|min:20',
         ]);
 
-        // Crear solicitud
-        SellerRequest::create([
-            'user_id' => $user->id,
-            'business_name' => $request->business_name,
-            'business_type' => $request->business_type,
-            'address' => $request->address,
-            'phone' => $request->phone,
-            'tax_id_type' => $request->tax_id_type,
-            'tax_id_number' => $request->tax_id_number,
-            'experience' => $request->experience,
-            'message' => $request->message,
-            'status' => 'PENDING',
-        ]);
+        $user = $request->user();
 
-        DB::commit();
+        // Verificar que el usuario no tenga ya una solicitud PENDING o APPROVED
+        $existing = SellerRequest::where('user_id', $user->id)
+            ->whereIn('status', ['PENDING', 'APPROVED'])
+            ->first();
 
-        return redirect()->back()->with('success', 'Solicitud enviada correctamente');
+        if ($existing) {
+            if ($existing->status === 'APPROVED') {
+                return redirect()->back()->with('error', 'Tu cuenta ya fue aprobada como vendedor');
+            }
+            if ($existing->status === 'PENDING') {
+                return redirect()->back()->with('error', 'Ya tienes una solicitud pendiente. El equipo la revisará pronto.');
+            }
+        }
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Error al enviar la solicitud. Inténtalo de nuevo.');
+        // Verificar que el número de documento no esté en uso por otro usuario
+        $docInUse = User::where('document_number', $request->tax_id_number)
+            ->where('id', '!=', $user->id)
+            ->exists();
+
+        if ($docInUse) {
+            return redirect()->back()->with('error', 'El número de documento ya está en uso por otra cuenta');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Actualizar datos del usuario
+            $user->update([
+                'phone' => $request->phone,
+                'document_type' => $request->tax_id_type,
+                'document_number' => $request->tax_id_number,
+            ]);
+
+            // Crear solicitud
+            SellerRequest::create([
+                'user_id' => $user->id,
+                'business_name' => $request->business_name,
+                'business_type' => $request->business_type,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'tax_id_type' => $request->tax_id_type,
+                'tax_id_number' => $request->tax_id_number,
+                'experience' => $request->experience,
+                'message' => $request->message,
+                'status' => 'PENDING',
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Solicitud enviada correctamente');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->with('error', 'Error al enviar la solicitud. Inténtalo de nuevo.');
+        }
     }
-}
 }

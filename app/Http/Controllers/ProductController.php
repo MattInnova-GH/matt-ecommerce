@@ -22,14 +22,14 @@ class ProductController extends Controller
         }
 
         if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
-        $products = $query->latest()->get()->map(fn($product) => [
+        $products = $query->latest()->get()->map(fn ($product) => [
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
-            'price' => (float)$product->price,
+            'price' => (float) $product->price,
             'stock' => $product->stock,
             'imageUrl' => $product->image_url,
             'category' => $product->category->name,
@@ -37,11 +37,11 @@ class ProductController extends Controller
         ]);
 
         $categories = Category::where('is_active', true)
-            ->withCount(['products' => function($q) {
+            ->withCount(['products' => function ($q) {
                 $q->where('is_active', true)->where('is_approved', true);
             }])
             ->get()
-            ->map(fn($category) => [
+            ->map(fn ($category) => [
                 'id' => $category->slug,
                 'name' => $category->name,
                 'productCount' => $category->products_count,

@@ -1,6 +1,6 @@
 import UserLayout from '@/layouts/UserLayout';
 import React, { useState, useRef } from 'react';
-import { Form, usePage } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import {
     User,
     Camera,
@@ -134,6 +134,7 @@ export default function ConfiguracionPage() {
 
     return (
         <UserLayout>
+            <Head title="Configuración" />
             <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-50">
                 <main className="container mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
                     {/* Header */}

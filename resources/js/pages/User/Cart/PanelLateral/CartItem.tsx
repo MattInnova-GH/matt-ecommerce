@@ -17,33 +17,33 @@ export function CartItem({ item }: CartItemProps) {
             />
 
             <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                <p className="truncate text-sm font-medium text-gray-900">
                     {item.name}
                 </p>
 
                 <p className="mt-0.5 text-xs text-gray-400">{item.category}</p>
 
-                <p className="mt-1 text-sm font-semibold dark:text-green-500">
+                <p className="mt-1 text-sm font-semibold">
                     ${item.price.toFixed(2)}
                 </p>
             </div>
 
             <div className="flex flex-col items-end gap-2">
-                <div className="flex items-center rounded-md border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center rounded-md border border-gray-200">
                     <button
                         onClick={() => updateQty(item.id, item.quantity - 1)}
-                        className="rounded-l-md px-2 py-1 transition-colors hover:bg-gray-50 dark:text-white dark:hover:bg-gray-800"
+                        className="rounded-l-md px-2 py-1 transition-colors hover:bg-gray-50"
                     >
                         −
                     </button>
 
-                    <span className="min-w-[32px] border-x px-3 py-1 text-center text-sm dark:border-gray-700 dark:text-white">
+                    <span className="min-w-[32px] border-x px-3 py-1 text-center text-sm">
                         {item.quantity}
                     </span>
 
                     <button
                         onClick={() => updateQty(item.id, item.quantity + 1)}
-                        className="rounded-r-md px-2 py-1 text-gray-500 transition-colors hover:bg-gray-50 dark:text-white"
+                        className="rounded-r-md px-2 py-1 text-gray-500 transition-colors hover:bg-gray-50"
                     >
                         +
                     </button>

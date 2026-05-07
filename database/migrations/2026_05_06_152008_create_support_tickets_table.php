@@ -18,15 +18,15 @@ return new class extends Migration
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
-            $table->enum('status', ['PENDING','IN_REVIEW','RESOLVED','CLOSED'])->default('PENDING');
-            $table->enum('priority', ['LOW','MEDIUM','HIGH'])->default('MEDIUM');
+            $table->enum('status', ['PENDING', 'IN_REVIEW', 'RESOLVED', 'CLOSED'])->default('PENDING');
+            $table->enum('priority', ['LOW', 'MEDIUM', 'HIGH'])->default('MEDIUM');
             $table->enum('category', [
                 'FEATURE_PRODUCT',
                 'ORDER_PROBLEM',
                 'PAYMENT_VALIDATION',
                 'SHIPPING_ISSUE',
                 'PRODUCT_ISSUE',
-                'OTHER'
+                'OTHER',
             ]);
 
             $table->string('title');

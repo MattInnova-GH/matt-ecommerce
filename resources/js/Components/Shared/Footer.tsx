@@ -1,23 +1,32 @@
 import { Link } from '@inertiajs/react';
-import { Mail, Phone, MapPin, CreditCard, Truck, Shield, Headphones } from 'lucide-react';
+import {
+    Mail,
+    Phone,
+    MapPin,
+    CreditCard,
+    Truck,
+    Shield,
+    Headphones,
+} from 'lucide-react';
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
         <footer className="bg-gray-900 text-gray-300">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
+            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-4">
                     <div>
-                        <Link href="/" className="inline-block mb-6">
+                        <Link href="/" className="mb-6 inline-block">
                             <img
                                 src="/img/inicio/logo.webp"
                                 alt="Logo"
                                 className="h-10 w-auto object-contain brightness-0 invert"
                             />
                         </Link>
-                        <p className="text-sm text-gray-400 leading-relaxed mb-6">
-                            Tu tienda online de confianza. Encuentra todo lo que necesitas con los mejores precios y envíos rápidos.
+                        <p className="mb-6 text-sm leading-relaxed text-gray-400">
+                            Tu tienda online de confianza. Encuentra todo lo que
+                            necesitas con los mejores precios y envíos rápidos.
                         </p>
                         <div className="flex gap-4">
                             <SocialIcon d="M12 2.04c-5.5 0-10 4.49-10 10.02c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89c1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02" />
@@ -26,67 +35,138 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h4 className="text-white font-semibold mb-6">Comprar</h4>
+                        <h4 className="mb-6 font-semibold text-white">
+                            Comprar
+                        </h4>
                         <ul className="space-y-4 text-sm">
-                            <li><Link href="/productos" className="hover:text-white transition">Todos los productos</Link></li>
-                            <li><Link href="/tiendas" className="hover:text-white transition">Tiendas</Link></li>
-                            <li><Link href="/" className="hover:text-white transition">Inicio</Link></li>
+                            <li>
+                                <Link
+                                    href="/productos"
+                                    className="transition hover:text-white"
+                                >
+                                    Todos los productos
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/tiendas"
+                                    className="transition hover:text-white"
+                                >
+                                    Tiendas
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/"
+                                    className="transition hover:text-white"
+                                >
+                                    Inicio
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="text-white font-semibold mb-6">Ayuda</h4>
+                        <h4 className="mb-6 font-semibold text-white">Ayuda</h4>
                         <ul className="space-y-4 text-sm">
-                            <li><Link href="/contacto" className="hover:text-white transition">Contacto</Link></li>
-                            <li><Link href="/envios" className="hover:text-white transition">Envíos y entregas</Link></li>
-                            <li><Link href="/devoluciones" className="hover:text-white transition">Devoluciones</Link></li>
-                            <li><Link href="/preguntas-frecuentes" className="hover:text-white transition">Preguntas frecuentes</Link></li>
+                            <li>
+                                <Link
+                                    href="/contacto"
+                                    className="transition hover:text-white"
+                                >
+                                    Contacto
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/envios"
+                                    className="transition hover:text-white"
+                                >
+                                    Envíos y entregas
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/devoluciones"
+                                    className="transition hover:text-white"
+                                >
+                                    Devoluciones
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/preguntas-frecuentes"
+                                    className="transition hover:text-white"
+                                >
+                                    Preguntas frecuentes
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="text-white font-semibold mb-6">Contacto</h4>
+                        <h4 className="mb-6 font-semibold text-white">
+                            Contacto
+                        </h4>
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">
-                                <MapPin size={18} className="mt-0.5 shrink-0 text-emerald-500" />
+                                <MapPin
+                                    size={18}
+                                    className="text-white-500 mt-0.5 shrink-0"
+                                />
                                 <span>Av. Principal 123, Ciudad</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Phone size={18} className="text-emerald-500" />
-                                <a href="tel:+123456789" className="hover:text-white transition">+1 234 567 89</a>
+                                <Phone size={18} className="text-white-500" />
+                                <a
+                                    href="tel:+123456789"
+                                    className="transition hover:text-white"
+                                >
+                                    +1 234 567 89
+                                </a>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Mail size={18} className="text-emerald-500" />
-                                <a href="mailto:info@tienda.com" className="hover:text-white transition">info@tienda.com</a>
+                                <Mail size={18} className="text-white-500" />
+                                <a
+                                    href="mailto:info@tienda.com"
+                                    className="transition hover:text-white"
+                                >
+                                    info@tienda.com
+                                </a>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 mt-12 pt-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                        <div className="flex items-center gap-3 justify-center sm:justify-start">
-                            <Truck size={20} className="text-emerald-500" />
-                            <span className="text-sm">Envíos a todo el país</span>
+                <div className="mt-12 border-t border-gray-800 pt-8">
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+                        <div className="flex items-center justify-center gap-3 sm:justify-start">
+                            <Truck size={20} className="text-white-500" />
+                            <span className="text-sm">
+                                Envíos a todo el país
+                            </span>
                         </div>
-                        <div className="flex items-center gap-3 justify-center sm:justify-start">
-                            <Shield size={20} className="text-emerald-500" />
+                        <div className="flex items-center justify-center gap-3 sm:justify-start">
+                            <Shield size={20} className="text-white-500" />
                             <span className="text-sm">Compra 100% segura</span>
                         </div>
-                        <div className="flex items-center gap-3 justify-center sm:justify-start">
-                            <Headphones size={20} className="text-emerald-500" />
+                        <div className="flex items-center justify-center gap-3 sm:justify-start">
+                            <Headphones size={20} className="text-white-500" />
                             <span className="text-sm">Soporte 24/7</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row">
                     <div className="flex gap-4">
                         <CreditCard size={24} className="text-gray-500" />
-                        <span className="text-xs text-gray-500 flex items-center">Yape • Plin • Tarjetas</span>
+                        <span className="flex items-center text-xs text-gray-500">
+                            Yape • Plin • Tarjetas
+                        </span>
                     </div>
                     <p className="text-xs text-gray-500">
-                        © {currentYear} Matt Innova Solution. Todos los derechos reservados.
+                        © {currentYear} Matt Innova Solution. Todos los derechos
+                        reservados.
                     </p>
                 </div>
             </div>
@@ -96,8 +176,16 @@ export default function Footer() {
 
 function SocialIcon({ d }: { d: string }) {
     return (
-        <a href="#" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+        <a
+            href="#"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 transition hover:bg-emerald-600 hover:text-white"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+            >
                 <path fill="currentColor" d={d} />
             </svg>
         </a>

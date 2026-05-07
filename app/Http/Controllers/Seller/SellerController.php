@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Seller; 
+namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;

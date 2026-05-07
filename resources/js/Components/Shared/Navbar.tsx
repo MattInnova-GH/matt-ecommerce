@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import UserMenu from './UserMenu';
 import { AuthModal } from './AuthModal';
+import SearchModal from './SearchModal';
 import CartDrawer from '@/Components/User/Cart';
 import { useCartStore } from '@/stores/cartStore';
 
@@ -19,13 +20,14 @@ export default function Navbar() {
     const auth = (props as any).auth as { user: AuthUser };
     const user = auth?.user ?? null;
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { openCart, totalItems } = useCartStore();
     const cartCount = totalItems();
 
     return (
         <>
-            <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
+            <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white backdrop-blur-sm">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between lg:h-20">
                         {/* Logo */}
@@ -60,14 +62,17 @@ export default function Navbar() {
 
                         {/* Acciones */}
                         <div className="flex items-center space-x-4 lg:space-x-6">
-                            <button className="hidden transition hover:opacity-60 sm:block dark:text-white">
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className="hidden transition hover:opacity-60 sm:block"
+                            >
                                 <Search size={20} />
                             </button>
 
                             {/* CART BUTTON */}
                             <button
                                 onClick={openCart}
-                                className="relative transition hover:opacity-60 dark:text-white"
+                                className="relative transition hover:opacity-60"
                             >
                                 <ShoppingCart size={20} />
 
@@ -86,9 +91,9 @@ export default function Navbar() {
 
                             <button
                                 onClick={() => setIsMobileMenuOpen(true)}
-                                className="rounded-lg p-2 transition hover:bg-gray-100 lg:hidden dark:hover:bg-zinc-900"
+                                className="rounded-lg p-2 transition hover:bg-gray-100 lg:hidden"
                             >
-                                <Menu size={22} className="dark:text-white" />
+                                <Menu size={22} />
                             </button>
                         </div>
                     </div>
@@ -101,6 +106,11 @@ export default function Navbar() {
             <AuthModal
                 isOpen={isLoginOpen}
                 onClose={() => setIsLoginOpen(false)}
+            />
+
+            <SearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
             />
 
             {isMobileMenuOpen && (
@@ -128,9 +138,7 @@ function NavLink({
         <Link
             href={href}
             className={`text-sm font-light tracking-tight transition ${
-                active
-                    ? 'text-black dark:text-white'
-                    : 'text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white'
+                active ? 'text-black' : 'text-gray-600 hover:text-black'
             }`}
         >
             {children}
@@ -170,8 +178,8 @@ function MobileDrawer({
                 onClick={onClose}
             />
 
-            <div className="fixed top-0 right-0 bottom-0 z-50 flex w-80 flex-col bg-white shadow-xl dark:bg-zinc-950">
-                <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-zinc-800">
+            <div className="fixed top-0 right-0 bottom-0 z-50 flex w-80 flex-col bg-white shadow-xl">
+                <div className="flex items-center justify-between border-b border-gray-100 p-4">
                     <img
                         src="/static/logo.webp"
                         alt="Logo"
@@ -180,9 +188,9 @@ function MobileDrawer({
 
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-zinc-900"
+                        className="rounded-lg p-2 hover:bg-gray-100"
                     >
-                        <X size={22} className="dark:text-white" />
+                        <X size={22} />
                     </button>
                 </div>
                 <div className="space-y-1 p-4">
@@ -193,8 +201,8 @@ function MobileDrawer({
                             onClick={onClose}
                             className={`block rounded-lg px-3 py-3 transition ${
                                 currentUrl === item.href
-                                    ? 'bg-gray-100 text-black dark:bg-zinc-800'
-                                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-zinc-900'
+                                    ? 'bg-gray-100 text-black'
+                                    : 'text-gray-600 hover:bg-gray-50'
                             }`}
                         >
                             {item.label}

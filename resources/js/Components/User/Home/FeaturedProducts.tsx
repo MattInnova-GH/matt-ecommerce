@@ -9,26 +9,32 @@ interface Product {
     imageUrl?: string;
 }
 
-export default function FeaturedProducts({ products = [] }: { products?: Product[] }) {
+export default function FeaturedProducts({
+    products = [],
+}: {
+    products?: Product[];
+}) {
     return (
-        <section className="py-12 sm:py-16 lg:py-20 bg-gray-50 dark:bg-zinc-900/50">
+        <section className="bg-gray-50 py-12 sm:py-16 lg:py-20">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center mb-8 sm:mb-12">
+                <div className="mb-8 flex items-center justify-between sm:mb-12">
                     <div>
-                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-light mb-2 dark:text-white">
+                        <h2 className="mb-2 text-2xl font-light sm:text-3xl lg:text-4xl">
                             Productos destacados
                         </h2>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Los más vendidos de esta semana</p>
+                        <p className="text-sm text-gray-600 sm:text-base">
+                            Los más vendidos de esta semana
+                        </p>
                     </div>
                     <Link
                         href="/productos"
-                        className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition flex items-center gap-1"
+                        className="flex items-center gap-1 text-sm font-medium text-gray-600 transition hover:text-black"
                     >
                         Ver todos <ArrowRight size={16} />
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-6 xl:grid-cols-6">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}

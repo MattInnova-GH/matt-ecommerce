@@ -14,7 +14,7 @@ class HomeController extends Controller
             ->withCount('products')
             ->take(6)
             ->get()
-            ->map(fn($category) => [
+            ->map(fn ($category) => [
                 'id' => $category->id,
                 'name' => $category->name,
                 'slug' => $category->slug,
@@ -27,7 +27,7 @@ class HomeController extends Controller
             ->latest()
             ->take(12)
             ->get()
-            ->map(fn($product) => [
+            ->map(fn ($product) => [
                 'id' => $product->id,
                 'name' => $product->name,
                 'price' => $product->price,

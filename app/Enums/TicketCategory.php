@@ -1,6 +1,5 @@
 <?php
 
-
 enum TicketCategory: string
 {
     case FEATURE_PRODUCT = 'FEATURE_PRODUCT';

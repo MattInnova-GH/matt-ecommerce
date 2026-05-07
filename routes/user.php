@@ -33,4 +33,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/configuracion/avatar', [ConfigurationController::class, 'updateAvatar'])
         ->name('configuration.avatar');
+
+    // ------------------ SEARCH BAR ------------------------------------------
+
 });

@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
-            $table->enum('status', ['PENDING','APPROVED','REJECTED'])->default('PENDING');
+            $table->enum('status', ['PENDING', 'APPROVED', 'REJECTED'])->default('PENDING');
 
             $table->string('business_name')->nullable();
             $table->string('business_type')->nullable();

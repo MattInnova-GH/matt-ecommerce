@@ -12,7 +12,7 @@ export function CartActions() {
     const isEmpty = items.length === 0;
 
     return (
-        <div className="flex flex-col gap-3 border-t border-gray-100 px-6 py-4 dark:border-gray-800">
+        <div className="flex flex-col gap-3 border-t border-gray-100 px-6 py-4">
             <button
                 onClick={handleCheckout}
                 disabled={isEmpty}
@@ -24,7 +24,7 @@ export function CartActions() {
             <button
                 onClick={clearCart}
                 disabled={isEmpty}
-                className="w-full rounded-xl py-2 text-sm text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-red-950"
+                className="w-full rounded-xl py-2 text-sm text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 Vaciar carrito
             </button>
