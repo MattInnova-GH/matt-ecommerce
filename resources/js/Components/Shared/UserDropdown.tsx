@@ -9,14 +9,15 @@ import {
 } from 'lucide-react';
 import { logout } from '@/routes';
 import { ConfirmModal } from '../Auth/logout/ConfirmModal';
-import favorites from '@/routes/favorites';
-import configuration from '@/routes/configuration';
+import favorites from '@/routes/client/favorites';
+import configuration from '@/routes/client/configuration';
+import { dashboard } from '@/routes/admin';
 
 type User = {
     name: string;
     last_name?: string;
     email: string;
-    role: 'USER' | 'SELLER' | 'ADMIN';
+    role: 'USER' | 'SELLER' | 'admin';
     image?: string;
 };
 
@@ -41,16 +42,9 @@ export default function UserDropdown({ user, onClose }: Props) {
 
     const roleLinks = {
         USER: [],
-        SELLER: [
+        admin: [
             {
-                href: '/seller',
-                label: 'Dashboard Vendedor',
-                icon: LayoutDashboard,
-            },
-        ],
-        ADMIN: [
-            {
-                href: '/admin',
+                href: dashboard(),
                 label: 'Dashboard Admin',
                 icon: LayoutDashboard,
             },
@@ -58,7 +52,7 @@ export default function UserDropdown({ user, onClose }: Props) {
     };
 
     const roleBadge = {
-        ADMIN: {
+        admin: {
             text: 'Administrador',
             className: 'bg-purple-100 text-purple-700',
         },
@@ -126,7 +120,7 @@ export default function UserDropdown({ user, onClose }: Props) {
                         <div className="px-4 py-2">
                             <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
                                 Panel de{' '}
-                                {user.role === 'ADMIN'
+                                {user.role === 'admin'
                                     ? 'Administrador'
                                     : 'Vendedor'}
                             </p>

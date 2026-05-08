@@ -40,7 +40,11 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user() ? [
-                    ...$request->user()->loadMissing('roles')->toArray(),
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->first_name . ' ' . $request->user()->last_name,
+                    'email' => $request->user()->email,
+                    'role' => ($role = $request->user()->roles->first()?->name) === 'client' ? 'user' : $role,
+                    'image' => $request->user()->avatar,
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

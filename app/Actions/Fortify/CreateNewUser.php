@@ -41,30 +41,19 @@ class CreateNewUser implements CreatesNewUsers
 
         return DB::transaction(function () use ($input) {
             $user = User::create([
-                'name' => $input['name'],
+                'first_name' => $input['name'],
                 'last_name' => $input['last_name'] ?? null,
                 'email' => $input['email'],
                 'phone' => $input['phone'],
                 'password' => $input['password'],
-                'document_type' => $input['document_type'] ?? null,
-                'document_number' => $input['document_number'] ?? null,
+                'dni' => $input['document_number'] ?? null,
             ]);
 
-            if ($input['registration_type'] === 'seller') {
+            if (isset($input['registration_type']) && $input['registration_type'] === 'seller') {
                 $user->assignRole('seller');
 
-                SellerRequest::create([
-                    'user_id' => $user->id,
-                    'status' => 'pending',
-                    'business_name' => $input['business_name'],
-                    'business_type' => $input['business_type'],
-                    'address' => $input['address'],
-                    'tax_id' => $input['document_number'],
-                    'phone' => $input['phone'],
-                    'experience' => $input['experience'],
-                ]);
             } else {
-                $user->assignRole('user');
+                $user->assignRole('client');
             }
 
             return $user;

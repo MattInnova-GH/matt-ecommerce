@@ -1,327 +1,346 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import { Loader2, Check, Shield, DollarSign, Truck } from 'lucide-react';
-import SellerRegisterForm from './SellerRegisterForm';
+import {
+    Loader2,
+    Eye,
+    EyeOff,
+    User,
+    Mail,
+    Lock,
+    Truck,
+    Shield,
+    Headphones,
+    Star,
+} from 'lucide-react';
 import register from '@/routes/register';
 
-// ============================================
-// COMPONENTE PRINCIPAL - REGISTER PAGE
-// ============================================
 export default function Register() {
-    return (
-        <>
-            <Head title="Registrarse | ZonaRetail" />
-            <main className="min-h-screen bg-white">
-                <div className="grid min-h-screen lg:grid-cols-2">
-                    {/* Columna izquierda - Formulario */}
-                    <div className="flex flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
-                        <div className="mx-auto w-full max-w-md">
-                            <div className="mb-8">
-                                <h1 className="text-2xl font-semibold text-gray-900">
-                                    Crear cuenta
-                                </h1>
-                                <p className="mt-1 text-sm text-gray-500">
-                                    ¿Ya tienes cuenta?{' '}
-                                    <a
-                                        href="/login"
-                                        className="font-medium text-gray-900 hover:underline"
-                                    >
-                                        Inicia sesión
-                                    </a>
-                                </p>
-                            </div>
-                            <RegisterTabs />
-                        </div>
-                    </div>
-
-                    {/* Columna derecha - Información */}
-                    <RightColumnInfo />
-                </div>
-            </main>
-        </>
-    );
-}
-
-// ============================================
-// REGISTER TABS COMPONENT
-// ============================================
-function RegisterTabs() {
-    const [tab, setTab] = useState<'client' | 'seller'>('client');
-
-    return (
-        <div>
-            {/* Tabs simples */}
-            <div className="mb-6 flex gap-6 border-b border-gray-200">
-                <button
-                    onClick={() => setTab('client')}
-                    className={`pb-3 text-sm font-medium transition-colors ${
-                        tab === 'client'
-                            ? 'border-b-2 border-gray-900 text-gray-900'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    Cliente
-                </button>
-                <button
-                    onClick={() => setTab('seller')}
-                    className={`pb-3 text-sm font-medium transition-colors ${
-                        tab === 'seller'
-                            ? 'border-b-2 border-gray-900 text-gray-900'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    Vendedor
-                </button>
-            </div>
-
-            {/* Banner vendedor */}
-            {tab === 'seller' && (
-                <div className="mb-5 border-l-2 border-gray-400 bg-gray-50 p-3 text-sm text-gray-600">
-                    Completa tus datos y los de tu negocio. Tu solicitud será
-                    revisada en 24-48 horas.
-                </div>
-            )}
-
-            {tab === 'client' ? <ClientRegisterForm /> : <SellerRegisterForm />}
-        </div>
-    );
-}
-
-// ============================================
-// CLIENT REGISTER FORM
-// ============================================
-function ClientRegisterForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     return (
-        <Form
-            action={register.store()}
-            resetOnError={['password', 'password_confirmation']}
-        >
-            {({ errors, processing }) => (
-                <>
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Nombre
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
-                            placeholder="Tu nombre"
-                        />
-                        {errors.name && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.name}
-                            </p>
-                        )}
-                    </div>
+        <>
+            <Head title="Registrarse | ZonaRetail" />
+            <main className="min-h-screen bg-white">
+                <div className="flex min-h-screen flex-col lg:flex-row">
+                    {/* Columna izquierda - Formulario */}
+                    <div className="flex flex-1 items-center justify-center px-4 py-12 lg:px-8">
+                        <div className="w-full max-w-md">
+                            {/* Card del formulario */}
+                            <div className="overflow-hidden rounded-2xl bg-white shadow-xl lg:shadow-none">
+                                <div className="p-8">
+                                    <div className="mb-8 text-center lg:text-left">
+                                        <h1 className="text-3xl font-bold text-gray-900">
+                                            Crear cuenta
+                                        </h1>
+                                        <p className="mt-2 text-gray-500">
+                                            Únete a ZonaRetail y comienza a
+                                            comprar
+                                        </p>
+                                    </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Apellido
-                        </label>
-                        <input
-                            type="text"
-                            name="last_name"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
-                            placeholder="Tu apellido"
-                        />
-                        {errors.last_name && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.last_name}
-                            </p>
-                        )}
-                    </div>
+                                    <Form
+                                        action={register.store()}
+                                        resetOnError={[
+                                            'password',
+                                            'password_confirmation',
+                                        ]}
+                                        className="space-y-5"
+                                    >
+                                        {({ errors, processing }) => (
+                                            <>
+                                                {/* Nombres */}
+                                                <div>
+                                                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                                                        Nombres
+                                                    </label>
+                                                    <div className="relative">
+                                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                            <User className="h-5 w-5 text-gray-400" />
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            name="name"
+                                                            className="w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 transition-all focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 focus:outline-none"
+                                                            placeholder="Juan Carlos"
+                                                            autoComplete="given-name"
+                                                        />
+                                                    </div>
+                                                    {errors.name && (
+                                                        <p className="mt-1 text-sm text-red-500">
+                                                            {errors.name}
+                                                        </p>
+                                                    )}
+                                                </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Correo electrónico
-                        </label>
-                        <input
-                            type="email"
-                            name="email"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
-                            placeholder="tu@email.com"
-                        />
-                        {errors.email && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.email}
-                            </p>
-                        )}
-                    </div>
+                                                {/* Apellidos */}
+                                                <div>
+                                                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                                                        Apellidos
+                                                    </label>
+                                                    <div className="relative">
+                                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                            <User className="h-5 w-5 text-gray-400" />
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            name="last_name"
+                                                            className="w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 transition-all focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 focus:outline-none"
+                                                            placeholder="Pérez González"
+                                                            autoComplete="family-name"
+                                                        />
+                                                    </div>
+                                                    {errors.last_name && (
+                                                        <p className="mt-1 text-sm text-red-500">
+                                                            {errors.last_name}
+                                                        </p>
+                                                    )}
+                                                </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Celular
-                        </label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
-                            placeholder="+51 987654321"
-                        />
-                        {errors.phone && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.phone}
-                            </p>
-                        )}
-                    </div>
+                                                {/* Correo electrónico */}
+                                                <div>
+                                                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                                                        Correo electrónico
+                                                    </label>
+                                                    <div className="relative">
+                                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                            <Mail className="h-5 w-5 text-gray-400" />
+                                                        </div>
+                                                        <input
+                                                            type="email"
+                                                            name="email"
+                                                            className="w-full rounded-lg border border-gray-300 py-2.5 pr-3 pl-10 transition-all focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 focus:outline-none"
+                                                            placeholder="tu@email.com"
+                                                            autoComplete="email"
+                                                        />
+                                                    </div>
+                                                    {errors.email && (
+                                                        <p className="mt-1 text-sm text-red-500">
+                                                            {errors.email}
+                                                        </p>
+                                                    )}
+                                                </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Contraseña
-                        </label>
-                        <div className="relative">
-                            <input
-                                type={showPassword ? 'text' : 'password'}
-                                name="password"
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
-                                placeholder="••••••••"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-400"
-                            >
-                                {showPassword ? 'Ocultar' : 'Mostrar'}
-                            </button>
-                        </div>
-                        {errors.password && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.password}
-                            </p>
-                        )}
-                    </div>
+                                                {/* Contraseña */}
+                                                <div>
+                                                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                                                        Contraseña
+                                                    </label>
+                                                    <div className="relative">
+                                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                            <Lock className="h-5 w-5 text-gray-400" />
+                                                        </div>
+                                                        <input
+                                                            type={
+                                                                showPassword
+                                                                    ? 'text'
+                                                                    : 'password'
+                                                            }
+                                                            name="password"
+                                                            className="w-full rounded-lg border border-gray-300 py-2.5 pr-12 pl-10 transition-all focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 focus:outline-none"
+                                                            placeholder="••••••••"
+                                                            autoComplete="new-password"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setShowPassword(
+                                                                    !showPassword,
+                                                                )
+                                                            }
+                                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 transition-colors hover:text-gray-600"
+                                                        >
+                                                            {showPassword ? (
+                                                                <EyeOff className="h-5 w-5" />
+                                                            ) : (
+                                                                <Eye className="h-5 w-5" />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                    {errors.password && (
+                                                        <p className="mt-1 text-sm text-red-500">
+                                                            {errors.password}
+                                                        </p>
+                                                    )}
+                                                </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Confirmar contraseña
-                        </label>
-                        <div className="relative">
-                            <input
-                                type={showConfirmPassword ? 'text' : 'password'}
-                                name="password_confirmation"
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none"
-                                placeholder="••••••••"
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setShowConfirmPassword(!showConfirmPassword)
-                                }
-                                className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-400"
-                            >
-                                {showConfirmPassword ? 'Ocultar' : 'Mostrar'}
-                            </button>
-                        </div>
-                        {errors.password_confirmation && (
-                            <p className="mt-1 text-xs text-red-500">
-                                {errors.password_confirmation}
-                            </p>
-                        )}
-                    </div>
+                                                {/* Confirmar contraseña */}
+                                                <div>
+                                                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                                                        Confirmar contraseña
+                                                    </label>
+                                                    <div className="relative">
+                                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                            <Lock className="h-5 w-5 text-gray-400" />
+                                                        </div>
+                                                        <input
+                                                            type={
+                                                                showConfirmPassword
+                                                                    ? 'text'
+                                                                    : 'password'
+                                                            }
+                                                            name="password_confirmation"
+                                                            className="w-full rounded-lg border border-gray-300 py-2.5 pr-12 pl-10 transition-all focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 focus:outline-none"
+                                                            placeholder="••••••••"
+                                                            autoComplete="new-password"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setShowConfirmPassword(
+                                                                    !showConfirmPassword,
+                                                                )
+                                                            }
+                                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 transition-colors hover:text-gray-600"
+                                                        >
+                                                            {showConfirmPassword ? (
+                                                                <EyeOff className="h-5 w-5" />
+                                                            ) : (
+                                                                <Eye className="h-5 w-5" />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                    {errors.password_confirmation && (
+                                                        <p className="mt-1 text-sm text-red-500">
+                                                            {
+                                                                errors.password_confirmation
+                                                            }
+                                                        </p>
+                                                    )}
+                                                </div>
 
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 py-2.5 font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
-                    >
-                        {processing && (
-                            <Loader2 className="animate-spin" size={18} />
-                        )}
-                        {processing ? 'Registrando...' : 'Crear cuenta'}
-                    </button>
-                </>
-            )}
-        </Form>
-    );
-}
-
-// ============================================
-// RIGHT COLUMN INFO COMPONENT
-// ============================================
-function RightColumnInfo() {
-    const benefits = [
-        {
-            icon: <Check size={16} />,
-            title: 'Llega a más clientes',
-            description:
-                'Miles de compradores visitan nuestra plataforma cada día',
-        },
-        {
-            icon: <DollarSign size={16} />,
-            title: 'Comisiones competitivas',
-            description:
-                'La comisión más baja del mercado, solo pagas por lo que vendes',
-        },
-        {
-            icon: <Shield size={16} />,
-            title: 'Pagos seguros',
-            description:
-                'Protegemos tu dinero y el de tus clientes en cada transacción',
-        },
-        {
-            icon: <Truck size={16} />,
-            title: 'Envíos integrados',
-            description: 'Gestión de envíos fácil y con las mejores tarifas',
-        },
-    ];
-
-    return (
-        <div className="hidden flex-col justify-center bg-gray-50 px-12 lg:flex xl:px-20">
-            <div className="mx-auto max-w-md">
-                <div className="mb-10">
-                    <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-900">
-                        <span className="text-xl font-bold text-white">T</span>
-                    </div>
-                    <h2 className="mb-3 text-2xl font-semibold text-gray-900">
-                        Vende en la tienda más grande de Latinoamérica
-                    </h2>
-                    <p className="leading-relaxed text-gray-500">
-                        Únete a miles de emprendedores que ya confían en
-                        nosotros para hacer crecer su negocio.
-                    </p>
-                </div>
-
-                <div className="space-y-6">
-                    {benefits.map((benefit, index) => (
-                        <div key={index} className="flex gap-4">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100">
-                                {benefit.icon}
+                                                {/* Botón de registro */}
+                                                <button
+                                                    type="submit"
+                                                    disabled={processing}
+                                                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    {processing && (
+                                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                                    )}
+                                                    {processing
+                                                        ? 'Creando cuenta...'
+                                                        : 'Registrarse'}
+                                                </button>
+                                            </>
+                                        )}
+                                    </Form>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-medium text-gray-900">
-                                    {benefit.title}
-                                </h3>
-                                <p className="text-sm text-gray-500">
-                                    {benefit.description}
+                        </div>
+                    </div>
+
+                    {/* Columna derecha - Información del ecommerce */}
+                    <div className="hidden lg:flex lg:flex-1 lg:bg-gradient-to-br lg:from-gray-900 lg:to-gray-800">
+                        <div className="flex flex-col justify-center px-12 py-12 text-white">
+                            {/* Testimonio o mensaje principal */}
+                            <div className="mb-12">
+                                <h2 className="mb-4 text-3xl font-bold">
+                                    Bienvenido a tu tienda de confianza
+                                </h2>
+                                <p className="text-lg text-gray-300">
+                                    Únete a miles de clientes satisfechos que ya
+                                    disfrutan de las mejores ofertas y productos
+                                    de calidad.
                                 </p>
                             </div>
-                        </div>
-                    ))}
-                </div>
 
-                <div className="mt-10 border-t border-gray-200 pt-8">
-                    <div className="flex items-center gap-4">
-                        <div className="flex -space-x-2">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div
-                                    key={i}
-                                    className="h-8 w-8 rounded-full border-2 border-white bg-gray-300"
-                                />
-                            ))}
+                            {/* Lista de beneficios */}
+                            <div className="space-y-6">
+                                <div className="flex items-start gap-4">
+                                    <div className="rounded-full bg-white/10 p-2">
+                                        <Truck className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold">
+                                            Envíos rápidos y seguros
+                                        </h3>
+                                        <p className="text-sm text-gray-300">
+                                            Recibe tus productos en la puerta de
+                                            tu casa
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-4">
+                                    <div className="rounded-full bg-white/10 p-2">
+                                        <Shield className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold">
+                                            Compra 100% segura
+                                        </h3>
+                                        <p className="text-sm text-gray-300">
+                                            Tus datos están protegidos con
+                                            nosotros
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-4">
+                                    <div className="rounded-full bg-white/10 p-2">
+                                        <Headphones className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold">
+                                            Soporte 24/7
+                                        </h3>
+                                        <p className="text-sm text-gray-300">
+                                            Estamos aquí para ayudarte cuando lo
+                                            necesites
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-4">
+                                    <div className="rounded-full bg-white/10 p-2">
+                                        <Star className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold">
+                                            Garantía de satisfacción
+                                        </h3>
+                                        <p className="text-sm text-gray-300">
+                                            Tu opinión es importante para
+                                            nosotros
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Estadísticas o badges */}
+                            <div className="mt-12 border-t border-white/10 pt-8">
+                                <div className="flex gap-8">
+                                    <div>
+                                        <div className="text-2xl font-bold">
+                                            +10,000
+                                        </div>
+                                        <div className="text-sm text-gray-300">
+                                            Clientes felices
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-2xl font-bold">
+                                            +500
+                                        </div>
+                                        <div className="text-sm text-gray-300">
+                                            Productos
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-2xl font-bold">
+                                            4.9
+                                        </div>
+                                        <div className="text-sm text-gray-300">
+                                            Calificación
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p className="text-sm text-gray-500">
-                            <span className="font-semibold text-gray-900">
-                                +10,000
-                            </span>{' '}
-                            vendedores activos
-                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
+            </main>
+        </>
     );
 }

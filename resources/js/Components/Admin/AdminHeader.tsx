@@ -14,7 +14,7 @@ interface AdminHeaderProps {
 }
 
 const roleLabels: Record<string, string> = {
-    ADMIN: 'Administrador',
+    admin: 'Administrador',
     SELLER: 'Vendedor',
     USER: 'Usuario',
 };
@@ -35,7 +35,11 @@ export function AdminHeader({ onOpenMobileSidebar, user }: AdminHeaderProps) {
 
     // Si el usuario no existe, devolvemos un placeholder o null
     if (!user) {
-        return <header className="bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 p-4">Cargando...</header>;
+        return (
+            <header className="border-b border-gray-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+                Cargando...
+            </header>
+        );
     }
 
     useEffect(() => {
@@ -49,22 +53,26 @@ export function AdminHeader({ onOpenMobileSidebar, user }: AdminHeaderProps) {
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(e.target as Node)
+            ) {
                 setOpen(false);
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () =>
+            document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     return (
-        <header className="bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-30">
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3">
+        <header className="sticky top-0 z-30 border-b border-gray-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="flex items-center justify-between px-4 py-3 sm:px-6">
                 <button
                     onClick={onOpenMobileSidebar}
-                    className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-lg transition-colors"
+                    className="rounded-lg p-2 transition-colors hover:bg-gray-100 lg:hidden dark:hover:bg-zinc-900"
                 >
-                    <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <Menu className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </button>
 
                 <div className="hidden lg:block"></div>
@@ -73,17 +81,19 @@ export function AdminHeader({ onOpenMobileSidebar, user }: AdminHeaderProps) {
                     <div className="relative" ref={dropdownRef}>
                         <button
                             onClick={() => setOpen((prev) => !prev)}
-                            className="relative p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-lg transition-colors"
+                            className="relative rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-zinc-900"
                         >
-                            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                            <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                         </button>
 
                         {open && (
-                            <div className={`
-                                absolute right-0 mt-2 w-80 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-gray-200 dark:border-zinc-800 overflow-hidden z-50
-                            `}>
-                                <div className="px-4 py-3 border-b border-gray-100 dark:border-zinc-800">
-                                    <span className="text-sm font-semibold">Notificaciones</span>
+                            <div
+                                className={`absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900`}
+                            >
+                                <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-800">
+                                    <span className="text-sm font-semibold">
+                                        Notificaciones
+                                    </span>
                                 </div>
                                 <div className="p-4 text-center text-sm text-gray-500">
                                     No hay notificaciones nuevas
@@ -93,19 +103,23 @@ export function AdminHeader({ onOpenMobileSidebar, user }: AdminHeaderProps) {
                     </div>
 
                     <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="text-right hidden sm:block">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{user.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{roleLabels[user.role ?? ''] ?? 'Usuario'}</p>
+                        <div className="hidden text-right sm:block">
+                            <p className="text-sm leading-tight font-semibold text-gray-900 dark:text-white">
+                                {user.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {roleLabels[user.role ?? ''] ?? 'Usuario'}
+                            </p>
                         </div>
                         {user.image ? (
                             <img
                                 src={user.image}
                                 alt={user.name}
-                                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover shadow-md"
+                                className="h-8 w-8 rounded-full object-cover shadow-md sm:h-9 sm:w-9"
                             />
                         ) : (
-                            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-md shrink-0">
-                                <span className="text-white text-xs sm:text-sm font-semibold">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md sm:h-9 sm:w-9">
+                                <span className="text-xs font-semibold text-white sm:text-sm">
                                     {getInitials(user.name)}
                                 </span>
                             </div>
@@ -114,13 +128,13 @@ export function AdminHeader({ onOpenMobileSidebar, user }: AdminHeaderProps) {
                 </div>
             </div>
 
-            <div className="lg:hidden px-4 pb-3">
-                <div className="flex items-center bg-gray-50 dark:bg-zinc-900 rounded-lg px-3 py-2 border border-transparent focus-within:border-emerald-300 transition-all">
-                    <Search className="w-4 h-4 text-gray-400 shrink-0" />
+            <div className="px-4 pb-3 lg:hidden">
+                <div className="flex items-center rounded-lg border border-transparent bg-gray-50 px-3 py-2 transition-all focus-within:border-emerald-300 dark:bg-zinc-900">
+                    <Search className="h-4 w-4 shrink-0 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Buscar..."
-                        className="bg-transparent border-none outline-none text-sm ml-2 w-full text-gray-700 dark:text-gray-300 placeholder-gray-400"
+                        className="ml-2 w-full border-none bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none dark:text-gray-300"
                     />
                 </div>
             </div>

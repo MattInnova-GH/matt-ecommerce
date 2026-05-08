@@ -11,7 +11,7 @@ interface NavItem {
 interface MobileSidebarProps {
     isOpen: boolean;
     onClose: () => void;
-    role: 'ADMIN' | 'SELLER';
+    role: 'admin' | 'SELLER';
 }
 
 export function MobileSidebar({ isOpen, onClose, role }: MobileSidebarProps) {
@@ -21,7 +21,7 @@ export function MobileSidebar({ isOpen, onClose, role }: MobileSidebarProps) {
 
     // Example nav items based on role (should ideally come from a config)
     const navItems: NavItem[] =
-        role === 'ADMIN'
+        role === 'admin'
             ? [
                   { name: 'Dashboard', path: '/admin', icon: Store },
                   { name: 'Usuarios', path: '/admin/usuarios', icon: Store },

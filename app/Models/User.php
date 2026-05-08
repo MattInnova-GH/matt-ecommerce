@@ -12,14 +12,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'document_type', 'document_number', 'phone',  'image', 'is_blocked', 'last_name'])]
+#[Fillable(['first_name', 'last_name', 'email', 'password',
+        'phone', 'dni', 'avatar', 'is_active'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
-    protected $appends = ['role'];
 
     /**
      * Get the attributes that should be cast.
@@ -37,43 +37,23 @@ class User extends Authenticatable
         ];
     }
 
-    public function getRoleAttribute(): string
-    {
-        return strtoupper($this->roles->first()?->name ?? 'USER');
+    public function addresses() {
+        return $this->hasMany(Address::class);
     }
 
-    public function products()
-    {
-        return $this->hasMany(Product::class, 'seller_id');
-    }
-
-    public function orders()
-    {
+    public function orders() {
         return $this->hasMany(Order::class);
     }
 
-    public function cart()
-    {
-        return $this->hasOne(Cart::class);
-    }
-
-    public function reviews()
-    {
+    public function reviews() {
         return $this->hasMany(Review::class);
     }
 
-    public function tickets()
-    {
-        return $this->hasMany(SupportTicket::class);
+    public function cart() {
+        return $this->hasOne(Cart::class);
     }
 
-    public function sellerProfile()
-    {
-        return $this->hasOne(SellerProfile::class);
-    }
-
-    public function sellerRequests()
-    {
-        return $this->hasMany(SellerRequest::class);
+    public function sessions() {
+        return $this->hasMany(Session::class);
     }
 }

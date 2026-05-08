@@ -191,7 +191,7 @@ export default function UserSettingClient({
                         Perfil
                     </button>
 
-                    {initialConfig.role !== 'ADMIN' && (
+                    {initialConfig.role !== 'admin' && (
                         <button
                             onClick={() => setActiveTab('seller')}
                             className={`rounded-xl px-4 py-2 ${

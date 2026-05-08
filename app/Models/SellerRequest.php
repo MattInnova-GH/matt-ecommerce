@@ -8,20 +8,13 @@ class SellerRequest extends Model
 {
     protected $fillable = [
         'user_id',
-        'status',
         'business_name',
         'business_type',
         'address',
-        'message',
-        'tax_id_type',
-        'tax_id_number',
+        'tax_id',
         'phone',
         'experience',
-        'documents',
-    ];
-
-    protected $casts = [
-        'documents' => 'array',
+        'status',
     ];
 
     public function user()

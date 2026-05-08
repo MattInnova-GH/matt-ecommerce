@@ -11,7 +11,7 @@ type AuthUser = {
     name: string;
     last_name?: string;
     email: string;
-    role: 'USER' | 'SELLER' | 'ADMIN';
+    role: 'USER' | 'SELLER' | 'admin';
     image?: string;
 } | null;
 
@@ -53,10 +53,10 @@ export default function Navbar() {
                             </NavLink>
 
                             <NavLink
-                                href="/tiendas"
-                                active={url.startsWith('/tiendas')}
+                                href="/categorias"
+                                active={url.startsWith('/categorias')}
                             >
-                                TIENDAS
+                                CATEGORIAS
                             </NavLink>
                         </div>
 

@@ -1,7 +1,14 @@
 import { ShoppingBag } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
-export default function HeroSection() {
+type Banner = {
+    id: number;
+    title: string;
+    imageUrl: string;
+    link?: string;
+};
+
+export default function HeroSection({ banners }: { banners: Banner[] }) {
     return (
         <section className="relative min-h-[70vh] w-full overflow-hidden md:min-h-[85vh]">
             {/* Imagen de fondo */}
@@ -11,7 +18,7 @@ export default function HeroSection() {
                     alt="Moda sostenible y tecnología"
                     className="h-full w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-r from-black/50 via-black/30 to-transparent" />
             </div>
 
             {/* Contenido */}

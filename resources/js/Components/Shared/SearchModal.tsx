@@ -4,10 +4,6 @@ import { Search, Loader2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import {
-    index,
-    search as searchQuery,
-} from '@/actions/App/Http/Controllers/SearchController';
 
 interface Product {
     id: number;
@@ -43,7 +39,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     // Fetch initial data (popular products and categories)
     useEffect(() => {
         if (isOpen && isInitialLoading) {
-            get(index.url(), {
+            get('', {
                 onSuccess: (page: any) => {
                     setProducts(page.products || []);
                     setCategories(page.categories || []);
@@ -61,11 +57,15 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 return;
             }
 
-            get(searchQuery.url({ q: searchTerm }), {
-                onSuccess: (page: any) => {
-                    setResults(page.products || []);
+            get(
+                '',
+                { q: searchTerm },
+                {
+                    onSuccess: (page: any) => {
+                        setResults(page.products || []);
+                    },
                 },
-            });
+            );
         },
         [get],
     );

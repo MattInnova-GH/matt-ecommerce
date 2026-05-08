@@ -6,22 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'total',
-    ];
+    protected $fillable = ['user_id'];
 
-    protected $casts = [
-        'total' => 'decimal:2',
-    ];
-
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class);
     }
 
-    public function items()
-    {
+    public function items() {
         return $this->hasMany(CartItem::class);
     }
 }

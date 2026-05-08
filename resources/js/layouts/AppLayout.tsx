@@ -1,4 +1,5 @@
 import { AuthModal } from '@/Components/Shared/AuthModal';
+import Footer from '@/Components/Shared/Footer';
 import Navbar from '@/Components/Shared/Navbar';
 
 import { useState } from 'react';
@@ -13,6 +14,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <>
             <Navbar />
             <main>{children}</main>
+            <Footer />
             <AuthModal
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}

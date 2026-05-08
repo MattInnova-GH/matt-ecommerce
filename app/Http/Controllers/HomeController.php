@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -12,31 +13,30 @@ class HomeController extends Controller
     {
         $categories = Category::where('is_active', true)
             ->withCount('products')
-            ->take(6)
             ->get()
-            ->map(fn ($category) => [
-                'id' => $category->id,
-                'name' => $category->name,
-                'slug' => $category->slug,
-                'imageUrl' => $category->image_url,
-                'productCount' => $category->products_count,
+            ->map(fn($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'slug' => $c->slug,
+                'imageUrl' => $c->image,
+                'productCount' => $c->products_count,
             ]);
 
         $products = Product::where('is_active', true)
-            ->where('is_approved', true)
+            ->where('is_featured', true)
             ->latest()
-            ->take(12)
+            ->take(8)
             ->get()
-            ->map(fn ($product) => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'imageUrl' => $product->image_url,
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'price' => (float) $p->price,
+                'imageUrl' => $p->thumbnail,
             ]);
 
-        return Inertia::render('User/Home', [
-            'categories' => $categories,
+        return Inertia::render('Client/Home', [
             'products' => $products,
+            'categories' => $categories,
         ]);
     }
 }

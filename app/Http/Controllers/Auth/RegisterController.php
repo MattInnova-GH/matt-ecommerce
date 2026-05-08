@@ -23,14 +23,14 @@ class RegisterController extends Controller
         ]);
 
         $user = User::create([
-            'name' => $validated['name'],
+            'first_name' => $validated['name'],
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
         ]);
 
-        $user->assignRole('user'); // ← Spatie
+        $user->assignRole('client'); 
 
         event(new Registered($user));
         Auth::login($user);

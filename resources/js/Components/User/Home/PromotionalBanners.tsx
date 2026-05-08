@@ -4,14 +4,14 @@ import { ArrowRight } from 'lucide-react';
 export default function PromotionalBanners() {
     const banners = [
         {
-            img: '/img/inicio/nitendo.jpg',
+            img: '/static/nitendo.jpg',
             title: 'Tecnología',
-            href: '/productos/tecnologia',
+            href: '/productos?category=tecnologia',
         },
         {
-            img: '/img/inicio/juegoMueble.jpg',
+            img: '/static/juegoMueble.jpg',
             title: 'Hogar',
-            href: '/productos/hogar',
+            href: '/productos?category=hogar',
         },
     ];
 

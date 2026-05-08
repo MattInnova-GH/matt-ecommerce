@@ -4,11 +4,12 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import AdminLayout from '@/layouts/AdminLayout';
 import SellerLayout from '@/layouts/SellerLayout';
 import 'leaflet/dist/leaflet.css';
+import AppLayout from './layouts/AppLayout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) => (title ? `${title}` : appName),
     layout: (name) => {
         // User Pages
         if (name.startsWith('User/')) {
