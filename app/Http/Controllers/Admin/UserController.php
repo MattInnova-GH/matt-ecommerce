@@ -16,33 +16,32 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        
         $roles = Role::all();
-        
+
         return Inertia::render('Admin/Users/Users', [
             'users' => $users,
-            'roles' => $roles
+            'roles' => $roles,
         ]);
     }
 
     public function changeRole(Request $request, User $user)
     {
         $request->validate([
-            'role' => 'required|string|exists:roles,name'
+            'role' => 'required|string|exists:roles,name',
         ]);
 
         // Remover todos los roles actuales y asignar el nuevo
         $user->syncRoles([$request->role]);
-        
+
         return redirect()->back();
     }
 
     public function toggleBlock(User $user)
     {
         $user->update([
-            'is_blocked' => !$user->is_blocked
+            'is_active' => ! $user->is_active,
         ]);
-        
+
         return redirect()->back();
     }
 
@@ -53,10 +52,10 @@ class UserController extends Controller
         $user->reviews()->delete();
         $user->cart()->delete();
         $user->sessions()->delete();
-        
+
         // Eliminar usuario
         $user->delete();
-        
+
         return redirect()->back();
     }
 }

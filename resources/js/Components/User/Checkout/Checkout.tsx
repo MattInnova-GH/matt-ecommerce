@@ -5,9 +5,10 @@ import { ShoppingBag } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 
 import { ProductList } from './components/ProductList';
-import { DeliveryMethod } from './components/DeliveryMethod';
 import { PaymentMethod } from './components/PaymentMethod';
 import { OrderSummary } from './components/OrderSummary';
+import Voucher from './components/Voucher';
+import { DeliveryMethod } from './components/DeliveryMethod';
 
 export function Checkout() {
     const { items } = useCartStore();
@@ -42,9 +43,11 @@ export function Checkout() {
                     <DeliveryMethod />
 
                     <PaymentMethod />
+
+                    <Voucher />
                 </div>
 
-                <div className="w-full flex-shrink-0 lg:w-[380px]">
+                <div className="w-full shrink-0 lg:w-95">
                     <div className="sticky top-24">
                         <OrderSummary />
                     </div>

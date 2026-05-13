@@ -15,6 +15,7 @@ export interface PublicProduct {
     colors?: string[];
     sizes?: string[];
     variants?: ProductVariant[];
+    is_favorited?: boolean;
 }
 
 export interface Category {

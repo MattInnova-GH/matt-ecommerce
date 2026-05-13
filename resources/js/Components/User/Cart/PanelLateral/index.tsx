@@ -13,7 +13,7 @@ export default function Panel({ isOpen }: PanelProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Carrito de compras"
-            className={`fixed top-0 right-0 z-50 flex h-full w-[420px] max-w-full transform flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+            className={`fixed top-0 right-0 z-50 flex h-full w-105 max-w-full transform flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
                 isOpen ? 'translate-x-0' : 'translate-x-full'
             }`}
         >

@@ -1,5 +1,4 @@
 import { ShoppingBag } from 'lucide-react';
-import { Link } from '@inertiajs/react';
 
 interface Product {
     id: number;

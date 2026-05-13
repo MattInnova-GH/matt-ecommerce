@@ -12,7 +12,21 @@ class FavoriteController extends Controller
     {
         $user = auth()->user();
 
-        return Inertia::render('User/Favorites/UserFavoriteClient', []);
+        $favorites = $user->favorites()
+            ->with(['category'])
+            ->get()
+            ->map(fn ($product) => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => $product->price,
+                'category' => $product->category->name ?? 'N/A',
+                'imageUrl' => $product->thumbnail ? (str_starts_with($product->thumbnail, 'http') ? $product->thumbnail : '/storage/'.$product->thumbnail) : null,
+            ]);
+
+        return Inertia::render('Client/UserFavoriteClient', [
+            'favorites' => $favorites,
+        ]);
     }
 
     // TOGGLE FAVORITO (agregar / quitar)

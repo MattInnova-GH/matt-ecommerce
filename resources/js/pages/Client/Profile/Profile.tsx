@@ -1,0 +1,118 @@
+import { useState, useEffect } from 'react';
+import { router, usePage } from '@inertiajs/react';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+    Section,
+    SettingsProps,
+} from '@/Components/User/Configuration/types/settings';
+import { SettingsSidebar } from '@/Components/User/Configuration/SettingsSidebar';
+import { ProfileSection } from '@/Components/User/Configuration/ProfileSection';
+import { PasswordSection } from '@/Components/User/Configuration/PasswordSection';
+import { AddressesSection } from '@/Components/User/Configuration/AddressesSection';
+import { OrderSection } from '@/Components/User/Configuration/OrderSection';
+import { FavoritesSection } from '@/Components/User/Configuration/FavoritesSection';
+
+export default function SettingsPage({
+    user,
+    addresses,
+    orders,
+    favorites,
+    flash,
+}: SettingsProps) {
+    const { url } = usePage();
+    // Get section from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSection = (urlParams.get('section') as Section) || 'profile';
+    
+    const [activeSection, setActiveSection] = useState<Section>(
+        ['profile', 'password', 'addresses', 'orders', 'favorites'].includes(
+            initialSection,
+        )
+            ? initialSection
+            : 'profile',
+    );
+
+    // Update section when URL changes (e.g. clicking "Mis Compras" from header while on profile)
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const section = params.get('section') as Section;
+        if (
+            section &&
+            ['profile', 'password', 'addresses', 'orders', 'favorites'].includes(
+                section,
+            )
+        ) {
+            setActiveSection(section);
+        }
+    }, [url]);
+
+    const handleLogout = () => {
+        router.post('/logout');
+    };
+
+    const sectionLabels: Record<Section, string> = {
+        profile: 'Mi Perfil',
+        password: 'Configuración',
+        addresses: 'Direcciones',
+        orders: 'Mis Pedidos',
+        favorites: 'Favoritos',
+    };
+
+    return (
+        <div className="min-h-screen bg-background">
+            <div className="container mx-auto px-4 py-8 lg:px-8">
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Mi Cuenta
+                    </h1>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        Gestiona tu información personal y preferencias
+                    </p>
+                </div>
+
+                <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+                    <SettingsSidebar
+                        user={user}
+                        activeSection={activeSection}
+                        onSectionChange={setActiveSection}
+                        onLogout={handleLogout}
+                    />
+
+                    <main className="min-w-0 flex-1">
+                        <p className="mb-4 text-xs text-muted-foreground lg:hidden">
+                            Mi Cuenta &rsaquo;{' '}
+                            <span className="font-medium text-foreground">
+                                {sectionLabels[activeSection]}
+                            </span>
+                        </p>
+                        <Card>
+                            <CardContent className="p-6 sm:p-8">
+                                {activeSection === 'profile' && (
+                                    <ProfileSection
+                                        user={user}
+                                        flash={flash?.success}
+                                    />
+                                )}
+                                {activeSection === 'password' && (
+                                    <PasswordSection flash={flash?.success} />
+                                )}
+                                {activeSection === 'addresses' && (
+                                    <AddressesSection
+                                        addresses={addresses}
+                                        flash={flash?.success}
+                                    />
+                                )}
+                                {activeSection === 'orders' && (
+                                    <OrderSection orders={orders} />
+                                )}
+                                {activeSection === 'favorites' && (
+                                    <FavoritesSection favorites={favorites} />
+                                )}
+                            </CardContent>
+                        </Card>
+                    </main>
+                </div>
+            </div>
+        </div>
+    );
+}

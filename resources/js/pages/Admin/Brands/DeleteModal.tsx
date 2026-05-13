@@ -3,7 +3,6 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -42,29 +41,30 @@ export default function DeleteModal({ brand, onClose }: Props) {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogCancel onClick={onClose}>
+                        Cancelar
+                    </AlertDialogCancel>
+
                     <Form
                         action={admin.brands.destroy(brand.id)}
-                        method="DELETE"
+                        onSuccess={onClose}
                         className="inline"
                     >
                         {({ processing }) => (
-                            <AlertDialogAction asChild>
-                                <Button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="bg-red-600 hover:bg-red-700"
-                                >
-                                    {processing ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Eliminando...
-                                        </>
-                                    ) : (
-                                        'Eliminar'
-                                    )}
-                                </Button>
-                            </AlertDialogAction>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="bg-red-600 hover:bg-red-700"
+                            >
+                                {processing ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Eliminando...
+                                    </>
+                                ) : (
+                                    'Eliminar'
+                                )}
+                            </Button>
                         )}
                     </Form>
                 </AlertDialogFooter>

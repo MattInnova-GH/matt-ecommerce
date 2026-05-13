@@ -6,7 +6,7 @@ type User = {
     name: string;
     last_name?: string;
     email: string;
-    role: 'USER' | 'SELLER' | 'admin';
+    role: 'client' | 'admin';
     image?: string;
 };
 

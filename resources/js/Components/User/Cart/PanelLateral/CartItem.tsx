@@ -23,9 +23,7 @@ export function CartItem({ item }: CartItemProps) {
 
                 <p className="mt-0.5 text-xs text-gray-400">{item.category}</p>
 
-                <p className="mt-1 text-sm font-semibold">
-                    ${item.price.toFixed(2)}
-                </p>
+                <p className="mt-1 text-sm font-semibold">${item.price}</p>
             </div>
 
             <div className="flex flex-col items-end gap-2">

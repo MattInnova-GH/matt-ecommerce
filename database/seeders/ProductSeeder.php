@@ -19,12 +19,11 @@ class ProductSeeder extends Seeder
 
         foreach ($categories as $category) {
             for ($i = 1; $i <= 3; $i++) {
-                $name = $category->name . " Product " . $i;
+                $name = $category->name.' Product '.$i;
                 Product::create([
                     'name' => $name,
                     'slug' => Str::slug($name),
-                    'description' => 'Descripción del producto ' . $name,
-                    'sku' => 'SKU-' . strtoupper(Str::random(6)),
+                    'description' => 'Descripción del producto '.$name,
                     'price' => rand(10, 500),
                     'stock' => rand(10, 100),
                     'thumbnail' => $category->image, // Use the same image for simplicity

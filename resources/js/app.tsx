@@ -2,7 +2,6 @@ import { createInertiaApp } from '@inertiajs/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import AdminLayout from '@/layouts/AdminLayout';
-import SellerLayout from '@/layouts/SellerLayout';
 import 'leaflet/dist/leaflet.css';
 import AppLayout from './layouts/AppLayout';
 
@@ -21,11 +20,6 @@ createInertiaApp({
         // Admin Pages
         if (name.startsWith('Admin/')) {
             return AdminLayout;
-        }
-
-        // Seller Pages
-        if (name.startsWith('Seller/')) {
-            return SellerLayout;
         }
 
         switch (true) {

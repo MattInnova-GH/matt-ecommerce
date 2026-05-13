@@ -35,7 +35,7 @@ export function StoreSelector() {
                 Selecciona una tienda
             </p>
 
-            <div className="max-h-[320px] space-y-2 overflow-y-auto pr-1">
+            <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
                 {stores.map((store) => {
                     const isSelected = selectedStore?.id === store.id;
                     const name = store.sellerLastName
@@ -61,7 +61,7 @@ export function StoreSelector() {
                             } `}
                         >
                             {/* Avatar */}
-                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100">
                                 {store.image ? (
                                     <img
                                         src={store.image}
@@ -94,7 +94,7 @@ export function StoreSelector() {
 
                             {/* Check */}
                             {isSelected && (
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gray-900">
+                                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-900">
                                     <Check size={12} className="text-white" />
                                 </div>
                             )}

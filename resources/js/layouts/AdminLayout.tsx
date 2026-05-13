@@ -3,14 +3,9 @@ import { Link, usePage, router } from '@inertiajs/react';
 import {
     LayoutDashboard,
     Package,
-    Truck,
     ShoppingCart,
-    CreditCard,
-    Users,
     Star,
     Image,
-    Bell,
-    FileText,
     Settings,
     LogOut,
     Menu,
@@ -18,8 +13,69 @@ import {
     ChevronDown,
     ShoppingBag,
     User,
+    PanelLeftClose,
+    PanelLeftOpen,
 } from 'lucide-react';
 import admin from '@/routes/admin';
+
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+
+import { cn } from '@/lib/utils';
+
+// -- Tipos --
+interface NavSubItem {
+    name: string;
+    href: string;
+}
+interface NavItem {
+    name: string;
+    href: string;
+    icon: React.ElementType;
+    badge?: number;
+    subitems?: NavSubItem[];
+}
+
+// -- Componente de ítem de nav colapsado (solo ícono con tooltip) --
+function CollapsedNavItem({
+    item,
+    isActive,
+}: {
+    item: NavItem;
+    isActive: boolean;
+}) {
+    return (
+        <TooltipProvider delayDuration={100}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Link
+                        href={item.href}
+                        className={cn(
+                            'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
+                            isActive
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                        )}
+                    >
+                        <item.icon size={18} />
+                        {item.badge ? (
+                            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
+                        ) : null}
+                    </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="text-xs font-medium">
+                    {item.name}
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    );
+}
 
 export default function AdminLayout({
     children,
@@ -29,12 +85,8 @@ export default function AdminLayout({
     const { url } = usePage();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [expandedMenus, setExpandedMenus] = useState<string[]>([
-        'products',
-        'orders',
-    ]);
+    const [expandedMenus, setExpandedMenus] = useState<string[]>(['productos']);
 
-    // Detectar tamaño de pantalla
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 1024) {
@@ -45,6 +97,7 @@ export default function AdminLayout({
         };
         handleResize();
         window.addEventListener('resize', handleResize);
+
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
@@ -68,12 +121,11 @@ export default function AdminLayout({
         return false;
     };
 
-    const navItems = [
+    const navItems: NavItem[] = [
         {
             name: 'Dashboard',
             href: admin.dashboard(),
             icon: LayoutDashboard,
-            exact: true,
         },
         {
             name: 'Productos',
@@ -87,30 +139,9 @@ export default function AdminLayout({
             ],
         },
         {
-            name: 'Proveedores',
-            href: '/admin/proveedores',
-            icon: Truck,
-        },
-        {
             name: 'Órdenes',
-            href: '/admin/ordenes',
+            href: admin.orders.index(),
             icon: ShoppingCart,
-            subitems: [
-                { name: 'Todas las órdenes', href: '/admin/ordenes' },
-                { name: 'Pendientes', href: '/admin/ordenes?status=pending' },
-                { name: 'Enviadas', href: '/admin/ordenes?status=shipped' },
-                { name: 'Entregadas', href: '/admin/ordenes?status=delivered' },
-            ],
-        },
-        {
-            name: 'Pagos',
-            href: '/admin/pagos',
-            icon: CreditCard,
-        },
-        {
-            name: 'Clientes',
-            href: '/admin/clientes',
-            icon: Users,
         },
         {
             name: 'Usuarios',
@@ -119,7 +150,7 @@ export default function AdminLayout({
         },
         {
             name: 'Reseñas',
-            href: '/admin/resenas',
+            href: admin.reviews.index(),
             icon: Star,
         },
         {
@@ -128,295 +159,264 @@ export default function AdminLayout({
             icon: Image,
         },
         {
-            name: 'Notificaciones',
-            href: '/admin/notificaciones',
-            icon: Bell,
-        },
-        {
-            name: 'Reportes',
-            href: '/admin/reportes',
-            icon: FileText,
-            subitems: [
-                { name: 'Ventas', href: '/admin/reportes/ventas' },
-                { name: 'Productos', href: '/admin/reportes/productos' },
-                { name: 'Clientes', href: '/admin/reportes/clientes' },
-                { name: 'Exportar', href: '/admin/reportes/exportar' },
-            ],
-        },
-        {
             name: 'Configuración',
             href: admin.settings.index(),
             icon: Settings,
         },
     ];
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Sidebar Desktop */}
-            <aside
-                className={`fixed top-0 left-0 z-40 h-screen bg-white shadow-xl transition-all duration-300 ${
-                    isSidebarOpen ? 'w-64' : 'w-20'
-                } hidden lg:block`}
+    // -- Sidebar Content (reutilizado en desktop y mobile) --
+    const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
+        <div className="flex h-full flex-col">
+            {/* Logo / Header */}
+            <div
+                className={cn(
+                    'flex h-16 items-center border-b px-4',
+                    isSidebarOpen || mobile
+                        ? 'justify-between'
+                        : 'justify-center',
+                )}
             >
-                {/* Logo */}
-                <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-                    {isSidebarOpen ? (
-                        <Link href="/admin" className="flex items-center gap-2">
-                            <ShoppingBag className="h-6 w-6 text-gray-900" />
-                            <span className="text-lg font-bold text-gray-900">
-                                Panel de control
-                            </span>
-                        </Link>
-                    ) : (
-                        <Link href="/admin" className="mx-auto">
-                            <ShoppingBag className="h-6 w-6 text-gray-900" />
-                        </Link>
-                    )}
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="rounded-lg p-1 hover:bg-gray-100"
+                {(isSidebarOpen || mobile) && (
+                    <Link
+                        href="/admin"
+                        className="flex min-w-0 items-center gap-2.5"
                     >
-                        <Menu size={18} />
-                    </button>
-                </div>
-
-                {/* Navigation */}
-                <nav className="h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4">
-                    {navItems.map((item) => (
-                        <div key={item.name}>
-                            {item.subitems ? (
-                                <>
-                                    <button
-                                        onClick={() =>
-                                            toggleMenu(item.name.toLowerCase())
-                                        }
-                                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                                            isActive(item.href)
-                                                ? 'bg-gray-100 text-gray-900'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                        }`}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <item.icon size={18} />
-                                            {isSidebarOpen && (
-                                                <span>{item.name}</span>
-                                            )}
-                                        </div>
-                                        {isSidebarOpen && (
-                                            <ChevronDown
-                                                size={16}
-                                                className={`transition-transform ${
-                                                    expandedMenus.includes(
-                                                        item.name.toLowerCase(),
-                                                    )
-                                                        ? 'rotate-180'
-                                                        : ''
-                                                }`}
-                                            />
-                                        )}
-                                    </button>
-                                    {isSidebarOpen &&
-                                        expandedMenus.includes(
-                                            item.name.toLowerCase(),
-                                        ) && (
-                                            <div className="mt-1 ml-9 space-y-1">
-                                                {item.subitems.map(
-                                                    (subitem) => (
-                                                        <Link
-                                                            key={subitem.name}
-                                                            href={subitem.href}
-                                                            className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
-                                                                isActive(
-                                                                    subitem.href,
-                                                                )
-                                                                    ? 'bg-gray-100 text-gray-900'
-                                                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                                                            }`}
-                                                        >
-                                                            {subitem.name}
-                                                        </Link>
-                                                    ),
-                                                )}
-                                            </div>
-                                        )}
-                                </>
-                            ) : (
-                                <Link
-                                    href={item.href}
-                                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                                        isActive(item.href)
-                                            ? 'bg-gray-100 text-gray-900'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                    }`}
-                                >
-                                    <item.icon size={18} />
-                                    {isSidebarOpen && <span>{item.name}</span>}
-                                </Link>
-                            )}
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
+                            <ShoppingBag className="h-4 w-4 text-primary-foreground" />
                         </div>
-                    ))}
-
-                    {/* Cerrar sesión */}
-                    <div className="mt-4 border-t border-gray-200 pt-4">
-                        <button
-                            onClick={() => router.post('/logout')}
-                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50"
-                        >
-                            <LogOut size={18} />
-                            {isSidebarOpen && <span>Cerrar sesión</span>}
-                        </button>
-                    </div>
-                </nav>
-            </aside>
-
-            {/* Header Mobile */}
-            <div className="sticky top-0 z-30 bg-white shadow-sm lg:hidden">
-                <div className="flex h-16 items-center justify-between px-4">
-                    <button
-                        onClick={() => setIsMobileMenuOpen(true)}
-                        className="rounded-lg p-2 hover:bg-gray-100"
-                    >
-                        <Menu size={22} />
-                    </button>
-                    <Link href="/admin" className="flex items-center gap-2">
-                        <ShoppingBag className="h-6 w-6 text-gray-900" />
-                        <span className="text-lg font-bold text-gray-900">
-                            Admin
-                        </span>
+                        <div className="min-w-0">
+                            <p className="truncate text-sm leading-tight font-semibold text-foreground">
+                                Panel de control
+                            </p>
+                            <p className="truncate text-[10px] text-muted-foreground"></p>
+                        </div>
                     </Link>
-                    <div className="w-8"></div>
-                </div>
+                )}
+
+                {!mobile && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    >
+                        {isSidebarOpen ? (
+                            <PanelLeftClose size={16} />
+                        ) : (
+                            <PanelLeftOpen size={16} />
+                        )}
+                    </Button>
+                )}
+
+                {mobile && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                        <X size={18} />
+                    </Button>
+                )}
             </div>
 
-            {/* Mobile Drawer */}
+            {/* Nav */}
+            <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+                {navItems.map((item) => {
+                    const active = isActive(item.href);
+                    const expanded = expandedMenus.includes(
+                        item.name.toLowerCase(),
+                    );
+
+                    if (!isSidebarOpen && !mobile) {
+                        return (
+                            <div
+                                key={item.name}
+                                className="mb-0.5 flex justify-center"
+                            >
+                                <CollapsedNavItem
+                                    item={item}
+                                    isActive={active}
+                                />
+                            </div>
+                        );
+                    }
+
+                    if (item.subitems) {
+                        return (
+                            <div key={item.name}>
+                                <button
+                                    onClick={() =>
+                                        toggleMenu(item.name.toLowerCase())
+                                    }
+                                    className={cn(
+                                        'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                        active
+                                            ? 'bg-accent text-accent-foreground'
+                                            : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+                                    )}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <item.icon size={16} />
+                                        <span>{item.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        {item.badge && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="h-4 px-1.5 text-[10px]"
+                                            >
+                                                {item.badge}
+                                            </Badge>
+                                        )}
+                                        <ChevronDown
+                                            size={14}
+                                            className={cn(
+                                                'text-muted-foreground transition-transform duration-200',
+                                                expanded && 'rotate-180',
+                                            )}
+                                        />
+                                    </div>
+                                </button>
+
+                                {expanded && (
+                                    <div className="mt-0.5 ml-5 space-y-0.5 border-l py-1 pl-3">
+                                        {item.subitems.map((subitem) => (
+                                            <Link
+                                                key={subitem.name}
+                                                href={subitem.href}
+                                                onClick={() =>
+                                                    mobile &&
+                                                    setIsMobileMenuOpen(false)
+                                                }
+                                                className={cn(
+                                                    'block rounded-md px-3 py-1.5 text-sm transition-colors',
+                                                    isActive(subitem.href)
+                                                        ? 'bg-primary/10 font-medium text-primary'
+                                                        : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+                                                )}
+                                            >
+                                                {subitem.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <Link
+                            key={item.name}
+                            href={item.href}
+                            onClick={() => mobile && setIsMobileMenuOpen(false)}
+                            className={cn(
+                                'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                active
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+                            )}
+                        >
+                            <div className="flex items-center gap-3">
+                                <item.icon size={16} />
+                                <span>{item.name}</span>
+                            </div>
+                            {item.badge && (
+                                <Badge
+                                    variant={active ? 'outline' : 'secondary'}
+                                    className={cn(
+                                        'h-4 px-1.5 text-[10px]',
+                                        active &&
+                                            'border-primary-foreground/50 text-primary-foreground',
+                                    )}
+                                >
+                                    {item.badge}
+                                </Badge>
+                            )}
+                        </Link>
+                    );
+                })}
+            </nav>
+
+            {/* Footer: User + Logout */}
+            <div className="border-t p-3">
+                <Button
+                    className="flex w-full"
+                    variant={'destructive'}
+                    onClick={() => router.post('/logout')}
+                >
+                    <LogOut className="mr-1 h-4 w-4" />
+                    Cerrar sesión
+                </Button>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="min-h-screen bg-background">
+            {/* ── Sidebar Desktop ── */}
+            <aside
+                className={cn(
+                    'fixed top-0 left-0 z-40 hidden h-screen border-r bg-card transition-all duration-300 lg:block',
+                    isSidebarOpen ? 'w-60' : 'w-[60px]',
+                )}
+            >
+                <SidebarContent />
+            </aside>
+
+            {/* ── Mobile Overlay ── */}
             {isMobileMenuOpen && (
                 <>
                     <div
-                        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm lg:hidden"
+                        className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden"
                         onClick={() => setIsMobileMenuOpen(false)}
                     />
-                    <div className="fixed top-0 left-0 z-50 h-full w-80 bg-white shadow-xl lg:hidden">
-                        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-                            <Link
-                                href="/admin"
-                                className="flex items-center gap-2"
-                            >
-                                <ShoppingBag className="h-6 w-6 text-gray-900" />
-                                <span className="text-lg font-bold text-gray-900">
-                                    ZonaRetail Admin
-                                </span>
-                            </Link>
-                            <button
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="rounded-lg p-1 hover:bg-gray-100"
-                            >
-                                <X size={22} />
-                            </button>
-                        </div>
-                        <nav className="h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4">
-                            {navItems.map((item) => (
-                                <div key={item.name}>
-                                    {item.subitems ? (
-                                        <>
-                                            <button
-                                                onClick={() =>
-                                                    toggleMenu(
-                                                        item.name.toLowerCase(),
-                                                    )
-                                                }
-                                                className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                                                    isActive(item.href)
-                                                        ? 'bg-gray-100 text-gray-900'
-                                                        : 'text-gray-600 hover:bg-gray-50'
-                                                }`}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <item.icon size={18} />
-                                                    <span>{item.name}</span>
-                                                </div>
-                                                <ChevronDown
-                                                    size={16}
-                                                    className={`transition-transform ${
-                                                        expandedMenus.includes(
-                                                            item.name.toLowerCase(),
-                                                        )
-                                                            ? 'rotate-180'
-                                                            : ''
-                                                    }`}
-                                                />
-                                            </button>
-                                            {expandedMenus.includes(
-                                                item.name.toLowerCase(),
-                                            ) && (
-                                                <div className="mt-1 ml-9 space-y-1">
-                                                    {item.subitems.map(
-                                                        (subitem) => (
-                                                            <Link
-                                                                key={
-                                                                    subitem.name
-                                                                }
-                                                                href={
-                                                                    subitem.href
-                                                                }
-                                                                onClick={() =>
-                                                                    setIsMobileMenuOpen(
-                                                                        false,
-                                                                    )
-                                                                }
-                                                                className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
-                                                                    isActive(
-                                                                        subitem.href,
-                                                                    )
-                                                                        ? 'bg-gray-100 text-gray-900'
-                                                                        : 'text-gray-500 hover:bg-gray-50'
-                                                                }`}
-                                                            >
-                                                                {subitem.name}
-                                                            </Link>
-                                                        ),
-                                                    )}
-                                                </div>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <Link
-                                            href={item.href}
-                                            onClick={() =>
-                                                setIsMobileMenuOpen(false)
-                                            }
-                                            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
-                                                isActive(item.href)
-                                                    ? 'bg-gray-100 text-gray-900'
-                                                    : 'text-gray-600 hover:bg-gray-50'
-                                            }`}
-                                        >
-                                            <item.icon size={18} />
-                                            <span>{item.name}</span>
-                                        </Link>
-                                    )}
-                                </div>
-                            ))}
-                            <div className="mt-4 border-t border-gray-200 pt-4">
-                                <button
-                                    onClick={() => router.post('/logout')}
-                                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50"
-                                >
-                                    <LogOut size={18} />
-                                    <span>Cerrar sesión</span>
-                                </button>
-                            </div>
-                        </nav>
-                    </div>
+                    <aside className="fixed top-0 left-0 z-50 h-full w-72 border-r bg-card shadow-xl lg:hidden">
+                        <SidebarContent mobile />
+                    </aside>
                 </>
             )}
 
-            {/* Main Content */}
-            <main
-                className={`min-h-screen transition-all duration-300 ${
-                    isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20'
-                }`}
+            {/* ── Topbar ── */}
+            <header
+                className={cn(
+                    'sticky top-0 z-30 flex h-16 items-center border-b bg-card/95 backdrop-blur transition-all duration-300',
+                    isSidebarOpen ? 'lg:ml-60' : 'lg:ml-15',
+                )}
             >
-                <div className="p-4 lg:p-8">{children}</div>
+                <div className="flex w-full items-center justify-between gap-4 px-4">
+                    {/* Left: mobile burger */}
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 lg:hidden"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                        >
+                            <Menu size={18} />
+                        </Button>
+
+                        {/* Breadcrumb / title placeholder */}
+                        <div className="hidden items-center gap-1.5 text-sm text-muted-foreground lg:flex">
+                            <ShoppingBag size={14} />
+                            <span>/</span>
+                            <span className="font-medium text-foreground capitalize">
+                                {url.split('/')[2] ?? 'dashboard'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* ── Main Content ── */}
+            <main
+                className={cn(
+                    'min-h-[calc(100vh-3.5rem)] transition-all duration-300',
+                    isSidebarOpen ? 'lg:ml-60' : 'lg:ml-[60px]',
+                )}
+            >
+                <div className="p-4 lg:p-6">{children}</div>
             </main>
         </div>
     );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm, router } from '@inertiajs/react';
+import { useForm, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,20 +28,32 @@ import {
     Trash2,
     Upload,
     Save,
-    Eye,
     Package,
-    Image as ImageIcon,
+    ImageIcon,
     Tags,
     Info,
     ArrowLeft,
+    X,
+    AlertCircle,
 } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import admin from '@/routes/admin';
 
 interface VariantField {
     id: string;
-    type: string;
+    name: string;
     value: string;
-    price_adjustment: number;
+    stock: number;
+}
+
+interface ProductImage {
+    id: number;
+    image_url: string;
+}
+
+interface ProductVariant {
+    id: number;
+    name: string;
+    value: string;
     stock: number;
 }
 
@@ -49,7 +61,6 @@ interface Product {
     id: number;
     name: string;
     slug: string;
-    sku: string;
     description: string | null;
     price: number;
     stock: number;
@@ -57,12 +68,10 @@ interface Product {
     brand_id: number | null;
     supplier_id: number | null;
     thumbnail: string | null;
-    gallery: string[] | null;
     is_active: boolean;
     is_featured: boolean;
-    meta_title: string | null;
-    meta_description: string | null;
-    variants?: any[];
+    images?: ProductImage[];
+    variants?: ProductVariant[];
 }
 
 interface Category {
@@ -80,33 +89,31 @@ interface Supplier {
     name: string;
 }
 
-export default function EditProduct({
-    product,
-    categories,
-    brands,
-    suppliers,
-}: {
+interface EditProductProps {
     product: Product;
     categories: Category[];
     brands: Brand[];
     suppliers: Supplier[];
-}) {
+}
+
+export default function EditProduct({
+    product,
+    categories,
+    brands,
+}: EditProductProps) {
     const [activeTab, setActiveTab] = useState('basic');
     const [variants, setVariants] = useState<VariantField[]>([]);
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
         product.thumbnail ? `/storage/${product.thumbnail}` : null,
     );
-    const [galleryPreviews, setGalleryPreviews] = useState<string[]>(
-        product.gallery ? product.gallery.map((img) => `/storage/${img}`) : [],
-    );
-    const [existingGallery, setExistingGallery] = useState<string[]>(
-        product.gallery || [],
+    const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+    const [existingImages, setExistingImages] = useState<ProductImage[]>(
+        product.images || [],
     );
 
     const { data, setData, put, processing, errors } = useForm({
         name: product.name || '',
         description: product.description || '',
-        sku: product.sku || '',
         price: product.price?.toString() || '',
         stock: product.stock?.toString() || '',
         category_id: product.category_id?.toString() || '',
@@ -116,38 +123,36 @@ export default function EditProduct({
         gallery: [] as File[],
         is_active: product.is_active ?? true,
         is_featured: product.is_featured ?? false,
-        variants: [] as any[],
-        meta_title: product.meta_title || '',
-        meta_description: product.meta_description || '',
-        deleted_gallery: [] as string[],
+        variants: [] as VariantField[],
+        deleted_images: [] as number[],
     });
 
-    // Inicializar variantes desde el producto
     useEffect(() => {
         if (product.variants && product.variants.length > 0) {
             setVariants(
-                product.variants.map((variant, index) => ({
-                    id: variant.id?.toString() || index.toString(),
-                    type: variant.type || '',
-                    value: variant.value || '',
-                    price_adjustment: variant.price_adjustment || 0,
-                    stock: variant.stock || 0,
+                product.variants.map((v) => ({
+                    id: v.id.toString(),
+                    name: v.name,
+                    value: v.value,
+                    stock: v.stock,
                 })),
             );
         } else {
-            setVariants([
-                { id: '1', type: '', value: '', price_adjustment: 0, stock: 0 },
-            ]);
+            setVariants([{ id: '1', name: '', value: '', stock: 0 }]);
         }
     }, [product]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const validVariants = variants.filter((v) => v.type && v.value);
+        const validVariants = variants.filter(
+            (v) => v.name.trim() !== '' && v.value.trim() !== '',
+        );
         setData('variants', validVariants);
-        put(`/admin/products/${product.id}`, {
+
+        put(admin.products.update(product.id), {
+            preserveScroll: true,
             onSuccess: () => {
-                router.visit('/admin/products');
+                // Opcional: mostrar notificación de éxito
             },
         });
     };
@@ -157,9 +162,8 @@ export default function EditProduct({
             ...variants,
             {
                 id: Date.now().toString(),
-                type: '',
+                name: '',
                 value: '',
-                price_adjustment: 0,
                 stock: 0,
             },
         ]);
@@ -171,7 +175,11 @@ export default function EditProduct({
         }
     };
 
-    const updateVariant = (id: string, field: string, value: any) => {
+    const updateVariant = (
+        id: string,
+        field: keyof VariantField,
+        value: any,
+    ) => {
         setVariants(
             variants.map((v) => (v.id === id ? { ...v, [field]: value } : v)),
         );
@@ -187,6 +195,11 @@ export default function EditProduct({
                 setThumbnailPreview(reader.result as string);
             reader.readAsDataURL(file);
         }
+    };
+
+    const removeThumbnail = () => {
+        setThumbnailPreview(null);
+        setData('thumbnail', null);
     };
 
     const handleGallery = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,154 +218,148 @@ export default function EditProduct({
         });
     };
 
-    const removeGalleryImage = (
-        index: number,
-        isExisting: boolean = false,
-        imagePath?: string,
-    ) => {
-        if (isExisting && imagePath) {
-            setData('deleted_gallery', [...data.deleted_gallery, imagePath]);
-            setExistingGallery(existingGallery.filter((_, i) => i !== index));
-        } else {
-            const newIndex = index - existingGallery.length;
-
-            if (newIndex >= 0) {
-                setGalleryPreviews(
-                    galleryPreviews.filter((_, i) => i !== index),
-                );
-                const newGallery = [...data.gallery];
-                newGallery.splice(newIndex, 1);
-                setData('gallery', newGallery);
-            }
-        }
+    const removeExistingImage = (id: number) => {
+        setData('deleted_images', [...data.deleted_images, id]);
+        setExistingImages(existingImages.filter((img) => img.id !== id));
     };
 
+    const removeNewGalleryImage = (index: number) => {
+        setGalleryPreviews(galleryPreviews.filter((_, i) => i !== index));
+        const newGallery = [...data.gallery];
+        newGallery.splice(index, 1);
+        setData('gallery', newGallery);
+    };
+
+    const totalStock =
+        parseInt(data.stock || '0') +
+        variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+
     return (
-        <div className="min-h-screen bg-background">
-            <div className="container mx-auto space-y-6 p-4 md:p-6">
+        <div className="min-h-screen bg-muted/30">
+            <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6 lg:p-8">
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link href="/admin/products">
+                    <div className="flex items-center gap-3">
+                        <Link href={admin.products.index()}>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="shrink-0"
+                                className="h-9 w-9"
                             >
                                 <ArrowLeft className="h-5 w-5" />
                             </Button>
                         </Link>
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                                Editar producto
+                        <div className="space-y-0.5">
+                            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+                                Editar Producto
                             </h1>
                             <p className="text-sm text-muted-foreground">
-                                Modifica los campos que deseas actualizar
+                                Actualizando:{' '}
+                                <span className="font-medium text-foreground">
+                                    {product.name}
+                                </span>
                             </p>
                         </div>
                     </div>
                     <div className="flex gap-2">
+                        <Link href={admin.products.index()}>
+                            <Button variant="outline" size="default">
+                                Cancelar
+                            </Button>
+                        </Link>
                         <Button
-                            variant="outline"
-                            onClick={() => router.visit('/admin/products')}
+                            onClick={handleSubmit}
+                            disabled={processing}
+                            className="gap-2 shadow-sm"
                         >
-                            Cancelar
-                        </Button>
-                        <Button onClick={handleSubmit} disabled={processing}>
-                            <Save className="mr-2 h-4 w-4" />
+                            <Save className="h-4 w-4" />
                             {processing
                                 ? 'Actualizando...'
-                                : 'Actualizar producto'}
+                                : 'Actualizar Producto'}
                         </Button>
                     </div>
                 </div>
 
-                {/* Formulario principal */}
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-6 lg:grid-cols-3">
                         {/* Columna principal */}
                         <div className="space-y-6 lg:col-span-2">
-                            <Card>
-                                <CardContent className="p-4 md:p-6">
-                                    <Tabs
-                                        value={activeTab}
-                                        onValueChange={setActiveTab}
-                                        className="space-y-6"
-                                    >
-                                        <TabsList className="grid w-full grid-cols-3">
-                                            <TabsTrigger
-                                                value="basic"
-                                                className="gap-2"
-                                            >
-                                                <Package className="h-4 w-4" />
-                                                <span className="hidden sm:inline">
-                                                    Información
-                                                </span>
-                                                <span className="sm:hidden">
-                                                    Info
-                                                </span>
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                                value="images"
-                                                className="gap-2"
-                                            >
-                                                <ImageIcon className="h-4 w-4" />
-                                                <span className="hidden sm:inline">
-                                                    Imágenes
-                                                </span>
-                                                <span className="sm:hidden">
-                                                    Fotos
-                                                </span>
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                                value="variants"
-                                                className="gap-2"
-                                            >
-                                                <Tags className="h-4 w-4" />
-                                                <span className="hidden sm:inline">
-                                                    Variantes
-                                                </span>
-                                                <span className="sm:hidden">
-                                                    Var.
-                                                </span>
-                                            </TabsTrigger>
-                                        </TabsList>
+                            <Card className="overflow-hidden border shadow-sm">
+                                <Tabs
+                                    value={activeTab}
+                                    onValueChange={setActiveTab}
+                                    className="w-full"
+                                >
+                                    <TabsList className="h-auto w-full justify-start rounded-none border-b bg-transparent p-0">
+                                        <TabsTrigger
+                                            value="basic"
+                                            className="gap-2 rounded-none border-b-2 border-transparent px-4 py-3 text-sm data-[state=active]:border-foreground data-[state=active]:bg-transparent"
+                                        >
+                                            <Package className="h-4 w-4" />
+                                            Información
+                                        </TabsTrigger>
+                                        <TabsTrigger
+                                            value="images"
+                                            className="gap-2 rounded-none border-b-2 border-transparent px-4 py-3 text-sm data-[state=active]:border-foreground data-[state=active]:bg-transparent"
+                                        >
+                                            <ImageIcon className="h-4 w-4" />
+                                            Imágenes
+                                        </TabsTrigger>
+                                        <TabsTrigger
+                                            value="variants"
+                                            className="gap-2 rounded-none border-b-2 border-transparent px-4 py-3 text-sm data-[state=active]:border-foreground data-[state=active]:bg-transparent"
+                                        >
+                                            <Tags className="h-4 w-4" />
+                                            Variantes
+                                        </TabsTrigger>
+                                    </TabsList>
 
-                                        {/* Información básica */}
+                                    <CardContent className="p-6">
+                                        {/* Información Básica */}
                                         <TabsContent
                                             value="basic"
-                                            className="space-y-6"
+                                            className="mt-0 space-y-6"
                                         >
                                             <div className="space-y-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="name">
+                                                    <Label
+                                                        htmlFor="name"
+                                                        className="text-sm font-medium"
+                                                    >
                                                         Nombre del producto{' '}
-                                                        <span className="text-red-500">
+                                                        <span className="text-destructive">
                                                             *
                                                         </span>
                                                     </Label>
                                                     <Input
                                                         id="name"
                                                         value={data.name}
-                                                        onChange={(e) => {
+                                                        onChange={(e) =>
                                                             setData(
                                                                 'name',
                                                                 e.target.value,
-                                                            );
-                                                        }}
-                                                        placeholder="Ej: Camiseta de algodón"
-                                                        className="w-full"
-                                                        required
+                                                            )
+                                                        }
+                                                        placeholder="Ej: Camiseta de algodón premium"
+                                                        className={
+                                                            errors.name
+                                                                ? 'border-destructive'
+                                                                : ''
+                                                        }
                                                     />
                                                     {errors.name && (
-                                                        <p className="text-sm text-red-500">
+                                                        <p className="flex items-center gap-1 text-xs text-destructive">
+                                                            <AlertCircle className="h-3 w-3" />
                                                             {errors.name}
                                                         </p>
                                                     )}
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="description">
+                                                    <Label
+                                                        htmlFor="description"
+                                                        className="text-sm font-medium"
+                                                    >
                                                         Descripción
                                                     </Label>
                                                     <Textarea
@@ -364,40 +371,29 @@ export default function EditProduct({
                                                                 e.target.value,
                                                             )
                                                         }
-                                                        rows={5}
-                                                        placeholder="Describe tu producto en detalle..."
+                                                        rows={6}
+                                                        placeholder="Describe las características principales del producto..."
                                                         className="resize-none"
                                                     />
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Una buena descripción
+                                                        ayuda a los clientes a
+                                                        entender mejor tu
+                                                        producto.
+                                                    </p>
                                                 </div>
                                             </div>
 
                                             <Separator />
 
-                                            <div className="grid gap-4 md:grid-cols-3">
+                                            <div className="grid gap-4 sm:grid-cols-2">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="sku">
-                                                        SKU{' '}
-                                                        <span className="text-red-500">
-                                                            *
-                                                        </span>
-                                                    </Label>
-                                                    <Input
-                                                        id="sku"
-                                                        value={data.sku}
-                                                        onChange={(e) =>
-                                                            setData(
-                                                                'sku',
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                        placeholder="SKU-001"
-                                                        required
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="price">
+                                                    <Label
+                                                        htmlFor="price"
+                                                        className="text-sm font-medium"
+                                                    >
                                                         Precio{' '}
-                                                        <span className="text-red-500">
+                                                        <span className="text-destructive">
                                                             *
                                                         </span>
                                                     </Label>
@@ -417,16 +413,23 @@ export default function EditProduct({
                                                                         .value,
                                                                 )
                                                             }
-                                                            className="pl-7"
+                                                            className={`pl-7 ${errors.price ? 'border-destructive' : ''}`}
                                                             placeholder="0.00"
-                                                            required
                                                         />
                                                     </div>
+                                                    {errors.price && (
+                                                        <p className="text-xs text-destructive">
+                                                            {errors.price}
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="stock">
-                                                        Stock{' '}
-                                                        <span className="text-red-500">
+                                                    <Label
+                                                        htmlFor="stock"
+                                                        className="text-sm font-medium"
+                                                    >
+                                                        Stock base{' '}
+                                                        <span className="text-destructive">
                                                             *
                                                         </span>
                                                     </Label>
@@ -440,29 +443,47 @@ export default function EditProduct({
                                                                 e.target.value,
                                                             )
                                                         }
+                                                        className={
+                                                            errors.stock
+                                                                ? 'border-destructive'
+                                                                : ''
+                                                        }
                                                         placeholder="0"
-                                                        required
                                                     />
+                                                    {errors.stock && (
+                                                        <p className="text-xs text-destructive">
+                                                            {errors.stock}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
 
                                             <Separator />
 
-                                            <div className="grid gap-4 md:grid-cols-3">
+                                            <div className="grid gap-4 sm:grid-cols-2">
                                                 <div className="space-y-2">
-                                                    <Label>Categoría</Label>
+                                                    <Label className="text-sm font-medium">
+                                                        Categoría{' '}
+                                                        <span className="text-destructive">
+                                                            *
+                                                        </span>
+                                                    </Label>
                                                     <Select
                                                         value={data.category_id}
-                                                        onValueChange={(
-                                                            value,
-                                                        ) =>
+                                                        onValueChange={(val) =>
                                                             setData(
                                                                 'category_id',
-                                                                value,
+                                                                val,
                                                             )
                                                         }
                                                     >
-                                                        <SelectTrigger>
+                                                        <SelectTrigger
+                                                            className={
+                                                                errors.category_id
+                                                                    ? 'border-destructive'
+                                                                    : ''
+                                                            }
+                                                        >
                                                             <SelectValue placeholder="Seleccionar categoría" />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -482,17 +503,22 @@ export default function EditProduct({
                                                             )}
                                                         </SelectContent>
                                                     </Select>
+                                                    {errors.category_id && (
+                                                        <p className="text-xs text-destructive">
+                                                            {errors.category_id}
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>Marca</Label>
+                                                    <Label className="text-sm font-medium">
+                                                        Marca
+                                                    </Label>
                                                     <Select
                                                         value={data.brand_id}
-                                                        onValueChange={(
-                                                            value,
-                                                        ) =>
+                                                        onValueChange={(val) =>
                                                             setData(
                                                                 'brand_id',
-                                                                value,
+                                                                val,
                                                             )
                                                         }
                                                     >
@@ -517,146 +543,108 @@ export default function EditProduct({
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <Label>Proveedor</Label>
-                                                    <Select
-                                                        value={data.supplier_id}
-                                                        onValueChange={(
-                                                            value,
-                                                        ) =>
-                                                            setData(
-                                                                'supplier_id',
-                                                                value,
-                                                            )
-                                                        }
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Seleccionar proveedor" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {suppliers.map(
-                                                                (supplier) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            supplier.id
-                                                                        }
-                                                                        value={supplier.id.toString()}
-                                                                    >
-                                                                        {
-                                                                            supplier.name
-                                                                        }
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            </div>
-
-                                            <Separator />
-
-                                            <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-                                                <div className="flex items-center space-x-2">
-                                                    <Switch
-                                                        id="is_active"
-                                                        checked={data.is_active}
-                                                        onCheckedChange={(
-                                                            checked,
-                                                        ) =>
-                                                            setData(
-                                                                'is_active',
-                                                                checked,
-                                                            )
-                                                        }
-                                                    />
-                                                    <Label htmlFor="is_active">
-                                                        Producto activo
-                                                    </Label>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <Switch
-                                                        id="is_featured"
-                                                        checked={
-                                                            data.is_featured
-                                                        }
-                                                        onCheckedChange={(
-                                                            checked,
-                                                        ) =>
-                                                            setData(
-                                                                'is_featured',
-                                                                checked,
-                                                            )
-                                                        }
-                                                    />
-                                                    <Label htmlFor="is_featured">
-                                                        Producto destacado
-                                                    </Label>
-                                                </div>
                                             </div>
                                         </TabsContent>
 
                                         {/* Imágenes */}
                                         <TabsContent
                                             value="images"
-                                            className="space-y-6"
+                                            className="mt-0 space-y-6"
                                         >
-                                            <div className="space-y-3">
-                                                <Label>
-                                                    Imagen principal (Thumbnail)
-                                                </Label>
-                                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        asChild
-                                                    >
-                                                        <label className="cursor-pointer">
-                                                            <Upload className="mr-2 h-4 w-4" />
-                                                            {thumbnailPreview
-                                                                ? 'Cambiar imagen'
-                                                                : 'Subir imagen'}
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                className="hidden"
-                                                                onChange={
-                                                                    handleThumbnail
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <Label className="text-sm font-medium">
+                                                        Imagen principal
+                                                    </Label>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Esta imagen se mostrará
+                                                        como portada del
+                                                        producto
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-start gap-4">
+                                                    {thumbnailPreview ? (
+                                                        <div className="group relative">
+                                                            <div className="h-32 w-32 overflow-hidden rounded-lg border bg-muted/50">
+                                                                <img
+                                                                    src={
+                                                                        thumbnailPreview
+                                                                    }
+                                                                    alt="Thumbnail preview"
+                                                                    className="h-full w-full object-cover"
+                                                                />
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                variant="destructive"
+                                                                size="icon"
+                                                                className="absolute -top-2 -right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                                                                onClick={
+                                                                    removeThumbnail
                                                                 }
-                                                            />
-                                                        </label>
-                                                    </Button>
-                                                    {thumbnailPreview && (
-                                                        <div className="relative">
-                                                            <img
-                                                                src={
-                                                                    thumbnailPreview
-                                                                }
-                                                                alt="Preview"
-                                                                className="h-20 w-20 rounded-lg border object-cover"
-                                                            />
+                                                            >
+                                                                <X className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex h-32 w-32 items-center justify-center rounded-lg border-2 border-dashed bg-muted/50">
+                                                            <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
                                                         </div>
                                                     )}
+                                                    <div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            asChild
+                                                            size="sm"
+                                                        >
+                                                            <label className="cursor-pointer gap-2">
+                                                                <Upload className="h-4 w-4" />
+                                                                {thumbnailPreview
+                                                                    ? 'Cambiar imagen'
+                                                                    : 'Subir imagen'}
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    className="hidden"
+                                                                    onChange={
+                                                                        handleThumbnail
+                                                                    }
+                                                                />
+                                                            </label>
+                                                        </Button>
+                                                        <p className="mt-2 text-xs text-muted-foreground">
+                                                            Recomendado:
+                                                            500x500px, JPG, PNG
+                                                            o WebP
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Recomendado: imagen cuadrada
-                                                    de al menos 500x500px
-                                                </p>
                                             </div>
 
                                             <Separator />
 
-                                            <div className="space-y-3">
-                                                <Label>
-                                                    Galería de imágenes
-                                                </Label>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <Label className="text-sm font-medium">
+                                                        Galería de imágenes
+                                                    </Label>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Imágenes adicionales
+                                                        para mostrar el producto
+                                                        desde diferentes ángulos
+                                                    </p>
+                                                </div>
+
                                                 <Button
                                                     type="button"
                                                     variant="outline"
                                                     asChild
+                                                    size="sm"
                                                 >
-                                                    <label className="cursor-pointer">
-                                                        <Upload className="mr-2 h-4 w-4" />
-                                                        Subir más imágenes
+                                                    <label className="cursor-pointer gap-2">
+                                                        <Upload className="h-4 w-4" />
+                                                        Agregar imágenes
                                                         <input
                                                             type="file"
                                                             accept="image/*"
@@ -669,176 +657,219 @@ export default function EditProduct({
                                                     </label>
                                                 </Button>
 
-                                                {(existingGallery.length > 0 ||
+                                                {(existingImages.length > 0 ||
                                                     galleryPreviews.length >
                                                         0) && (
-                                                    <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                                                        {/* Imágenes existentes */}
-                                                        {existingGallery.map(
-                                                            (image, index) => (
+                                                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                                                        {existingImages.map(
+                                                            (img) => (
                                                                 <div
-                                                                    key={`existing-${index}`}
-                                                                    className="group relative"
+                                                                    key={img.id}
+                                                                    className="group relative aspect-square overflow-hidden rounded-lg border bg-muted/50"
                                                                 >
                                                                     <img
-                                                                        src={`/storage/${image}`}
-                                                                        alt={`Gallery ${index}`}
-                                                                        className="h-24 w-full rounded-lg border object-cover"
+                                                                        src={`/storage/${img.image_url}`}
+                                                                        alt="Gallery"
+                                                                        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                                                                     />
-                                                                    <Button
-                                                                        type="button"
-                                                                        variant="destructive"
-                                                                        size="icon"
-                                                                        className="absolute -top-2 -right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                                                                        onClick={() =>
-                                                                            removeGalleryImage(
-                                                                                index,
-                                                                                true,
-                                                                                image,
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <Trash2 className="h-3 w-3" />
-                                                                    </Button>
-                                                                </div>
-                                                            ),
-                                                        )}
-
-                                                        {/* Imágenes nuevas */}
-                                                        {galleryPreviews.map(
-                                                            (
-                                                                preview,
-                                                                index,
-                                                            ) => {
-                                                                const globalIndex =
-                                                                    existingGallery.length +
-                                                                    index;
-
-                                                                return (
-                                                                    <div
-                                                                        key={`new-${index}`}
-                                                                        className="group relative"
-                                                                    >
-                                                                        <img
-                                                                            src={
-                                                                                preview
-                                                                            }
-                                                                            alt={`New Gallery ${index}`}
-                                                                            className="h-24 w-full rounded-lg border object-cover"
-                                                                        />
+                                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                                                                         <Button
                                                                             type="button"
                                                                             variant="destructive"
                                                                             size="icon"
-                                                                            className="absolute -top-2 -right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                                                                            className="h-7 w-7"
                                                                             onClick={() =>
-                                                                                removeGalleryImage(
-                                                                                    globalIndex,
-                                                                                    false,
+                                                                                removeExistingImage(
+                                                                                    img.id,
                                                                                 )
                                                                             }
                                                                         >
                                                                             <Trash2 className="h-3 w-3" />
                                                                         </Button>
                                                                     </div>
-                                                                );
-                                                            },
+                                                                    <Badge
+                                                                        variant="secondary"
+                                                                        className="absolute top-2 left-2 text-[10px]"
+                                                                    >
+                                                                        Actual
+                                                                    </Badge>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                        {galleryPreviews.map(
+                                                            (
+                                                                preview,
+                                                                index,
+                                                            ) => (
+                                                                <div
+                                                                    key={`new-${index}`}
+                                                                    className="group relative aspect-square overflow-hidden rounded-lg border bg-muted/50"
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            preview
+                                                                        }
+                                                                        alt="New gallery"
+                                                                        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                                                                    />
+                                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="destructive"
+                                                                            size="icon"
+                                                                            className="h-7 w-7"
+                                                                            onClick={() =>
+                                                                                removeNewGalleryImage(
+                                                                                    index,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <Trash2 className="h-3 w-3" />
+                                                                        </Button>
+                                                                    </div>
+                                                                    <Badge className="absolute top-2 left-2 bg-primary/80 text-[10px]">
+                                                                        Nueva
+                                                                    </Badge>
+                                                                </div>
+                                                            ),
                                                         )}
                                                     </div>
                                                 )}
+
+                                                {existingImages.length === 0 &&
+                                                    galleryPreviews.length ===
+                                                        0 && (
+                                                        <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed bg-muted/30">
+                                                            <p className="text-sm text-muted-foreground">
+                                                                No hay imágenes
+                                                                en la galería
+                                                            </p>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </TabsContent>
 
                                         {/* Variantes */}
                                         <TabsContent
                                             value="variants"
-                                            className="space-y-4"
+                                            className="mt-0 space-y-6"
                                         >
-                                            <Alert>
-                                                <Info className="h-4 w-4" />
-                                                <AlertDescription>
-                                                    Las variantes permiten
+                                            <Alert className="border-muted bg-muted/30">
+                                                <Info className="h-4 w-4 text-muted-foreground" />
+                                                <AlertDescription className="text-xs text-muted-foreground">
+                                                    Las variantes te permiten
                                                     ofrecer diferentes opciones
-                                                    como tallas, colores, etc.
+                                                    como tallas, colores o
+                                                    materiales. El stock de las
+                                                    variantes se suma
+                                                    automáticamente al stock
+                                                    total.
                                                 </AlertDescription>
                                             </Alert>
 
-                                            {variants.map((variant) => (
-                                                <Card key={variant.id}>
-                                                    <CardContent className="p-4">
-                                                        <div className="grid gap-3 md:grid-cols-5">
-                                                            <Input
-                                                                placeholder="Tipo (Ej: Talla)"
-                                                                value={
-                                                                    variant.type
-                                                                }
-                                                                onChange={(e) =>
-                                                                    updateVariant(
-                                                                        variant.id,
-                                                                        'type',
-                                                                        e.target
-                                                                            .value,
-                                                                    )
-                                                                }
-                                                            />
-                                                            <Input
-                                                                placeholder="Valor (Ej: M)"
-                                                                value={
-                                                                    variant.value
-                                                                }
-                                                                onChange={(e) =>
-                                                                    updateVariant(
-                                                                        variant.id,
-                                                                        'value',
-                                                                        e.target
-                                                                            .value,
-                                                                    )
-                                                                }
-                                                            />
-                                                            <div className="relative">
-                                                                <span className="absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">
-                                                                    $
-                                                                </span>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <Label className="text-sm font-medium">
+                                                        Lista de variantes
+                                                    </Label>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Configura las opciones
+                                                        disponibles para este
+                                                        producto
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={addVariant}
+                                                    size="sm"
+                                                    className="gap-2"
+                                                >
+                                                    <Plus className="h-3 w-3" />
+                                                    Agregar variante
+                                                </Button>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                {variants.map(
+                                                    (variant, index) => (
+                                                        <div
+                                                            key={variant.id}
+                                                            className="flex flex-col gap-3 rounded-lg border bg-card p-4 transition-all sm:flex-row sm:items-end"
+                                                        >
+                                                            <div className="flex-1 space-y-1.5">
+                                                                <Label className="text-xs font-medium">
+                                                                    Nombre
+                                                                </Label>
                                                                 <Input
-                                                                    type="number"
-                                                                    placeholder="Ajuste precio"
+                                                                    placeholder="Ej: Talla"
                                                                     value={
-                                                                        variant.price_adjustment
+                                                                        variant.name
                                                                     }
                                                                     onChange={(
                                                                         e,
                                                                     ) =>
                                                                         updateVariant(
                                                                             variant.id,
-                                                                            'price_adjustment',
-                                                                            parseFloat(
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                            ),
-                                                                        )
-                                                                    }
-                                                                    className="pl-7"
-                                                                />
-                                                            </div>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Stock"
-                                                                value={
-                                                                    variant.stock
-                                                                }
-                                                                onChange={(e) =>
-                                                                    updateVariant(
-                                                                        variant.id,
-                                                                        'stock',
-                                                                        parseInt(
+                                                                            'name',
                                                                             e
                                                                                 .target
                                                                                 .value,
-                                                                        ),
-                                                                    )
-                                                                }
-                                                            />
+                                                                        )
+                                                                    }
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 space-y-1.5">
+                                                                <Label className="text-xs font-medium">
+                                                                    Valor
+                                                                </Label>
+                                                                <Input
+                                                                    placeholder="Ej: XL"
+                                                                    value={
+                                                                        variant.value
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        updateVariant(
+                                                                            variant.id,
+                                                                            'value',
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                        )
+                                                                    }
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
+                                                            <div className="w-28 space-y-1.5">
+                                                                <Label className="text-xs font-medium">
+                                                                    Stock
+                                                                </Label>
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="0"
+                                                                    value={
+                                                                        variant.stock
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        updateVariant(
+                                                                            variant.id,
+                                                                            'stock',
+                                                                            parseInt(
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                            ) ||
+                                                                                0,
+                                                                        )
+                                                                    }
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
@@ -852,189 +883,207 @@ export default function EditProduct({
                                                                     variants.length ===
                                                                     1
                                                                 }
-                                                                className="text-red-500 hover:text-red-600"
+                                                                className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={addVariant}
-                                                className="w-full sm:w-auto"
-                                            >
-                                                <Plus className="mr-2 h-4 w-4" />{' '}
-                                                Agregar variante
-                                            </Button>
+                                                    ),
+                                                )}
+                                            </div>
+
+                                            {variants.some(
+                                                (v) => v.name && v.value,
+                                            ) && (
+                                                <div className="rounded-lg bg-muted/30 p-3">
+                                                    <p className="text-center text-xs text-muted-foreground">
+                                                        Stock total incluyendo
+                                                        variantes:{' '}
+                                                        <span className="font-semibold text-foreground">
+                                                            {totalStock}
+                                                        </span>{' '}
+                                                        unidades
+                                                    </p>
+                                                </div>
+                                            )}
                                         </TabsContent>
-                                    </Tabs>
-                                </CardContent>
+                                    </CardContent>
+                                </Tabs>
                             </Card>
                         </div>
 
-                        {/* Sidebar - Resumen y acciones */}
+                        {/* Sidebar */}
                         <div className="space-y-6">
-                            <Card className="sticky top-6">
-                                <CardHeader>
-                                    <CardTitle className="text-lg">
-                                        Resumen del producto
+                            <Card className="border shadow-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-base font-semibold">
+                                        Estado del producto
                                     </CardTitle>
-                                    <CardDescription>
-                                        Vista previa de la información
+                                    <CardDescription className="text-xs">
+                                        Configura la visibilidad y promoción
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="text-sm font-medium">
-                                            Estado
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <Label className="text-sm">
+                                                Producto activo
+                                            </Label>
+                                            <p className="text-[10px] text-muted-foreground">
+                                                Visible en la tienda
+                                            </p>
                                         </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {data.is_active ? (
-                                                <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                                                    Activo
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant="secondary">
-                                                    Inactivo
-                                                </Badge>
-                                            )}
-                                            {data.is_featured && (
-                                                <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
-                                                    Destacado
-                                                </Badge>
-                                            )}
-                                        </div>
+                                        <Switch
+                                            checked={data.is_active}
+                                            onCheckedChange={(checked) =>
+                                                setData('is_active', checked)
+                                            }
+                                        />
                                     </div>
                                     <Separator />
-                                    <div className="space-y-1">
-                                        <div className="text-sm font-medium">
-                                            Precio
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <Label className="text-sm">
+                                                Producto destacado
+                                            </Label>
+                                            <p className="text-[10px] text-muted-foreground">
+                                                Aparece en secciones especiales
+                                            </p>
                                         </div>
-                                        <div className="text-2xl font-bold">
-                                            $
-                                            {data.price
-                                                ? parseFloat(
-                                                      data.price,
-                                                  ).toFixed(2)
-                                                : '0.00'}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <div className="text-sm font-medium">
-                                            Stock
-                                        </div>
-                                        <div className="text-base font-semibold">
-                                            {data.stock || 0} unidades
-                                        </div>
-                                    </div>
-                                    {variants.some(
-                                        (v) => v.type && v.value,
-                                    ) && (
-                                        <>
-                                            <Separator />
-                                            <div className="space-y-1">
-                                                <div className="text-sm font-medium">
-                                                    Variantes
-                                                </div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {
-                                                        variants.filter(
-                                                            (v) =>
-                                                                v.type &&
-                                                                v.value,
-                                                        ).length
-                                                    }{' '}
-                                                    variante(s) configurada(s)
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                    <Separator />
-                                    <div className="space-y-2">
-                                        <div className="text-sm font-medium">
-                                            Acciones rápidas
-                                        </div>
-                                        <Button
-                                            type="submit"
-                                            className="w-full"
-                                            disabled={processing}
-                                        >
-                                            <Save className="mr-2 h-4 w-4" />
-                                            Actualizar producto
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="w-full"
-                                        >
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            Vista previa
-                                        </Button>
+                                        <Switch
+                                            checked={data.is_featured}
+                                            onCheckedChange={(checked) =>
+                                                setData('is_featured', checked)
+                                            }
+                                        />
                                     </div>
                                 </CardContent>
                             </Card>
 
-                            {/* Consejos */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-lg">
-                                        Consejos útiles
+                            <Card className="border shadow-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-base font-semibold">
+                                        Resumen
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-3 text-sm">
-                                    <div className="flex gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className="shrink-0"
-                                        >
-                                            1
-                                        </Badge>
-                                        <span>
-                                            Usa imágenes de alta calidad para
-                                            destacar tu producto
+                                <CardContent className="space-y-3">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            Precio:
+                                        </span>
+                                        <span className="font-semibold">
+                                            $
+                                            {parseFloat(
+                                                data.price || '0',
+                                            ).toFixed(2)}
                                         </span>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className="shrink-0"
-                                        >
-                                            2
-                                        </Badge>
-                                        <span>
-                                            Completa todos los campos para
-                                            mejorar el SEO
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            Stock base:
+                                        </span>
+                                        <span className="font-medium">
+                                            {parseInt(data.stock || '0')} unid.
                                         </span>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className="shrink-0"
-                                        >
-                                            3
-                                        </Badge>
-                                        <span>
-                                            Las variantes ayudan a organizar
-                                            diferentes versiones
+                                    {variants.some(
+                                        (v) => v.name && v.value,
+                                    ) && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-muted-foreground">
+                                                Stock variantes:
+                                            </span>
+                                            <span className="font-medium">
+                                                {variants.reduce(
+                                                    (s, v) =>
+                                                        s + (v.stock || 0),
+                                                    0,
+                                                )}{' '}
+                                                unid.
+                                            </span>
+                                        </div>
+                                    )}
+                                    <Separator />
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            Stock total:
+                                        </span>
+                                        <span className="font-bold">
+                                            {totalStock} unid.
                                         </span>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className="shrink-0"
-                                        >
-                                            4
-                                        </Badge>
-                                        <span>
-                                            Mantén el stock actualizado para
-                                            evitar problemas
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            Variantes:
+                                        </span>
+                                        <span className="font-medium">
+                                            {
+                                                variants.filter(
+                                                    (v) => v.name && v.value,
+                                                ).length
+                                            }
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">
+                                            Imágenes:
+                                        </span>
+                                        <span className="font-medium">
+                                            {(product.thumbnail ? 1 : 0) +
+                                                (product.images?.length || 0)}
                                         </span>
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            <Card className="border shadow-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-base font-semibold">
+                                        Información del sistema
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2 text-xs">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            ID:
+                                        </span>
+                                        <span className="font-mono">
+                                            {product.id}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Slug:
+                                        </span>
+                                        <span className="max-w-[180px] truncate font-mono">
+                                            {product.slug}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Creado:
+                                        </span>
+                                        <span>
+                                            {new Date(
+                                                product.created_at,
+                                            ).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <div className="flex gap-3">
+                                <Button
+                                    onClick={handleSubmit}
+                                    disabled={processing}
+                                    className="flex-1 gap-2 shadow-sm"
+                                >
+                                    <Save className="h-4 w-4" />
+                                    {processing
+                                        ? 'Guardando...'
+                                        : 'Guardar cambios'}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </form>

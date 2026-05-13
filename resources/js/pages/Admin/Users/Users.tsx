@@ -71,7 +71,6 @@ interface User {
     phone: string | null;
     avatar: string | null;
     is_active: boolean;
-    is_blocked: boolean;
     email_verified_at: string | null;
     created_at: string;
     roles: { id: number; name: string }[];
@@ -98,10 +97,8 @@ export default function Users({ users, roles }: Props) {
             user.email.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
-    const activeUsers = users.filter(
-        (u) => u.is_active && !u.is_blocked,
-    ).length;
-    const blockedUsers = users.filter((u) => u.is_blocked).length;
+    const activeUsers = users.filter((u) => u.is_active).length;
+    const blockedUsers = users.filter((u) => !u.is_active).length;
 
     const getInitials = (firstName: string, lastName: string) => {
         return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -169,7 +166,7 @@ export default function Users({ users, roles }: Props) {
         }
 
         const user = userToBlock; // capturar antes
-        const wasBlocked = user.is_blocked;
+        const wasActive = user.is_active;
         setIsProcessing(true);
 
         router.post(
@@ -179,7 +176,7 @@ export default function Users({ users, roles }: Props) {
                 onSuccess: () => {
                     setUserToBlock(null);
                     toast.success(
-                        `Usuario ${wasBlocked ? 'desbloqueado' : 'bloqueado'} exitosamente`,
+                        `Usuario ${wasActive ? 'desbloqueado' : 'bloqueado'} exitosamente`,
                     );
                     setIsProcessing(false);
                 },
@@ -197,6 +194,7 @@ export default function Users({ users, roles }: Props) {
             seller: 'bg-blue-100 text-blue-700',
             customer: 'bg-green-100 text-green-700',
         };
+
         return colors[roleName] || 'bg-gray-100 text-gray-700';
     };
 
@@ -369,17 +367,13 @@ export default function Users({ users, roles }: Props) {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        {user.is_blocked ? (
-                                            <Badge className="bg-red-100 text-red-700">
-                                                Bloqueado
-                                            </Badge>
-                                        ) : user.is_active ? (
+                                        {user.is_active ? (
                                             <Badge className="bg-green-100 text-green-700">
                                                 Activo
                                             </Badge>
                                         ) : (
-                                            <Badge className="bg-gray-100 text-gray-700">
-                                                Inactivo
+                                            <Badge className="bg-red-100 text-red-700">
+                                                Bloqueado
                                             </Badge>
                                         )}
                                     </TableCell>
@@ -425,15 +419,15 @@ export default function Users({ users, roles }: Props) {
                                                     }
                                                     className="text-orange-600"
                                                 >
-                                                    {user.is_blocked ? (
+                                                    {user.is_active ? (
                                                         <>
-                                                            <RefreshCw className="mr-2 h-4 w-4" />
-                                                            Desbloquear Usuario
+                                                            <Ban className="mr-2 h-4 w-4" />{' '}
+                                                            Bloquear Usuario
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <Ban className="mr-2 h-4 w-4" />
-                                                            Bloquear Usuario
+                                                            <RefreshCw className="mr-2 h-4 w-4" />{' '}
+                                                            Desbloquear Usuario
                                                         </>
                                                     )}
                                                 </DropdownMenuItem>
@@ -537,12 +531,12 @@ export default function Users({ users, roles }: Props) {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {userToBlock?.is_blocked
-                                ? 'Desbloquear Usuario'
-                                : 'Bloquear Usuario'}
+                            {userToBlock?.is_active
+                                ? 'Bloquear Usuario'
+                                : 'Desbloquear Usuario'}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {userToBlock?.is_blocked ? (
+                            {userToBlock?.is_active ? (
                                 <>
                                     ¿Estás seguro de desbloquear a{' '}
                                     <strong>
@@ -570,14 +564,14 @@ export default function Users({ users, roles }: Props) {
                         <AlertDialogAction
                             onClick={handleToggleBlock}
                             className={
-                                userToBlock?.is_blocked
-                                    ? 'bg-green-600 hover:bg-green-700'
-                                    : 'bg-red-600 hover:bg-red-700'
+                                userToBlock?.is_active
+                                    ? 'bg-red-600 hover:bg-red-700'
+                                    : 'bg-green-600 hover:bg-green-700'
                             }
                         >
-                            {userToBlock?.is_blocked
-                                ? 'Desbloquear'
-                                : 'Bloquear'}
+                            {userToBlock?.is_active
+                                ? 'Bloquear'
+                                : 'Desbloquear'}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

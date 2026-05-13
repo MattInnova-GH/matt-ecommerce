@@ -10,14 +10,14 @@ import {
 import { logout } from '@/routes';
 import { ConfirmModal } from '../Auth/logout/ConfirmModal';
 import favorites from '@/routes/client/favorites';
-import configuration from '@/routes/client/configuration';
 import { dashboard } from '@/routes/admin';
+import profile from '@/routes/client/profile';
 
 type User = {
     name: string;
     last_name?: string;
     email: string;
-    role: 'USER' | 'SELLER' | 'admin';
+    role: 'client ' | 'admin';
     image?: string;
 };
 
@@ -35,9 +35,13 @@ export default function UserDropdown({ user, onClose }: Props) {
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
     const commonLinks = [
-        { href: '/mis-compras', label: 'Mis Compras', icon: ShoppingBag },
+        {
+            href: profile.index({ query: { section: 'orders' } }),
+            label: 'Mis Compras',
+            icon: ShoppingBag,
+        },
         { href: favorites.index(), label: 'Favoritos', icon: Heart },
-        { href: configuration.index(), label: 'Configuración', icon: Settings },
+        { href: profile.index(), label: 'Configuración', icon: Settings },
     ];
 
     const roleLinks = {
@@ -56,8 +60,7 @@ export default function UserDropdown({ user, onClose }: Props) {
             text: 'Administrador',
             className: 'bg-purple-100 text-purple-700',
         },
-        SELLER: { text: 'Vendedor', className: 'bg-blue-100 text-blue-700' },
-        USER: { text: 'Cliente', className: 'bg-gray-100 text-gray-700' },
+        client: { text: 'Cliente', className: 'bg-gray-100 text-gray-700' },
     }[user.role] || { text: 'Cliente', className: 'bg-gray-100 text-gray-700' };
 
     return (

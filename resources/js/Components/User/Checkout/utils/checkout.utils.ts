@@ -35,6 +35,7 @@ export function calcOrderTotals(
     };
 }
 
-export function formatPrice(amount: number): string {
-    return `S/ ${amount.toFixed(2)}`;
+export function formatPrice(amount: number | string): string {
+    const value = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return `S/ ${(value || 0).toFixed(2)}`;
 }

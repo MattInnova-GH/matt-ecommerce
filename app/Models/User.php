@@ -13,13 +13,12 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['first_name', 'last_name', 'email', 'password',
-        'phone', 'dni', 'avatar', 'is_active'])]
+    'phone', 'dni', 'avatar', 'is_active'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
-
 
     /**
      * Get the attributes that should be cast.
@@ -33,27 +32,37 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'email_verified' => 'boolean',
-            'is_blocked' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
-    public function addresses() {
+    public function addresses()
+    {
         return $this->hasMany(Address::class);
     }
 
-    public function orders() {
+    public function orders()
+    {
         return $this->hasMany(Order::class);
     }
 
-    public function reviews() {
+    public function reviews()
+    {
         return $this->hasMany(Review::class);
     }
 
-    public function cart() {
+    public function cart()
+    {
         return $this->hasOne(Cart::class);
     }
 
-    public function sessions() {
+    public function sessions()
+    {
         return $this->hasMany(Session::class);
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(Product::class, 'favorites')->withTimestamps();
     }
 }

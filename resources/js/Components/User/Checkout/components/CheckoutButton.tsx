@@ -18,6 +18,7 @@ export function CheckoutButton() {
         selectedStore,
         cardData, // datos de tarjeta guardados
         yapePhone, // teléfono yape guardado
+        voucherFile, // voucher subido
     } = useCheckoutStore();
 
     const { total } = calcOrderTotals(items, deliveryMethod);
@@ -30,8 +31,10 @@ export function CheckoutButton() {
     const getPaymentWarning = (): string | null => {
         if (paymentMethod === 'card' && !cardData)
             return 'Ingresa los datos de tu tarjeta haciendo clic en "Tarjeta"';
-        if (paymentMethod === 'yape' && !yapePhone)
-            return 'Vincula tu número Yape haciendo clic en "Yape / Plin"';
+        if (paymentMethod === 'yape') {
+            if (!yapePhone) return 'Vincula tu número Yape haciendo clic en "Yape / Plin"';
+            if (!voucherFile) return 'Debes subir el comprobante de pago para continuar';
+        }
         return null;
     };
 
@@ -51,32 +54,28 @@ export function CheckoutButton() {
         setEmailError('');
         setIsLoading(true);
 
-        try {
-            const res = await fetch('/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email,
-                    items,
-                    deliveryMethod,
-                    paymentMethod,
-                    deliveryAddress,
-                    selectedStore,
-                    cardData,
-                    yapePhone,
-                    total,
-                }),
-            });
-
-            if (!res.ok) throw new Error('Error al procesar la orden');
-
-            clearCart();
-            router.visit('/'); // redirige al inicio
-        } catch (error) {
-            console.error('Error al confirmar orden:', error);
-        } finally {
-            setIsLoading(false);
-        }
+        router.post('/checkout', {
+            email,
+            items,
+            deliveryMethod,
+            paymentMethod,
+            deliveryAddress: deliveryMethod === 'delivery' ? deliveryAddress : null,
+            selectedStore: deliveryMethod === 'pickup' ? selectedStore : null,
+            cardData,
+            yapePhone,
+            voucher: voucherFile,
+            total,
+        }, {
+            onSuccess: () => {
+                clearCart();
+            },
+            onError: (errors) => {
+                console.error('Error al confirmar orden:', errors);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            }
+        });
     };
 
     return (

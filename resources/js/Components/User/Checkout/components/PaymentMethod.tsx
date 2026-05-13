@@ -1,4 +1,4 @@
-import { CreditCard, Smartphone, Banknote } from 'lucide-react';
+import { CreditCard, Smartphone } from 'lucide-react';
 import { useCheckoutStore } from '@/stores/checkoutStore';
 import { CardModal } from './CardModal';
 import { YapeModal } from './YapeModal';
@@ -26,18 +26,18 @@ export function PaymentMethod() {
             description: 'Pago por QR',
             icon: Smartphone,
         },
-        {
-            id: 'cash' as const,
-            label: 'Efectivo',
-            description: 'Contra entrega',
-            icon: Banknote,
-        },
     ];
 
     const handleSelect = (id: 'card' | 'yape' | 'cash') => {
         setPaymentMethod(id);
-        if (id === 'card') openCardModal();
-        if (id === 'yape') openYapeModal();
+
+        if (id === 'card') {
+            openCardModal();
+        }
+
+        if (id === 'yape') {
+            openYapeModal();
+        }
     };
 
     return (
@@ -49,10 +49,11 @@ export function PaymentMethod() {
                 Selecciona cómo deseas pagar
             </p>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {options.map((option) => {
                     const Icon = option.icon;
                     const isSelected = paymentMethod === option.id;
+
                     return (
                         <button
                             key={option.id}

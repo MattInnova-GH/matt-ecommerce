@@ -18,8 +18,8 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax', 10, 2);
             $table->decimal('total', 10, 2);
-            $table->enum('status', ['PENDING','ACCEPTED','REJECTED','SHIPPED','DELIVERED','CANCELLED'])->default('PENDING');
-            $table->json('shipping_address');
+            $table->enum('status', ['PENDING', 'ACCEPTED', 'REJECTED', 'SHIPPED', 'DELIVERED', 'CANCELLED'])->default('PENDING');
+            $table->json('shipping_address')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

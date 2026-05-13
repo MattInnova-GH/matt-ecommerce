@@ -72,7 +72,7 @@ export function CartHeader() {
                 </button>
             </div>
 
-            <div className="absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+            <div className="absolute right-0 bottom-0 left-0 h-px bg-linear-to-r from-transparent via-gray-200 to-transparent" />
         </div>
     );
 }

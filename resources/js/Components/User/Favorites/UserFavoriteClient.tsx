@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import { Heart, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
+import { Link, usePage, router } from '@inertiajs/react';
+import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
 
 import type { PublicProduct } from '@/lib/types/type.public';
 
@@ -22,13 +22,7 @@ export default function FavoritesPage() {
     const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
     const handleRemoveFavorite = (productId: number) => {
-        setFavorites((prev) => prev.filter((p) => p.id !== productId));
-
-        setSelectedItems((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(productId);
-            return newSet;
-        });
+        router.delete(`/favoritos/${productId}`, { preserveScroll: true });
     };
 
     const handleToggleSelect = (productId: number) => {
@@ -51,8 +45,11 @@ export default function FavoritesPage() {
     };
 
     const handleRemoveSelected = () => {
-        setFavorites((prev) => prev.filter((p) => !selectedItems.has(p.id)));
-        setSelectedItems(new Set());
+        const ids = Array.from(selectedItems);
+        router.post('/favoritos/bulk-delete', { ids }, {
+            preserveScroll: true,
+            onSuccess: () => setSelectedItems(new Set()),
+        });
     };
 
     const handleAddAllToCart = () => {

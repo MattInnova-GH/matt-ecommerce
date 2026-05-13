@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm, router, Form } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,16 +29,15 @@ import {
     Upload,
     Save,
     Package,
-    Image as ImageIcon,
+    ImageIcon,
     Tags,
     Info,
 } from 'lucide-react';
+import admin from '@/routes/admin';
 
-interface VariantField {
-    id: string;
-    type: string;
+interface Variant {
+    name: string;
     value: string;
-    price_adjustment: number;
     stock: number;
 }
 
@@ -52,23 +51,18 @@ interface Brand {
     name: string;
 }
 
-interface Supplier {
-    id: number;
-    name: string;
+interface CreateProductProps {
+    categories: Category[];
+    brands: Brand[];
 }
 
 export default function CreateProduct({
     categories,
     brands,
-    suppliers,
-}: {
-    categories: Category[];
-    brands: Brand[];
-    suppliers: Supplier[];
-}) {
+}: CreateProductProps) {
     const [activeTab, setActiveTab] = useState('basic');
-    const [variants, setVariants] = useState<VariantField[]>([
-        { id: '1', type: '', value: '', price_adjustment: 0, stock: 0 },
+    const [variants, setVariants] = useState<Variant[]>([
+        { name: '', value: '', stock: 0 },
     ]);
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
         null,
@@ -78,7 +72,6 @@ export default function CreateProduct({
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         description: '',
-        sku: '',
         price: '',
         stock: '',
         category_id: '',
@@ -88,46 +81,37 @@ export default function CreateProduct({
         gallery: [] as File[],
         is_active: true,
         is_featured: false,
-        variants: [] as any[],
-        meta_title: '',
-        meta_description: '',
+        variants: [] as Variant[],
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const validVariants = variants.filter((v) => v.type && v.value);
+        const validVariants = variants.filter((v) => v.name && v.value);
         setData('variants', validVariants);
 
-        post('/admin/products', {
+        post(admin.products.store(), {
             onSuccess: () => {
-                router.visit('/admin/products');
+                // Redirigir después de guardar
             },
+            preserveScroll: true,
         });
     };
 
     const addVariant = () => {
-        setVariants([
-            ...variants,
-            {
-                id: Date.now().toString(),
-                type: '',
-                value: '',
-                price_adjustment: 0,
-                stock: 0,
-            },
-        ]);
+        setVariants([...variants, { name: '', value: '', stock: 0 }]);
     };
 
-    const removeVariant = (id: string) => {
+    const removeVariant = (index: number) => {
         if (variants.length > 1) {
-            setVariants(variants.filter((v) => v.id !== id));
+            setVariants(variants.filter((_, i) => i !== index));
         }
     };
 
-    const updateVariant = (id: string, field: string, value: any) => {
-        setVariants(
-            variants.map((v) => (v.id === id ? { ...v, [field]: value } : v)),
-        );
+    const updateVariant = (index: number, field: keyof Variant, value: any) => {
+        const updatedVariants = [...variants];
+        updatedVariants[index][field] =
+            field === 'stock' ? parseInt(value) || 0 : value;
+        setVariants(updatedVariants);
     };
 
     const handleThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +128,8 @@ export default function CreateProduct({
 
     const handleGallery = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        setData('gallery', [...data.gallery, ...files]);
+        const currentGallery = data.gallery || [];
+        setData('gallery', [...currentGallery, ...files]);
 
         files.forEach((file) => {
             const reader = new FileReader();
@@ -160,31 +145,33 @@ export default function CreateProduct({
 
     const removeGalleryImage = (index: number) => {
         setGalleryPreviews(galleryPreviews.filter((_, i) => i !== index));
-        const newGallery = [...data.gallery];
+        const newGallery = [...(data.gallery || [])];
         newGallery.splice(index, 1);
         setData('gallery', newGallery);
     };
+
+    const totalStock =
+        parseInt(data.stock || '0') +
+        variants.reduce((sum, v) => sum + (v.stock || 0), 0);
 
     return (
         <div className="min-h-screen bg-background">
             <div className="container mx-auto space-y-6 p-4 md:p-6">
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-4">
-                        <div>
-                            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                                Crear nuevo producto
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Completa todos los campos para agregar un nuevo
-                                producto a tu tienda
-                            </p>
-                        </div>
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+                            Crear nuevo producto
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            Completa todos los campos para agregar un nuevo
+                            producto a tu tienda
+                        </p>
                     </div>
                     <div className="flex gap-2">
                         <Button
                             variant="outline"
-                            onClick={() => router.visit('/admin/products')}
+                            onClick={() => router.visit(admin.products.index())}
                         >
                             Cancelar
                         </Button>
@@ -196,7 +183,7 @@ export default function CreateProduct({
                 </div>
 
                 {/* Formulario principal */}
-                <Form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}>
                     <div className="grid gap-6 lg:grid-cols-3">
                         {/* Columna principal */}
                         <div className="space-y-6 lg:col-span-2">
@@ -262,12 +249,12 @@ export default function CreateProduct({
                                                     <Input
                                                         id="name"
                                                         value={data.name}
-                                                        onChange={(e) => {
+                                                        onChange={(e) =>
                                                             setData(
                                                                 'name',
                                                                 e.target.value,
-                                                            );
-                                                        }}
+                                                            )
+                                                        }
                                                         placeholder="Ej: Camiseta de algodón"
                                                         className="w-full"
                                                         required
@@ -301,27 +288,7 @@ export default function CreateProduct({
 
                                             <Separator />
 
-                                            <div className="grid gap-4 md:grid-cols-3">
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="sku">
-                                                        SKU{' '}
-                                                        <span className="text-red-500">
-                                                            *
-                                                        </span>
-                                                    </Label>
-                                                    <Input
-                                                        id="sku"
-                                                        value={data.sku}
-                                                        onChange={(e) =>
-                                                            setData(
-                                                                'sku',
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                        placeholder="SKU-001"
-                                                        required
-                                                    />
-                                                </div>
+                                            <div className="grid gap-4 md:grid-cols-2">
                                                 <div className="space-y-2">
                                                     <Label htmlFor="price">
                                                         Precio{' '}
@@ -350,10 +317,15 @@ export default function CreateProduct({
                                                             required
                                                         />
                                                     </div>
+                                                    {errors.price && (
+                                                        <p className="text-sm text-red-500">
+                                                            {errors.price}
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label htmlFor="stock">
-                                                        Stock{' '}
+                                                        Stock base{' '}
                                                         <span className="text-red-500">
                                                             *
                                                         </span>
@@ -371,14 +343,24 @@ export default function CreateProduct({
                                                         placeholder="0"
                                                         required
                                                     />
+                                                    {errors.stock && (
+                                                        <p className="text-sm text-red-500">
+                                                            {errors.stock}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
 
                                             <Separator />
 
-                                            <div className="grid gap-4 md:grid-cols-3">
+                                            <div className="grid gap-4 md:grid-cols-2">
                                                 <div className="space-y-2">
-                                                    <Label>Categoría</Label>
+                                                    <Label>
+                                                        Categoría{' '}
+                                                        <span className="text-red-500">
+                                                            *
+                                                        </span>
+                                                    </Label>
                                                     <Select
                                                         onValueChange={(
                                                             value,
@@ -388,6 +370,7 @@ export default function CreateProduct({
                                                                 value,
                                                             )
                                                         }
+                                                        value={data.category_id}
                                                     >
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Seleccionar categoría" />
@@ -409,6 +392,11 @@ export default function CreateProduct({
                                                             )}
                                                         </SelectContent>
                                                     </Select>
+                                                    {errors.category_id && (
+                                                        <p className="text-sm text-red-500">
+                                                            {errors.category_id}
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label>Marca</Label>
@@ -421,6 +409,7 @@ export default function CreateProduct({
                                                                 value,
                                                             )
                                                         }
+                                                        value={data.brand_id}
                                                     >
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Seleccionar marca" />
@@ -436,39 +425,6 @@ export default function CreateProduct({
                                                                     >
                                                                         {
                                                                             brand.name
-                                                                        }
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label>Proveedor</Label>
-                                                    <Select
-                                                        onValueChange={(
-                                                            value,
-                                                        ) =>
-                                                            setData(
-                                                                'supplier_id',
-                                                                value,
-                                                            )
-                                                        }
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Seleccionar proveedor" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {suppliers.map(
-                                                                (supplier) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            supplier.id
-                                                                        }
-                                                                        value={supplier.id.toString()}
-                                                                    >
-                                                                        {
-                                                                            supplier.name
                                                                         }
                                                                     </SelectItem>
                                                                 ),
@@ -641,22 +597,24 @@ export default function CreateProduct({
                                                     Las variantes permiten
                                                     ofrecer diferentes opciones
                                                     como tallas, colores, etc.
+                                                    El stock de cada variante se
+                                                    suma al stock base.
                                                 </AlertDescription>
                                             </Alert>
 
-                                            {variants.map((variant) => (
-                                                <Card key={variant.id}>
+                                            {variants.map((variant, index) => (
+                                                <Card key={index}>
                                                     <CardContent className="p-4">
-                                                        <div className="grid gap-3 md:grid-cols-5">
+                                                        <div className="grid gap-3 md:grid-cols-4">
                                                             <Input
                                                                 placeholder="Tipo (Ej: Talla)"
                                                                 value={
-                                                                    variant.type
+                                                                    variant.name
                                                                 }
                                                                 onChange={(e) =>
                                                                     updateVariant(
-                                                                        variant.id,
-                                                                        'type',
+                                                                        index,
+                                                                        'name',
                                                                         e.target
                                                                             .value,
                                                                     )
@@ -669,39 +627,13 @@ export default function CreateProduct({
                                                                 }
                                                                 onChange={(e) =>
                                                                     updateVariant(
-                                                                        variant.id,
+                                                                        index,
                                                                         'value',
                                                                         e.target
                                                                             .value,
                                                                     )
                                                                 }
                                                             />
-                                                            <div className="relative">
-                                                                <span className="absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">
-                                                                    $
-                                                                </span>
-                                                                <Input
-                                                                    type="number"
-                                                                    placeholder="Ajuste precio"
-                                                                    value={
-                                                                        variant.price_adjustment
-                                                                    }
-                                                                    onChange={(
-                                                                        e,
-                                                                    ) =>
-                                                                        updateVariant(
-                                                                            variant.id,
-                                                                            'price_adjustment',
-                                                                            parseFloat(
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                            ),
-                                                                        )
-                                                                    }
-                                                                    className="pl-7"
-                                                                />
-                                                            </div>
                                                             <Input
                                                                 type="number"
                                                                 placeholder="Stock"
@@ -710,13 +642,10 @@ export default function CreateProduct({
                                                                 }
                                                                 onChange={(e) =>
                                                                     updateVariant(
-                                                                        variant.id,
+                                                                        index,
                                                                         'stock',
-                                                                        parseInt(
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                        ),
+                                                                        e.target
+                                                                            .value,
                                                                     )
                                                                 }
                                                             />
@@ -726,7 +655,7 @@ export default function CreateProduct({
                                                                 size="icon"
                                                                 onClick={() =>
                                                                     removeVariant(
-                                                                        variant.id,
+                                                                        index,
                                                                     )
                                                                 }
                                                                 disabled={
@@ -796,23 +725,30 @@ export default function CreateProduct({
                                         </div>
                                         <div className="text-2xl font-bold">
                                             $
-                                            {data.price
-                                                ? parseFloat(
-                                                      data.price,
-                                                  ).toFixed(2)
-                                                : '0.00'}
+                                            {parseFloat(
+                                                data.price || '0',
+                                            ).toFixed(2)}
                                         </div>
                                     </div>
                                     <div className="space-y-1">
                                         <div className="text-sm font-medium">
-                                            Stock
+                                            Stock total
                                         </div>
                                         <div className="text-base font-semibold">
-                                            {data.stock || 0} unidades
+                                            {totalStock} unidades
                                         </div>
+                                        {parseInt(data.stock || '0') > 0 && (
+                                            <div className="text-xs text-muted-foreground">
+                                                Base: {data.stock} | Variantes:{' '}
+                                                {variants.reduce(
+                                                    (s, v) => s + v.stock,
+                                                    0,
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                     {variants.some(
-                                        (v) => v.type && v.value,
+                                        (v) => v.name && v.value,
                                     ) && (
                                         <>
                                             <Separator />
@@ -824,7 +760,7 @@ export default function CreateProduct({
                                                     {
                                                         variants.filter(
                                                             (v) =>
-                                                                v.type &&
+                                                                v.name &&
                                                                 v.value,
                                                         ).length
                                                     }{' '}
@@ -851,7 +787,7 @@ export default function CreateProduct({
                             </Card>
                         </div>
                     </div>
-                </Form>
+                </form>
             </div>
         </div>
     );

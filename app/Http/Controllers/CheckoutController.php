@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Banner;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CheckoutController extends Controller
 {
@@ -12,15 +13,7 @@ class CheckoutController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return Inertia::render('Client/Checkout');
     }
 
     /**
@@ -28,38 +21,62 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'items' => 'required|array',
+            'total' => 'required|numeric',
+            'paymentMethod' => 'required|string',
+            'voucher' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'deliveryMethod' => 'required|string|in:delivery,pickup',
+            'deliveryAddress' => 'nullable|array',
+            'selectedStore' => 'nullable|array',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Banner $banner)
-    {
-        //
-    }
+        // Validación manual extra para mayor claridad
+        if ($request->deliveryMethod === 'delivery' && empty($request->deliveryAddress)) {
+            return back()->withErrors(['deliveryAddress' => 'La dirección de entrega es obligatoria para envíos a domicilio.']);
+        }
+        if ($request->deliveryMethod === 'pickup' && empty($request->selectedStore)) {
+            return back()->withErrors(['selectedStore' => 'Debes seleccionar una tienda para el recojo.']);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Banner $banner)
-    {
-        //
-    }
+        $notes = "Metodo: {$request->paymentMethod}";
+        if ($request->deliveryMethod === 'pickup' && $request->selectedStore) {
+            $notes .= ' | Recojo en tienda: '.($request->selectedStore['name'] ?? 'N/A');
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Banner $banner)
-    {
-        //
-    }
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'order_number' => 'ORD-'.strtoupper(uniqid()),
+            'subtotal' => $request->total,
+            'tax' => 0,
+            'total' => $request->total,
+            'status' => 'PENDING',
+            'shipping_address' => $request->deliveryMethod === 'delivery' ? $request->deliveryAddress : null,
+            'notes' => $notes,
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Banner $banner)
-    {
-        //
+        foreach ($request->items as $item) {
+            $order->items()->create([
+                'product_id' => $item['id'],
+                'product_name' => $item['name'],
+                'product_price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'subtotal' => (float) $item['price'] * $item['quantity'],
+            ]);
+        }
+
+        $receiptUrl = null;
+        if ($request->hasFile('voucher')) {
+            $receiptUrl = $request->file('voucher')->store('vouchers', 'public');
+        }
+
+        $order->payment()->create([
+            'method' => $request->paymentMethod,
+            'amount' => $request->total,
+            'receipt_url' => $receiptUrl,
+            'status' => 'PENDING',
+        ]);
+
+        return redirect()->route('home')->with('success', '¡Gracias por tu compra! Tu pedido ha sido procesado y está pendiente de verificación de pago.');
     }
 }

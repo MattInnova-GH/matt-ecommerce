@@ -6,12 +6,13 @@ import { AuthModal } from './AuthModal';
 import SearchModal from './SearchModal';
 import CartDrawer from '@/Components/User/Cart';
 import { useCartStore } from '@/stores/cartStore';
+import { products } from '@/routes';
 
 type AuthUser = {
     name: string;
     last_name?: string;
     email: string;
-    role: 'USER' | 'SELLER' | 'admin';
+    role: 'client' | 'admin';
     image?: string;
 } | null;
 
@@ -46,7 +47,7 @@ export default function Navbar() {
                             </NavLink>
 
                             <NavLink
-                                href="/productos"
+                                href={products()}
                                 active={url.startsWith('/productos')}
                             >
                                 PRODUCTOS

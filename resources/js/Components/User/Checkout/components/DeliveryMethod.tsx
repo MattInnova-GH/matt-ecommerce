@@ -1,4 +1,4 @@
-import { Truck, Store } from 'lucide-react';
+import { Truck } from 'lucide-react';
 import { useCheckoutStore, DELIVERY_COST } from '@/stores/checkoutStore';
 import { formatPrice } from '../utils/checkout.utils';
 import { DeliveryForm } from './DeliveryForm';
@@ -15,14 +15,6 @@ export function DeliveryMethod() {
             badge: formatPrice(DELIVERY_COST),
             badgeColor: 'text-gray-900',
             icon: Truck,
-        },
-        {
-            id: 'pickup' as const,
-            label: 'Recojo en tienda',
-            description: 'Sin costo adicional',
-            badge: 'Gratis',
-            badgeColor: 'text-green-600',
-            icon: Store,
         },
     ];
 
@@ -42,6 +34,7 @@ export function DeliveryMethod() {
                 {options.map((option) => {
                     const Icon = option.icon;
                     const isSelected = deliveryMethod === option.id;
+
                     return (
                         <button
                             key={option.id}
@@ -53,7 +46,7 @@ export function DeliveryMethod() {
                             } `}
                         >
                             <div
-                                className={`flex-shrink-0 rounded-lg p-2 transition-colors ${isSelected ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'}`}
+                                className={`shrink-0 rounded-lg p-2 transition-colors ${isSelected ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'}`}
                             >
                                 <Icon size={18} />
                             </div>

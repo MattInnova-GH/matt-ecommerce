@@ -6,17 +6,17 @@ type YapeStep = 'phone' | 'saved';
 
 export function YapeModal() {
     const { closeYapeModal, setYapePhone } = useCheckoutStore();
-
     const [step, setStep] = useState<YapeStep>('phone');
     const [phone, setPhone] = useState('');
     const [phoneError, setPhoneError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
     const handlePhoneSubmit = async () => {
         if (phone.replace(/\s/g, '').length < 9) {
             setPhoneError('Ingresa un número válido de 9 dígitos');
+
             return;
         }
+
         setPhoneError('');
         setIsLoading(true);
         await new Promise((r) => setTimeout(r, 800));
@@ -68,7 +68,7 @@ export function YapeModal() {
                                 Número de celular
                             </label>
                             <div className="flex gap-2">
-                                <div className="flex flex-shrink-0 items-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500">
+                                <div className="flex shrink-0 items-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500">
                                     🇵🇪 +51
                                 </div>
                                 <input

@@ -6,7 +6,7 @@ export function CartActions() {
 
     const handleCheckout = () => {
         closeCart();
-        router.visit('/checkout');
+        router.get('/checkout');
     };
 
     const isEmpty = items.length === 0;

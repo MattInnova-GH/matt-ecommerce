@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,12 +42,13 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,
-                    'name' => $request->user()->first_name . ' ' . $request->user()->last_name,
+                    'name' => $request->user()->first_name.' '.$request->user()->last_name,
                     'email' => $request->user()->email,
                     'role' => ($role = $request->user()->roles->first()?->name) === 'client' ? 'user' : $role,
                     'image' => $request->user()->avatar,
                 ] : null,
             ],
+            'settings' => Setting::first(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'success' => $request->session()->get('success'),
