@@ -200,11 +200,11 @@ function TypingIndicator() {
 }
 
 export default function Chatbot() {
-    const [isOpen, setIsOpen]       = useState(false);
-    const [messages, setMessages]   = useState<Message[]>([WELCOME]);
+    const [isOpen, setIsOpen]         = useState(false);
+    const [messages, setMessages]     = useState<Message[]>([WELCOME]);
     const [inputValue, setInputValue] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [hasUnread, setHasUnread] = useState(false);
+    const [isLoading, setIsLoading]   = useState(false);
+    const [hasUnread, setHasUnread]   = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef       = useRef<HTMLInputElement>(null);
     const nextId         = useRef(1);
@@ -258,16 +258,37 @@ export default function Chatbot() {
 
     return (
         <>
-            {/* Panel del chat */}
+            {/* Backdrop móvil — solo visible en pantallas pequeñas */}
             <div
-                className={`fixed bottom-24 right-4 z-1100 flex w-85 flex-col rounded-2xl border border-gray-200 bg-white shadow-2xl transition-all duration-300 sm:right-6 sm:w-90 ${
-                    isOpen
-                        ? 'translate-y-0 scale-100 opacity-100'
-                        : 'pointer-events-none translate-y-3 scale-95 opacity-0'
+                className={`fixed inset-0 z-1099 bg-black/50 transition-opacity duration-300 sm:hidden ${
+                    isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
+                onClick={() => setIsOpen(false)}
+            />
+
+            {/* Panel del chat
+                Móvil:     bottom sheet, ancho completo, sube desde abajo, máx 90vh
+                Escritorio: panel flotante esquina inferior-derecha, ancho fijo
+            */}
+            <div
+                className={`
+                    fixed z-1100 flex flex-col bg-white border border-gray-200
+                    inset-x-0 bottom-0 rounded-t-2xl max-h-[90vh]
+                    sm:inset-auto sm:bottom-24 sm:right-6 sm:w-90 sm:rounded-2xl sm:shadow-2xl sm:max-h-none
+                    transition-all duration-300
+                    ${isOpen
+                        ? 'translate-y-0 opacity-100'
+                        : 'pointer-events-none translate-y-full opacity-0 sm:translate-y-3 sm:scale-95'
+                    }
+                `}
             >
+                {/* Tirador visual para móvil */}
+                <div className="flex justify-center pt-2 pb-1 sm:hidden">
+                    <span className="h-1 w-10 rounded-full bg-gray-300" />
+                </div>
+
                 {/* Cabecera */}
-                <div className="flex items-center justify-between rounded-t-2xl bg-gray-900 px-4 py-3.5">
+                <div className="flex shrink-0 items-center justify-between rounded-t-2xl bg-gray-900 px-4 py-3.5">
                     <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
                             <Sparkles className="h-4 w-4 text-white" />
@@ -284,18 +305,19 @@ export default function Chatbot() {
                     </div>
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="rounded-full p-1.5 text-gray-400 transition hover:bg-white/10 hover:text-white"
-                        aria-label="Minimizar chat"
+                        className="flex items-center gap-1.5 rounded-full px-3 py-2 text-gray-400 transition hover:bg-white/10 hover:text-white sm:p-1.5"
+                        aria-label="Cerrar chat"
                     >
+                        <span className="text-xs font-medium sm:hidden">Cerrar</span>
                         <ChevronDown className="h-4 w-4" />
                     </button>
                 </div>
 
-                {/* Mensajes */}
-                <div
-                    className="flex flex-col gap-4 overflow-y-auto px-4 py-4"
-                    style={{ minHeight: '280px', maxHeight: '360px' }}
-                >
+                {/* Mensajes
+                    Móvil:     flex-1 min-h-0 para que ocupe el espacio disponible y haga scroll
+                    Escritorio: altura fija con min/max
+                */}
+                <div className="flex flex-1 min-h-0 flex-col gap-4 overflow-y-auto px-4 py-4 sm:flex-none sm:min-h-70 sm:max-h-90">
                     {messages.map((msg) => (
                         <MessageBubble key={msg.id} msg={msg} />
                     ))}
@@ -305,16 +327,16 @@ export default function Chatbot() {
 
                 {/* Preguntas rápidas */}
                 {showQuickQuestions && (
-                    <div className="border-t border-gray-100 px-4 py-3">
+                    <div className="shrink-0 border-t border-gray-100 px-4 py-3">
                         <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
                             Preguntas frecuentes
                         </p>
-                        <div className="flex flex-col gap-1.5">
+                        <div className="grid grid-cols-1 gap-1.5 sm:flex sm:flex-col">
                             {QUICK_QUESTIONS.map((q) => (
                                 <button
                                     key={q}
                                     onClick={() => sendMessage(q)}
-                                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-xs text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
+                                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-xs text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
                                 >
                                     {q}
                                 </button>
@@ -326,7 +348,7 @@ export default function Chatbot() {
                 {/* Input */}
                 <form
                     onSubmit={handleSubmit}
-                    className="flex items-center gap-2 rounded-b-2xl border-t border-gray-100 bg-gray-50 px-3 py-2.5"
+                    className="flex shrink-0 items-center gap-2 rounded-b-2xl border-t border-gray-100 bg-gray-50 px-3 py-2.5"
                 >
                     <input
                         ref={inputRef}
@@ -349,10 +371,15 @@ export default function Chatbot() {
                 </form>
             </div>
 
-            {/* Botón flotante */}
+            {/* Botón flotante
+                En móvil se oculta cuando el chat está abierto (el header y el backdrop ya cierran).
+                En escritorio siempre visible para abrir/cerrar.
+            */}
             <button
                 onClick={() => setIsOpen((prev) => !prev)}
-                className="fixed bottom-5 right-4 z-1100 flex h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg shadow-black/20 transition-transform hover:scale-105 active:scale-95 sm:right-6"
+                className={`fixed bottom-5 right-4 z-1100 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg shadow-black/20 transition-all hover:scale-105 active:scale-95 sm:right-6 sm:flex ${
+                    isOpen ? 'hidden' : 'flex'
+                }`}
                 aria-label={isOpen ? 'Cerrar chat' : 'Abrir chat'}
             >
                 <span className={`absolute transition-all duration-200 ${isOpen ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
