@@ -372,7 +372,7 @@ export default function Product({
                                             max={priceRange.max}
                                             step={1}
                                             value={priceValue}
-                                            onValueChange={setPriceValue}
+                                            onValueChange={(v) => setPriceValue(v as [number, number])}
                                             className="mt-6"
                                         />
                                         <div className="flex items-center justify-between text-sm font-medium">
@@ -483,7 +483,7 @@ export default function Product({
                                         {products.data.map((product) => (
                                             <ProductCard
                                                 key={product.id}
-                                                product={product}
+                                                product={{ ...product, imageUrl: product.imageUrl ?? undefined }}
                                             />
                                         ))}
                                     </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\Client\CategoryController;
 use App\Http\Controllers\Client\ProductController;
 use App\Http\Controllers\HomeController;
@@ -16,6 +17,15 @@ Route::get('/categorias/{slug}', [CategoryController::class, 'show'])->name('cat
 // ------------------ SEARCH BAR ------------------------------------------
 
 Route::get('/buscar', [PublicProductController::class, 'search'])->name('product.search');
+
+// ------------------ CHATBOT ------------------------------------------
+
+Route::post('/chatbot', [ChatbotController::class, 'respond'])->name('chatbot.respond');
+
+Route::get('/libro-de-reclamaciones', fn () => inertia('Client/Reclamaciones'))->name('reclamaciones');
+Route::get('/terminos-y-condiciones', fn () => inertia('Client/TerminosCondiciones'))->name('terminos');
+Route::get('/politica-de-privacidad', fn () => inertia('Client/PoliticaPrivacidad'))->name('privacidad');
+Route::get('/preguntas-frecuentes', fn () => inertia('Client/PreguntasFrecuentes'))->name('faq');
 
 require __DIR__.'/admin.php';
 require __DIR__.'/auth.php';

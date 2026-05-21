@@ -386,7 +386,7 @@ export default function Payments({ payments }: PaymentsProps) {
                                         <TableHead>Cliente</TableHead>
                                         <TableHead>Monto</TableHead>
                                         <TableHead>Método</TableHead>
-                                        <TableHead>Comprobante</TableHead>
+                                        <TableHead>Orden de Compra</TableHead>
                                         <TableHead>Estado</TableHead>
                                         <TableHead>Fecha</TableHead>
                                         <TableHead className="text-right">
@@ -527,7 +527,7 @@ export default function Payments({ payments }: PaymentsProps) {
                                                                 }}
                                                             >
                                                                 <Eye className="h-4 w-4" />
-                                                                Ver comprobante
+                                                                Ver orden de compra
                                                             </DropdownMenuItem>
                                                         )}
                                                         <DropdownMenuItem
@@ -652,7 +652,7 @@ export default function Payments({ payments }: PaymentsProps) {
                     >
                         <DialogContent className="max-w-2xl">
                             <DialogHeader>
-                                <DialogTitle>Comprobante de pago</DialogTitle>
+                                <DialogTitle>Orden de Compra</DialogTitle>
                                 <DialogDescription>
                                     Pedido #{selectedPayment?.order_id} -{' '}
                                     {formatAmount(

@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { register } from '@/routes';
 
 type RegisterFormProps = {
     onSuccess?: () => void;
@@ -19,7 +20,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('register'), {
+        post(register.url(), {
             onSuccess: () => {
                 onSuccess?.();
             },

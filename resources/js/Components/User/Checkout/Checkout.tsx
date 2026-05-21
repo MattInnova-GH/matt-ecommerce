@@ -7,7 +7,6 @@ import { useCartStore } from '@/stores/cartStore';
 import { ProductList } from './components/ProductList';
 import { PaymentMethod } from './components/PaymentMethod';
 import { OrderSummary } from './components/OrderSummary';
-import Voucher from './components/Voucher';
 import { DeliveryMethod } from './components/DeliveryMethod';
 
 export function Checkout() {
@@ -43,8 +42,6 @@ export function Checkout() {
                     <DeliveryMethod />
 
                     <PaymentMethod />
-
-                    <Voucher />
                 </div>
 
                 <div className="w-full shrink-0 lg:w-95">

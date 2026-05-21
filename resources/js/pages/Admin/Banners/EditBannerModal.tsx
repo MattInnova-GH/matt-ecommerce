@@ -241,7 +241,7 @@ export function EditBannerModal({ banner }: EditBannerModalProps) {
                                         ) : (
                                             <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
                                                 <img
-                                                    src={currentImage}
+                                                    src={currentImage ?? undefined}
                                                     alt="Preview"
                                                     className="h-40 w-full object-cover"
                                                 />

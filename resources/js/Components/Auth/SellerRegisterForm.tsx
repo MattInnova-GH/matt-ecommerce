@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { register } from '@/routes';
 
 const BUSINESS_TYPES = [
     'Tecnología',
@@ -34,7 +35,7 @@ export function SellerRegisterForm() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('register')); // Debes configurar el controller para manejar esto
+        post(register.url()); // Debes configurar el controller para manejar esto
     };
 
     return (

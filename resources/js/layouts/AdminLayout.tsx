@@ -124,7 +124,7 @@ export default function AdminLayout({
     const navItems: NavItem[] = [
         {
             name: 'Dashboard',
-            href: admin.dashboard(),
+            href: admin.dashboard().url,
             icon: LayoutDashboard,
         },
         {
@@ -132,35 +132,35 @@ export default function AdminLayout({
             href: '/admin/productos',
             icon: Package,
             subitems: [
-                { name: 'Todos los productos', href: admin.products.index() },
-                { name: 'Crear producto', href: admin.products.create() },
-                { name: 'Categorías', href: admin.categories.index() },
-                { name: 'Marcas', href: admin.brands.index() },
+                { name: 'Todos los productos', href: admin.products.index().url },
+                { name: 'Crear producto', href: admin.products.create().url },
+                { name: 'Categorías', href: admin.categories.index().url },
+                { name: 'Marcas', href: admin.brands.index().url },
             ],
         },
         {
             name: 'Órdenes',
-            href: admin.orders.index(),
+            href: admin.orders.index().url,
             icon: ShoppingCart,
         },
         {
             name: 'Usuarios',
-            href: admin.users.index(),
+            href: admin.users.index().url,
             icon: User,
         },
         {
             name: 'Reseñas',
-            href: admin.reviews.index(),
+            href: admin.reviews.index().url,
             icon: Star,
         },
         {
             name: 'Banners',
-            href: admin.banners.index(),
+            href: admin.banners.index().url,
             icon: Image,
         },
         {
             name: 'Configuración',
-            href: admin.settings.index(),
+            href: admin.settings.index().url,
             icon: Settings,
         },
     ];

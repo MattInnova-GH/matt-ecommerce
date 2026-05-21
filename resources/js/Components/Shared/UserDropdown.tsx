@@ -17,7 +17,7 @@ type User = {
     name: string;
     last_name?: string;
     email: string;
-    role: 'client ' | 'admin';
+    role: 'client' | 'admin';
     image?: string;
 };
 
@@ -36,19 +36,19 @@ export default function UserDropdown({ user, onClose }: Props) {
 
     const commonLinks = [
         {
-            href: profile.index({ query: { section: 'orders' } }),
+            href: profile.index({ query: { section: 'orders' } }).url,
             label: 'Mis Compras',
             icon: ShoppingBag,
         },
-        { href: favorites.index(), label: 'Favoritos', icon: Heart },
-        { href: profile.index(), label: 'Configuración', icon: Settings },
+        { href: favorites.index().url, label: 'Favoritos', icon: Heart },
+        { href: profile.index().url, label: 'Configuración', icon: Settings },
     ];
 
-    const roleLinks = {
-        USER: [],
+    const roleLinks: Record<string, { href: string; label: string; icon: React.ElementType }[]> = {
+        client: [],
         admin: [
             {
-                href: dashboard(),
+                href: dashboard().url,
                 label: 'Dashboard Admin',
                 icon: LayoutDashboard,
             },

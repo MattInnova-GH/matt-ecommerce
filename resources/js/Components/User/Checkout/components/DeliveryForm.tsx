@@ -4,9 +4,9 @@ import { MapPin, User, Phone } from 'lucide-react';
 import MapPicker from './MapPicker';
 
 export function DeliveryForm() {
-    const { setDeliveryAddress, isCardModalOpen, isYapeModalOpen } =
+    const { setDeliveryAddress, isTransferModalOpen, isYapeModalOpen } =
         useCheckoutStore();
-    const isAnyModalOpen = isCardModalOpen || isYapeModalOpen;
+    const isAnyModalOpen = isTransferModalOpen || isYapeModalOpen;
 
     const [coords, setCoords] = useState({ lat: -12.0464, lng: -77.0428 });
     const [address, setAddress] = useState('');

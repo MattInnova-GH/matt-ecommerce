@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type DeliveryMethod = 'delivery' | 'pickup';
-export type PaymentMethod = 'card' | 'yape' | 'cash';
+export type PaymentMethod = 'transfer' | 'yape' | 'card';
+export type YapeMode = 'code' | 'qr';
 
 export interface DeliveryAddress {
     lat: number;
@@ -33,10 +34,23 @@ interface CheckoutState {
     deliveryAddress: DeliveryAddress | null;
     selectedStore: SelectedStore | null;
 
-    cardData: CardData | null;
-    yapePhone: string | null;
+    // Transferencia bancaria
+    transferConfirmed: boolean;
 
+    // Yape
+    yapePhone: string | null;
+    yapeCode: string | null;
+    yapeMode: YapeMode;
+
+    // Comprobante (no persistido — File no es serializable)
+    voucherFile: File | null;
+
+    // Card
+    cardData: CardData | null;
     isCardModalOpen: boolean;
+
+    // Modales
+    isTransferModalOpen: boolean;
     isYapeModalOpen: boolean;
 
     setDeliveryMethod: (method: DeliveryMethod) => void;
@@ -45,14 +59,23 @@ interface CheckoutState {
     setDeliveryAddress: (address: DeliveryAddress) => void;
     setSelectedStore: (store: SelectedStore) => void;
 
-    setCardData: (data: CardData) => void;
-    setYapePhone: (phone: string) => void;
+    setTransferConfirmed: (value: boolean) => void;
 
-    openCardModal: () => void;
-    closeCardModal: () => void;
+    setYapePhone: (phone: string) => void;
+    setYapeCode: (code: string) => void;
+    setYapeMode: (mode: YapeMode) => void;
+
+    setVoucherFile: (file: File | null) => void;
+
+    openTransferModal: () => void;
+    closeTransferModal: () => void;
 
     openYapeModal: () => void;
     closeYapeModal: () => void;
+
+    setCardData: (data: CardData) => void;
+    openCardModal: () => void;
+    closeCardModal: () => void;
 }
 
 export const DELIVERY_COST = 15;
@@ -61,77 +84,53 @@ export const useCheckoutStore = create<CheckoutState>()(
     persist(
         (set) => ({
             deliveryMethod: 'delivery',
-            paymentMethod: 'card',
+            paymentMethod: 'transfer',
 
             deliveryAddress: null,
             selectedStore: null,
 
-            cardData: null,
+            transferConfirmed: false,
+
             yapePhone: null,
+            yapeCode: null,
+            yapeMode: 'code',
+
             voucherFile: null,
 
+            cardData: null,
             isCardModalOpen: false,
+
+            isTransferModalOpen: false,
             isYapeModalOpen: false,
 
-            setDeliveryMethod: (method) =>
-                set({
-                    deliveryMethod: method,
-                }),
+            setDeliveryMethod: (method) => set({ deliveryMethod: method }),
+            setPaymentMethod: (method) => set({ paymentMethod: method }),
+            setDeliveryAddress: (address) => set({ deliveryAddress: address }),
+            setSelectedStore: (store) => set({ selectedStore: store }),
 
-            setPaymentMethod: (method) =>
-                set({
-                    paymentMethod: method,
-                }),
+            setTransferConfirmed: (value) => set({ transferConfirmed: value }),
 
-            setDeliveryAddress: (address) =>
-                set({
-                    deliveryAddress: address,
-                }),
+            setYapePhone: (phone) => set({ yapePhone: phone }),
+            setYapeCode: (code) => set({ yapeCode: code }),
+            setYapeMode: (mode) => set({ yapeMode: mode }),
 
-            setSelectedStore: (store) =>
-                set({
-                    selectedStore: store,
-                }),
+            setVoucherFile: (file) => set({ voucherFile: file }),
 
-            setCardData: (data) =>
-                set({
-                    cardData: data,
-                }),
+            openTransferModal: () => set({ isTransferModalOpen: true }),
+            closeTransferModal: () => set({ isTransferModalOpen: false }),
 
-            setYapePhone: (phone) =>
-                set({
-                    yapePhone: phone,
-                }),
+            openYapeModal: () => set({ isYapeModalOpen: true }),
+            closeYapeModal: () => set({ isYapeModalOpen: false }),
 
-            setVoucherFile: (file) =>
-                set({
-                    voucherFile: file,
-                }),
-
-            openCardModal: () =>
-                set({
-                    isCardModalOpen: true,
-                }),
-
-            closeCardModal: () =>
-                set({
-                    isCardModalOpen: false,
-                }),
-
-            openYapeModal: () =>
-                set({
-                    isYapeModalOpen: true,
-                }),
-
-            closeYapeModal: () =>
-                set({
-                    isYapeModalOpen: false,
-                }),
+            setCardData: (data) => set({ cardData: data }),
+            openCardModal: () => set({ isCardModalOpen: true }),
+            closeCardModal: () => set({ isCardModalOpen: false }),
         }),
         {
             name: 'checkout-storage',
             partialize: (state) => {
-                const { voucherFile, ...rest } = state;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { voucherFile, isTransferModalOpen, isYapeModalOpen, isCardModalOpen, ...rest } = state;
                 return rest;
             },
         },

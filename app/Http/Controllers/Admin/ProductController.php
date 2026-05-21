@@ -67,9 +67,10 @@ class ProductController extends Controller
             'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'gallery.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'variants' => ['nullable', 'array'],
-            'variants.*.name' => ['required_with:variants', 'string', 'max:255'],
-            'variants.*.value' => ['required_with:variants', 'string', 'max:255'],
-            'variants.*.stock' => ['required_with:variants', 'integer', 'min:0'],
+            'variants.*.name' => ['nullable', 'string', 'max:255'],
+            'variants.*.value' => ['nullable', 'string', 'max:255'],
+            'variants.*.stock' => ['nullable', 'integer', 'min:0'],
+            'variants.*.price' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         // Generar slug si no viene
@@ -105,11 +106,14 @@ class ProductController extends Controller
             // Guardar variantes
             if (! empty($validated['variants'])) {
                 foreach ($validated['variants'] as $variant) {
-                    $product->variants()->create([
-                        'name' => $variant['name'],
-                        'value' => $variant['value'],
-                        'stock' => $variant['stock'],
-                    ]);
+                    if (! empty($variant['name']) && ! empty($variant['value'])) {
+                        $product->variants()->create([
+                            'name' => $variant['name'],
+                            'value' => $variant['value'],
+                            'stock' => $variant['stock'] ?? 0,
+                            'price' => isset($variant['price']) && $variant['price'] !== '' ? $variant['price'] : null,
+                        ]);
+                    }
                 }
             }
 
@@ -141,9 +145,10 @@ class ProductController extends Controller
             'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'gallery.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'variants' => ['nullable', 'array'],
-            'variants.*.name' => ['required_with:variants', 'string', 'max:255'],
-            'variants.*.value' => ['required_with:variants', 'string', 'max:255'],
-            'variants.*.stock' => ['required_with:variants', 'integer', 'min:0'],
+            'variants.*.name' => ['nullable', 'string', 'max:255'],
+            'variants.*.value' => ['nullable', 'string', 'max:255'],
+            'variants.*.stock' => ['nullable', 'integer', 'min:0'],
+            'variants.*.price' => ['nullable', 'numeric', 'min:0'],
             'deleted_images' => ['nullable', 'array'],
             'deleted_images.*' => ['integer', 'exists:product_images,id'],
         ]);
@@ -204,6 +209,7 @@ class ProductController extends Controller
                             'name' => $variant['name'],
                             'value' => $variant['value'],
                             'stock' => $variant['stock'] ?? 0,
+                            'price' => isset($variant['price']) && $variant['price'] !== '' ? $variant['price'] : null,
                         ]);
                     }
                 }

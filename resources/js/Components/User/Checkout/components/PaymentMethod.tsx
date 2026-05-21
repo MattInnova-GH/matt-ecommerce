@@ -1,43 +1,37 @@
-import { CreditCard, Smartphone } from 'lucide-react';
+import { Banknote, Smartphone } from 'lucide-react';
 import { useCheckoutStore } from '@/stores/checkoutStore';
-import { CardModal } from './CardModal';
+import { TransferModal } from './TransferModal';
 import { YapeModal } from './YapeModal';
 
 export function PaymentMethod() {
     const {
         paymentMethod,
         setPaymentMethod,
-        openCardModal,
+        openTransferModal,
         openYapeModal,
-        isCardModalOpen,
+        isTransferModalOpen,
         isYapeModalOpen,
     } = useCheckoutStore();
 
     const options = [
         {
-            id: 'card' as const,
-            label: 'Tarjeta',
-            description: 'Crédito o débito',
-            icon: CreditCard,
+            id: 'transfer' as const,
+            label: 'Transferencia',
+            description: 'Cuenta bancaria / CCI',
+            icon: Banknote,
         },
         {
             id: 'yape' as const,
-            label: 'Yape / Plin',
-            description: 'Pago por QR',
+            label: 'Yape',
+            description: 'Código o QR de pago',
             icon: Smartphone,
         },
     ];
 
-    const handleSelect = (id: 'card' | 'yape' | 'cash') => {
+    const handleSelect = (id: 'transfer' | 'yape') => {
         setPaymentMethod(id);
-
-        if (id === 'card') {
-            openCardModal();
-        }
-
-        if (id === 'yape') {
-            openYapeModal();
-        }
+        if (id === 'transfer') openTransferModal();
+        if (id === 'yape') openYapeModal();
     };
 
     return (
@@ -62,7 +56,7 @@ export function PaymentMethod() {
                                 isSelected
                                     ? 'border-gray-900 bg-gray-50'
                                     : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                            } `}
+                            }`}
                         >
                             <div
                                 className={`rounded-xl p-3 transition-colors ${isSelected ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'}`}
@@ -84,8 +78,7 @@ export function PaymentMethod() {
                 })}
             </div>
 
-            {/* Modales */}
-            {isCardModalOpen && <CardModal />}
+            {isTransferModalOpen && <TransferModal />}
             {isYapeModalOpen && <YapeModal />}
         </div>
     );

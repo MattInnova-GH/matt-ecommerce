@@ -39,6 +39,7 @@ interface Variant {
     name: string;
     value: string;
     stock: number;
+    price: number | '';
 }
 
 interface Category {
@@ -61,9 +62,6 @@ export default function CreateProduct({
     brands,
 }: CreateProductProps) {
     const [activeTab, setActiveTab] = useState('basic');
-    const [variants, setVariants] = useState<Variant[]>([
-        { name: '', value: '', stock: 0 },
-    ]);
     const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
         null,
     );
@@ -81,37 +79,37 @@ export default function CreateProduct({
         gallery: [] as File[],
         is_active: true,
         is_featured: false,
-        variants: [] as Variant[],
+        variants: [{ name: '', value: '', stock: 0, price: '' as number | '' }] as Variant[],
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const validVariants = variants.filter((v) => v.name && v.value);
-        setData('variants', validVariants);
-
-        post(admin.products.store(), {
-            onSuccess: () => {
-                // Redirigir después de guardar
-            },
+        post(admin.products.store().url, {
+            onSuccess: () => {},
             preserveScroll: true,
         });
     };
 
     const addVariant = () => {
-        setVariants([...variants, { name: '', value: '', stock: 0 }]);
+        setData('variants', [...data.variants, { name: '', value: '', stock: 0, price: '' }]);
     };
 
     const removeVariant = (index: number) => {
-        if (variants.length > 1) {
-            setVariants(variants.filter((_, i) => i !== index));
+        if (data.variants.length > 1) {
+            setData('variants', data.variants.filter((_, i) => i !== index));
         }
     };
 
-    const updateVariant = (index: number, field: keyof Variant, value: any) => {
-        const updatedVariants = [...variants];
-        updatedVariants[index][field] =
-            field === 'stock' ? parseInt(value) || 0 : value;
-        setVariants(updatedVariants);
+    const updateVariant = (index: number, field: keyof Variant, value: string) => {
+        const updated = [...data.variants];
+        if (field === 'stock') {
+            updated[index][field] = parseInt(value) || 0;
+        } else if (field === 'price') {
+            updated[index][field] = value === '' ? '' : parseFloat(value) || '';
+        } else {
+            updated[index][field] = value as never;
+        }
+        setData('variants', updated);
     };
 
     const handleThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +150,7 @@ export default function CreateProduct({
 
     const totalStock =
         parseInt(data.stock || '0') +
-        variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+        data.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
 
     return (
         <div className="min-h-screen bg-background">
@@ -602,66 +600,53 @@ export default function CreateProduct({
                                                 </AlertDescription>
                                             </Alert>
 
-                                            {variants.map((variant, index) => (
+                                            {data.variants.map((variant, index) => (
                                                 <Card key={index}>
                                                     <CardContent className="p-4">
-                                                        <div className="grid gap-3 md:grid-cols-4">
+                                                        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-5">
                                                             <Input
                                                                 placeholder="Tipo (Ej: Talla)"
-                                                                value={
-                                                                    variant.name
-                                                                }
+                                                                value={variant.name}
                                                                 onChange={(e) =>
-                                                                    updateVariant(
-                                                                        index,
-                                                                        'name',
-                                                                        e.target
-                                                                            .value,
-                                                                    )
+                                                                    updateVariant(index, 'name', e.target.value)
                                                                 }
                                                             />
                                                             <Input
                                                                 placeholder="Valor (Ej: M)"
-                                                                value={
-                                                                    variant.value
-                                                                }
+                                                                value={variant.value}
                                                                 onChange={(e) =>
-                                                                    updateVariant(
-                                                                        index,
-                                                                        'value',
-                                                                        e.target
-                                                                            .value,
-                                                                    )
+                                                                    updateVariant(index, 'value', e.target.value)
                                                                 }
                                                             />
                                                             <Input
                                                                 type="number"
                                                                 placeholder="Stock"
-                                                                value={
-                                                                    variant.stock
-                                                                }
+                                                                value={variant.stock}
                                                                 onChange={(e) =>
-                                                                    updateVariant(
-                                                                        index,
-                                                                        'stock',
-                                                                        e.target
-                                                                            .value,
-                                                                    )
+                                                                    updateVariant(index, 'stock', e.target.value)
                                                                 }
                                                             />
+                                                            <div className="relative">
+                                                                <span className="absolute top-1/2 left-3 -translate-y-1/2 text-xs text-muted-foreground">
+                                                                    S/
+                                                                </span>
+                                                                <Input
+                                                                    type="number"
+                                                                    step="0.01"
+                                                                    placeholder="Precio"
+                                                                    value={variant.price}
+                                                                    className="pl-8"
+                                                                    onChange={(e) =>
+                                                                        updateVariant(index, 'price', e.target.value)
+                                                                    }
+                                                                />
+                                                            </div>
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() =>
-                                                                    removeVariant(
-                                                                        index,
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    variants.length ===
-                                                                    1
-                                                                }
+                                                                onClick={() => removeVariant(index)}
+                                                                disabled={data.variants.length === 1}
                                                                 className="text-red-500 hover:text-red-600"
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
@@ -740,14 +725,14 @@ export default function CreateProduct({
                                         {parseInt(data.stock || '0') > 0 && (
                                             <div className="text-xs text-muted-foreground">
                                                 Base: {data.stock} | Variantes:{' '}
-                                                {variants.reduce(
+                                                {data.variants.reduce(
                                                     (s, v) => s + v.stock,
                                                     0,
                                                 )}
                                             </div>
                                         )}
                                     </div>
-                                    {variants.some(
+                                    {data.variants.some(
                                         (v) => v.name && v.value,
                                     ) && (
                                         <>
@@ -758,7 +743,7 @@ export default function CreateProduct({
                                                 </div>
                                                 <div className="text-sm text-muted-foreground">
                                                     {
-                                                        variants.filter(
+                                                        data.variants.filter(
                                                             (v) =>
                                                                 v.name &&
                                                                 v.value,

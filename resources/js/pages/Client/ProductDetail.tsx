@@ -52,6 +52,14 @@ interface RelatedProduct {
     images?: ProductImage[];
 }
 
+interface ProductVariant {
+    id: number;
+    name: string;
+    value: string;
+    stock: number;
+    price: number | null;
+}
+
 interface ProductDetail {
     id: number;
     name: string;
@@ -64,6 +72,7 @@ interface ProductDetail {
     category?: { id: number; name: string };
     brand?: { id: number; name: string };
     reviews: Review[];
+    variants?: ProductVariant[];
 }
 
 interface ProductDetailProps {
@@ -220,7 +229,23 @@ export default function ProductDetail({
     );
     const [quantity, setQuantity] = useState(1);
     const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
     const { addItem, openCart } = useCartStore();
+
+    // Precio activo: precio de la variante seleccionada (si tiene) o precio base
+    const activePrice =
+        selectedVariant?.price != null ? selectedVariant.price : product.price;
+    const activeStock =
+        selectedVariant ? selectedVariant.stock : product.stock;
+
+    // Agrupar variantes por nombre (Ej: "Talla", "Color")
+    const variantGroups = (product.variants ?? []).reduce<
+        Record<string, ProductVariant[]>
+    >((acc, v) => {
+        if (!acc[v.name]) acc[v.name] = [];
+        acc[v.name].push(v);
+        return acc;
+    }, {});
 
     // Combinar thumbnail con galería, evitando duplicados
     const allImages: ProductImage[] = [
@@ -228,17 +253,21 @@ export default function ProductDetail({
         ...product.images.filter((img) => img.image_url !== product.thumbnail),
     ];
 
+    const productImage = product.thumbnail
+        ? product.thumbnail.startsWith('http')
+            ? product.thumbnail
+            : `/storage/${product.thumbnail}`
+        : '';
+
     const addToCart = () => {
         addItem({
             id: product.id,
-            name: product.name,
-            price: product.price,
+            name: selectedVariant
+                ? `${product.name} (${selectedVariant.name}: ${selectedVariant.value})`
+                : product.name,
+            price: activePrice,
             quantity: quantity,
-            image: product.thumbnail
-                ? product.thumbnail.startsWith('http')
-                    ? product.thumbnail
-                    : `/storage/${product.thumbnail}`
-                : '',
+            image: productImage,
             category: product.category?.name || 'General',
         });
         openCart();
@@ -247,14 +276,12 @@ export default function ProductDetail({
     const handleProcessPayment = () => {
         addItem({
             id: product.id,
-            name: product.name,
-            price: product.price,
+            name: selectedVariant
+                ? `${product.name} (${selectedVariant.name}: ${selectedVariant.value})`
+                : product.name,
+            price: activePrice,
             quantity: quantity,
-            image: product.thumbnail
-                ? product.thumbnail.startsWith('http')
-                    ? product.thumbnail
-                    : `/storage/${product.thumbnail}`
-                : '',
+            image: productImage,
             category: product.category?.name || 'General',
         });
         router.get('/checkout');
@@ -386,15 +413,21 @@ export default function ProductDetail({
 
                             <div>
                                 <span className="text-3xl font-bold text-primary">
-                                    {formatCurrency(product.price)}
+                                    {formatCurrency(activePrice)}
                                 </span>
+                                {selectedVariant?.price != null &&
+                                    selectedVariant.price !== product.price && (
+                                        <span className="ml-2 text-sm text-muted-foreground line-through">
+                                            {formatCurrency(product.price)}
+                                        </span>
+                                    )}
                                 <div className="mt-2">
-                                    {product.stock > 0 ? (
+                                    {activeStock > 0 ? (
                                         <Badge
                                             variant="outline"
                                             className="border-emerald-200 bg-emerald-50 text-emerald-700"
                                         >
-                                            En stock ({product.stock} unidades)
+                                            En stock ({activeStock} unidades)
                                         </Badge>
                                     ) : (
                                         <Badge variant="destructive">
@@ -403,6 +436,71 @@ export default function ProductDetail({
                                     )}
                                 </div>
                             </div>
+
+                            {/* Selector de variantes */}
+                            {Object.keys(variantGroups).length > 0 && (
+                                <div className="space-y-3">
+                                    {Object.entries(variantGroups).map(
+                                        ([groupName, groupVariants]) => (
+                                            <div key={groupName}>
+                                                <p className="mb-2 text-sm font-medium">
+                                                    {groupName}:{' '}
+                                                    {selectedVariant?.name ===
+                                                        groupName && (
+                                                        <span className="font-normal text-muted-foreground">
+                                                            {
+                                                                selectedVariant.value
+                                                            }
+                                                        </span>
+                                                    )}
+                                                </p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {groupVariants.map((v) => {
+                                                        const isSelected =
+                                                            selectedVariant?.id ===
+                                                            v.id;
+                                                        return (
+                                                            <button
+                                                                key={v.id}
+                                                                onClick={() =>
+                                                                    setSelectedVariant(
+                                                                        isSelected
+                                                                            ? null
+                                                                            : v,
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    v.stock ===
+                                                                    0
+                                                                }
+                                                                className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-all ${
+                                                                    isSelected
+                                                                        ? 'border-primary bg-primary text-primary-foreground'
+                                                                        : v.stock === 0
+                                                                          ? 'cursor-not-allowed border-gray-100 bg-gray-50 text-gray-300 line-through'
+                                                                          : 'border-gray-200 hover:border-primary'
+                                                                }`}
+                                                            >
+                                                                {v.value}
+                                                                {v.price !=
+                                                                    null &&
+                                                                    v.price !==
+                                                                        product.price && (
+                                                                        <span className="ml-1 text-xs opacity-70">
+                                                                            {formatCurrency(
+                                                                                v.price,
+                                                                            )}
+                                                                        </span>
+                                                                    )}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ),
+                                    )}
+                                </div>
+                            )}
 
                             <div className="space-y-2">
                                 <h3 className="font-semibold">Descripción</h3>
@@ -416,7 +514,7 @@ export default function ProductDetail({
 
                             {/* Cantidad y carrito */}
                             <div className="space-y-4">
-                                {product.stock > 0 && (
+                                {activeStock > 0 && (
                                     <div className="flex items-center gap-4">
                                         <span className="text-sm font-medium">
                                             Cantidad:

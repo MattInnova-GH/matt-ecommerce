@@ -1,4 +1,5 @@
 import { AuthModal } from '@/Components/Shared/AuthModal';
+import Chatbot from '@/Components/Shared/Chatbot';
 import Footer from '@/Components/Shared/Footer';
 import Navbar from '@/Components/Shared/Navbar';
 
@@ -6,7 +7,7 @@ import { useState } from 'react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>(
+    const [authModalTab, _setAuthModalTab] = useState<'login' | 'register'>(
         'login',
     );
 
@@ -20,6 +21,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 onClose={() => setIsAuthModalOpen(false)}
                 defaultTab={authModalTab}
             />
+            <Chatbot />
         </>
     );
 }

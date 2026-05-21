@@ -20,7 +20,7 @@ export default function Footer() {
     return (
         <footer className="bg-gray-900 text-gray-300">
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-4">
+                <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                     <div>
                         <Link href="/" className="mb-6 inline-block">
                             {settings?.logo ? (
@@ -110,6 +110,36 @@ export default function Footer() {
                                     className="transition hover:text-white"
                                 >
                                     Inicio
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="mb-6 font-semibold text-white">Legal</h4>
+                        <ul className="space-y-4 text-sm">
+                            <li>
+                                <Link
+                                    href="/terminos-y-condiciones"
+                                    className="transition hover:text-white"
+                                >
+                                    Términos y Condiciones
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/politica-de-privacidad"
+                                    className="transition hover:text-white"
+                                >
+                                    Política de Privacidad
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/libro-de-reclamaciones"
+                                    className="transition hover:text-white"
+                                >
+                                    Libro de Reclamaciones
                                 </Link>
                             </li>
                         </ul>
@@ -222,7 +252,7 @@ export default function Footer() {
                     <div className="flex gap-4">
                         <CreditCard size={24} className="text-gray-500" />
                         <span className="flex items-center text-xs text-gray-500">
-                            Yape • Plin • Tarjetas
+                            Yape • Transferencia bancaria
                         </span>
                     </div>
                     <p className="text-xs text-gray-500">

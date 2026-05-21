@@ -131,9 +131,8 @@ export const STATUS_CONFIG: Record<
 };
 
 export const PAYMENT_METHODS: Record<string, string> = {
-    credit_card: 'Tarjeta de crédito',
-    debit_card: 'Tarjeta de débito',
-    paypal: 'PayPal',
+    transfer: 'Transferencia bancaria',
+    yape: 'Yape',
     bank_transfer: 'Transferencia bancaria',
     cash: 'Efectivo',
 };
@@ -339,7 +338,7 @@ export default function OrderDetailModal({
                                     {order.payment?.receipt_url && (
                                         <div className="mt-4 space-y-2">
                                             <p className="text-xs text-muted-foreground">
-                                                Comprobante
+                                                Orden de Compra
                                             </p>
                                             <div className="overflow-hidden rounded-md border bg-background">
                                                 {order.payment.receipt_url.match(
@@ -347,7 +346,7 @@ export default function OrderDetailModal({
                                                 ) ? (
                                                     <img
                                                         src={`/storage/${order.payment.receipt_url}`}
-                                                        alt="Comprobante"
+                                                        alt="Orden de Compra"
                                                         className="max-h-40 w-full cursor-zoom-in object-contain"
                                                         onClick={() =>
                                                             window.open(
@@ -371,13 +370,13 @@ export default function OrderDetailModal({
                                                 className="w-full text-xs"
                                                 asChild
                                             >
-                                                href=
-                                                {`/storage/${order.payment.receipt_url}`}
-                                                target="_blank" rel="noopener
-                                                noreferrer"
-                                                <a>
+                                                <a
+                                                    href={`/storage/${order.payment.receipt_url}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
                                                     <Eye className="mr-1.5 h-3.5 w-3.5" />
-                                                    Ver comprobante completo
+                                                    Ver orden de compra completa
                                                 </a>
                                             </Button>
                                         </div>

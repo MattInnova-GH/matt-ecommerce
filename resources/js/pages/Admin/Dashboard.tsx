@@ -312,8 +312,8 @@ export default function Dashboard({
                                         boxShadow:
                                             '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                                     }}
-                                    formatter={(value: number) => [
-                                        formatCurrency(value),
+                                    formatter={(value) => [
+                                        formatCurrency(Number(value ?? 0)),
                                         'Ingresos',
                                     ]}
                                 />

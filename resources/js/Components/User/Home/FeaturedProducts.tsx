@@ -81,7 +81,7 @@ export default function FeaturedProducts({ products = [] }: Props) {
                             key={product.id}
                             product={{
                                 ...product,
-                                imageUrl: product.imageUrl || null,
+                                imageUrl: product.imageUrl || undefined,
                                 stock: 10, // Default para destacados
                                 category: product.category || 'Destacado',
                                 is_favorited: false,

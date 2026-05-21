@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    User,
+    User as UserIcon,
     Settings,
     LogOut,
     ShoppingBag,
@@ -9,10 +9,10 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Section } from './types/settings';
+import { Section, User } from './types/settings';
 
 interface SettingsSidebarProps {
-    user: UserType;
+    user: User;
     activeSection: Section;
     onSectionChange: (section: Section) => void;
     onLogout: () => void;
@@ -27,7 +27,7 @@ const navItems: {
     label: string;
     icon: React.ElementType;
 }[] = [
-    { id: 'profile', label: 'Mi Perfil', icon: User },
+    { id: 'profile', label: 'Mi Perfil', icon: UserIcon },
     { id: 'orders', label: 'Mis Pedidos', icon: ShoppingBag },
     { id: 'favorites', label: 'Favoritos', icon: Heart },
     { id: 'password', label: 'Configuración', icon: Settings },
