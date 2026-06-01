@@ -4,7 +4,7 @@
 
 ## 🚀 Guía de Instalación y Configuración Local
 
-Para poder ver y probar el sitio web en tu computadora, debes instalar algunas herramientas básicas. Sigue estos pasos en orden:
+Para poder ver y probar el sitio web en tu computadora, debes instalar algunas herramientas básicas. Sigue estos pasos en orden:::
 
 ### 1. Requisitos Previos (Instalación de Programas)
 
