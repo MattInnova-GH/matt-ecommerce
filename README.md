@@ -1,8 +1,6 @@
 # Documentación de Inicio y Arquitectura del Proyecto (E-commerce)
 
-¡Bienvenido! Este documento contiene la información básica y detallada sobre la estructura y configuración local de nuestro proyecto E-commerce. Está pensado especialmente para que cualquier persona, incluso sin conocimientos avanzados de programación, pueda entender cómo levantar el proyecto en su computadora y comprender qué hace cada parte del sistema.
-
----
+## ¡Bienvenido! Este documento contiene la información básica y detallada sobre la estructura y configuración local de nuestro proyecto E-commerce. Está pensado especialmente para que cualquier persona, incluso sin conocimientos avanzados de programación, pueda entender cómo levantar el proyecto en su computadora y comprender qué hace cada parte del sistema.
 
 ## 🚀 Guía de Instalación y Configuración Local
 
