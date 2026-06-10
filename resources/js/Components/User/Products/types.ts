@@ -8,6 +8,9 @@ export interface PublicProduct {
     slug: string;
     name: string;
     description?: string;
+    final_price: number; // ✅ Precio con descuento (NUEVO)
+    has_discount: boolean; // ✅ Si tiene descuento (NUEVO)
+    discount_badge?: string; // ✅ Texto del descuento ej: "-20%" (NUEVO)
     price: number;
     stock: number;
     category: string;

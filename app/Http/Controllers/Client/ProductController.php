@@ -21,7 +21,7 @@ class ProductController extends Controller
 
         // Búsqueda por nombre
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%'.$request->search.'%');
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         // Filtro por categoría
@@ -65,24 +65,24 @@ class ProductController extends Controller
                 break;
         }
 
+        // ✅ CORREGIDO: Ahora incluimos todos los datos de descuento
         $products = $query->paginate(12)->through(fn ($product) => [
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
-            'price' => $product->price,
+            'price' => (float) $product->price,
+            'final_price' => $product->final_price,      // ✅ Precio con descuento
+            'has_discount' => $product->has_discount,    // ✅ Si tiene descuento
+            'discount_badge' => $product->discount_badge, // ✅ Texto del descuento
             'stock' => $product->stock,
             'category' => $product->category->name ?? 'General',
-            'imageUrl' => $product->thumbnail ? (str_starts_with($product->thumbnail, 'http') ? $product->thumbnail : '/storage/'.$product->thumbnail) : null,
+            'imageUrl' => $product->thumbnail ? (str_starts_with($product->thumbnail, 'http') ? $product->thumbnail : '/storage/' . $product->thumbnail) : null,
             'is_favorited' => auth()->check() ? $product->favoritedBy()->where('user_id', auth()->id())->exists() : false,
         ]);
 
-        // Obtener categorías activas para filtros
         $categories = Category::where('is_active', true)->get();
-
-        // Obtener marcas
         $brands = Brand::all();
 
-        // Calcular rango de precios
         $minProductPrice = Product::where('is_active', true)->min('price') ?? 0;
         $maxProductPrice = Product::where('is_active', true)->max('price') ?? 1000;
 
@@ -106,73 +106,110 @@ class ProductController extends Controller
     }
 
     public function show($slug)
-    {
-        $product = Product::with([
-            'category',
-            'brand',
-            'images',
-            'variants',
-            'reviews' => function ($query) {
-                $query->where('is_approved', true)
-                    ->with('user')
-                    ->orderBy('created_at', 'desc');
-            },
-        ])
-            ->where('slug', $slug)
-            ->where('is_active', true)
-            ->firstOrFail();
+{
+    $product = Product::with([
+        'category',
+        'brand',
+        'images',
+        'variants',
+        'reviews' => function ($query) {
+            $query->where('is_approved', true)
+                ->with('user')
+                ->orderBy('created_at', 'desc');
+        },
+    ])
+        ->where('slug', $slug)
+        ->where('is_active', true)
+        ->firstOrFail();
 
-        // Mapear reviews para incluir nombre y avatar formateados
-        $product->setRelation('reviews', $product->reviews->map(function ($review) {
-            $review->user = (object) [
-                'id' => $review->user->id,
-                'name' => $review->user->first_name.' '.$review->user->last_name,
-                'avatar' => $review->user->avatar,
+    // Mapear reviews para incluir nombre y avatar formateados
+    $product->setRelation('reviews', $product->reviews->map(function ($review) {
+        $review->user = (object) [
+            'id' => $review->user->id,
+            'name' => $review->user->first_name.' '.$review->user->last_name,
+            'avatar' => $review->user->avatar,
+        ];
+
+        return $review;
+    }));
+
+    // Calcular promedio de calificaciones basado solo en aprobadas
+    $averageRating = $product->reviews->avg('rating') ?? 0;
+    $totalReviews = $product->reviews->count();
+
+    // ✅ CORREGIDO: Productos relacionados con datos de descuento
+    $relatedProducts = Product::where('category_id', $product->category_id)
+        ->where('id', '!=', $product->id)
+        ->where('is_active', true)
+        ->with('images')
+        ->limit(4)
+        ->get()
+        ->map(function ($related) {
+            return [
+                'id' => $related->id,
+                'name' => $related->name,
+                'slug' => $related->slug,
+                'price' => (float) $related->price,
+                'final_price' => $related->final_price,      // ✅ Precio con descuento
+                'has_discount' => $related->has_discount,    // ✅ Si tiene descuento
+                'discount_badge' => $related->discount_badge, // ✅ Texto del descuento
+                'thumbnail' => $related->thumbnail,
+                'images' => $related->images,
             ];
+        });
 
-            return $review;
-        }));
+    $product->is_favorited = auth()->check() ? $product->favoritedBy()->where('user_id', auth()->id())->exists() : false;
 
-        // Calcular promedio de calificaciones basado solo en aprobadas
-        $averageRating = $product->reviews->avg('rating') ?? 0;
-        $totalReviews = $product->reviews->count();
+    // Verificar si el usuario puede comentar
+    $canReview = false;
+    if (auth()->check()) {
+        $canReview = Order::where('user_id', auth()->id())
+            ->whereIn('status', ['ACCEPTED', 'SHIPPED', 'DELIVERED'])
+            ->whereHas('items', function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })
+            ->exists();
 
-        // Productos relacionados (misma categoría, excluyendo el actual)
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->where('is_active', true)
-            ->with('images')
-            ->limit(4)
-            ->get();
+        // Opcional: Evitar múltiples reseñas del mismo usuario para el mismo producto
+        $hasAlreadyReviewed = Review::where('user_id', auth()->id())
+            ->where('product_id', $product->id)
+            ->exists();
 
-        $product->is_favorited = auth()->check() ? $product->favoritedBy()->where('user_id', auth()->id())->exists() : false;
-
-        // Verificar si el usuario puede comentar
-        $canReview = false;
-        if (auth()->check()) {
-            $canReview = Order::where('user_id', auth()->id())
-                ->whereIn('status', ['ACCEPTED', 'SHIPPED', 'DELIVERED'])
-                ->whereHas('items', function ($query) use ($product) {
-                    $query->where('product_id', $product->id);
-                })
-                ->exists();
-
-            // Opcional: Evitar múltiples reseñas del mismo usuario para el mismo producto
-            $hasAlreadyReviewed = Review::where('user_id', auth()->id())
-                ->where('product_id', $product->id)
-                ->exists();
-
-            if ($hasAlreadyReviewed) {
-                $canReview = false;
-            }
+        if ($hasAlreadyReviewed) {
+            $canReview = false;
         }
-
-        return Inertia::render('Client/ProductDetail', [
-            'product' => $product,
-            'averageRating' => round($averageRating, 1),
-            'totalReviews' => $totalReviews,
-            'relatedProducts' => $relatedProducts,
-            'canReview' => $canReview,
-        ]);
     }
+
+    // ✅ CORREGIDO: Mapeo explícito del producto con todos los campos
+    return Inertia::render('Client/ProductDetail', [
+        'product' => [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'description' => $product->description,
+            'price' => (float) $product->price,
+            'final_price' => $product->final_price,        // ✅ IMPORTANTE
+            'has_discount' => $product->has_discount,      // ✅ IMPORTANTE
+            'discount_badge' => $product->discount_badge,  // ✅ IMPORTANTE
+            'stock' => $product->stock,
+            'thumbnail' => $product->thumbnail,
+            'images' => $product->images,
+            'category' => $product->category ? [
+                'id' => $product->category->id,
+                'name' => $product->category->name,
+            ] : null,
+            'brand' => $product->brand ? [
+                'id' => $product->brand->id,
+                'name' => $product->brand->name,
+            ] : null,
+            'variants' => $product->variants,
+            'reviews' => $product->reviews,
+            'is_favorited' => $product->is_favorited,
+        ],
+        'averageRating' => round($averageRating, 1),
+        'totalReviews' => $totalReviews,
+        'relatedProducts' => $relatedProducts,
+        'canReview' => $canReview,
+    ]);
+}
 }

@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-        'name', 'slug', 'description',  'price', 'stock',
-        'thumbnail', 'is_active', 'is_featured',
-        'category_id', 'brand_id', 'supplier_id',
+        'name', 'slug', 'description', 'price', 'stock', 'thumbnail', 
+        'is_active', 'is_featured', 'category_id', 'brand_id', 'supplier_id',
     ];
 
     protected $casts = [
@@ -61,5 +60,45 @@ class Product extends Model
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    /**
+     * Obtiene la promoción activa del producto (hereda de su categoría)
+     */
+    public function getActivePromotionAttribute(): ?Promotion
+    {
+        return $this->category?->activePromotion();
+    }
+
+    /**
+     * Precio final con descuento aplicado si hay promoción activa
+     */
+    public function getFinalPriceAttribute(): float
+    {
+        $promotion = $this->active_promotion;
+        if ($promotion && $promotion->isCurrentlyActive()) {
+            return $promotion->applyDiscount($this->price);
+        }
+        return (float) $this->price;
+    }
+
+    /**
+     * Obtiene el badge de descuento para mostrar
+     */
+    public function getDiscountBadgeAttribute(): ?string
+    {
+        $promotion = $this->active_promotion;
+        if ($promotion && $promotion->isCurrentlyActive()) {
+            return $promotion->getDiscountBadgeText();
+        }
+        return null;
+    }
+
+    /**
+     * Indica si el producto tiene descuento activo
+     */
+    public function getHasDiscountAttribute(): bool
+    {
+        return $this->final_price < $this->price;
     }
 }

@@ -3,14 +3,21 @@ import { Heart, Package } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-
 import { PublicProduct } from './types';
 
 type Props = {
     product: PublicProduct;
 };
 
-function OptimizedImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+function OptimizedImage({
+    src,
+    alt,
+    className,
+}: {
+    src: string;
+    alt: string;
+    className?: string;
+}) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -25,18 +32,21 @@ function OptimizedImage({ src, alt, className }: { src: string; alt: string; cla
     }, [src]);
 
     return (
-        <div className={cn("relative h-full w-full overflow-hidden", className)}>
+        <div
+            className={cn('relative h-full w-full overflow-hidden', className)}
+        >
             {isLoading && (
                 <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
             )}
-            
             {!error ? (
                 <img
                     src={src}
                     alt={alt}
                     className={cn(
-                        "h-full w-full object-cover transition-all duration-700",
-                        isLoading ? "scale-110 blur-sm opacity-0" : "scale-100 blur-0 opacity-100"
+                        'h-full w-full object-cover transition-all duration-700',
+                        isLoading
+                            ? 'scale-110 opacity-0 blur-sm'
+                            : 'blur-0 scale-100 opacity-100',
                     )}
                 />
             ) : (
@@ -64,17 +74,19 @@ export function ProductCardSkeleton() {
 export default function ProductCard({ product }: Props) {
     const [liked, setLiked] = useState(product.is_favorited ?? false);
 
+    // ✅ Determinar qué precio mostrar
+    const displayPrice = product.has_discount
+        ? product.final_price
+        : product.price;
+
     const toggleFavorite = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-
         setLiked(!liked);
         router.post(
             `/favoritos/toggle/${product.id}`,
             {},
-            {
-                preserveScroll: true,
-            },
+            { preserveScroll: true },
         );
     };
 
@@ -83,10 +95,10 @@ export default function ProductCard({ product }: Props) {
             <Link href={`/productos/${product.slug}`} className="block">
                 <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-muted">
                     {product.imageUrl ? (
-                        <OptimizedImage 
-                            src={product.imageUrl} 
-                            alt={product.name} 
-                            className="group-hover:scale-105 transition-transform duration-500"
+                        <OptimizedImage
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="transition-transform duration-500 group-hover:scale-105"
                         />
                     ) : (
                         <div className="flex h-full items-center justify-center bg-muted text-sm text-muted-foreground">
@@ -95,15 +107,25 @@ export default function ProductCard({ product }: Props) {
                         </div>
                     )}
 
-                    {product.stock < 5 && product.stock > 0 && (
-                        <div className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 px-2 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">
-                            ¡Últimas {product.stock}!
+                    {/* Badge de descuento */}
+                    {product.has_discount && product.discount_badge && (
+                        <div className="absolute top-3 left-3 z-10 rounded-full bg-red-500 px-2 py-1 text-xs font-bold text-white shadow-sm">
+                            {product.discount_badge} OFF
                         </div>
                     )}
 
+                    {/* Stock bajo - ajustado para no solaparse con el badge */}
+                    {product.stock < 5 &&
+                        product.stock > 0 &&
+                        !product.has_discount && (
+                            <div className="absolute top-3 left-3 z-10 rounded-full bg-orange-500 px-2 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
+                                ¡Últimas {product.stock}!
+                            </div>
+                        )}
+
                     {product.stock === 0 && (
                         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-                            <span className="rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-widest text-black shadow-xl">
+                            <span className="rounded-full bg-white px-3 py-1 text-xs font-bold tracking-widest text-black uppercase shadow-xl">
                                 Agotado
                             </span>
                         </div>
@@ -117,10 +139,10 @@ export default function ProductCard({ product }: Props) {
                         <Heart
                             size={16}
                             className={cn(
-                                "transition-colors duration-300",
+                                'transition-colors duration-300',
                                 liked
                                     ? 'fill-red-500 text-red-500'
-                                    : 'text-gray-600 hover:text-red-400'
+                                    : 'text-gray-600 hover:text-red-400',
                             )}
                         />
                     </button>
@@ -131,27 +153,33 @@ export default function ProductCard({ product }: Props) {
                         {product.category}
                     </p>
 
-                    <p className="line-clamp-2 text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">
+                    <p className="line-clamp-2 text-sm leading-tight font-semibold text-foreground transition-colors group-hover:text-primary">
                         {product.name}
                     </p>
 
-                    <div className="flex items-center justify-between">
+                    {/* ✅ PRECIO CORREGIDO - Ahora muestra el descuento */}
+                    <div className="flex items-center gap-2">
                         <span className="text-base font-bold text-foreground">
-                            ${product.price}
+                            ${displayPrice.toFixed(2)}
                         </span>
-                        
-                        {product.colors && product.colors.length > 0 && (
-                            <div className="flex -space-x-1">
-                                {product.colors.slice(0, 3).map((color, index) => (
-                                    <span
-                                        key={index}
-                                        className="h-3 w-3 rounded-full border-2 border-background shadow-sm"
-                                        style={{ backgroundColor: color }}
-                                    />
-                                ))}
-                            </div>
+                        {product.has_discount && (
+                            <span className="text-xs text-muted-foreground line-through">
+                                ${product.price.toFixed(2)}
+                            </span>
                         )}
                     </div>
+
+                    {product.colors && product.colors.length > 0 && (
+                        <div className="flex -space-x-1">
+                            {product.colors.slice(0, 3).map((color, index) => (
+                                <span
+                                    key={index}
+                                    className="h-3 w-3 rounded-full border-2 border-background shadow-sm"
+                                    style={{ backgroundColor: color }}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </Link>
         </div>

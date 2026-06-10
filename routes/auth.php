@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', fn () => inertia('Auth/Login'))->name('login');
+
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
     Route::get('/register', fn () => inertia('Auth/Register'))->name('register');

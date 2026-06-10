@@ -48,6 +48,9 @@ interface RelatedProduct {
     name: string;
     slug: string;
     price: number;
+    final_price: number; // ✅ Con descuento
+    has_discount: boolean; // ✅ Si tiene descuento
+    discount_badge?: string; // ✅ Badge de descuento
     thumbnail: string | null;
     images?: ProductImage[];
 }
@@ -65,7 +68,10 @@ interface ProductDetail {
     name: string;
     slug: string;
     description: string;
-    price: number;
+    price: number; // Precio original
+    final_price: number; // ✅ Precio con descuento
+    has_discount: boolean; // ✅ Si tiene descuento
+    discount_badge?: string; // ✅ Badge de descuento
     stock: number;
     thumbnail: string | null;
     images: ProductImage[];
@@ -229,16 +235,22 @@ export default function ProductDetail({
     );
     const [quantity, setQuantity] = useState(1);
     const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+    const [selectedVariant, setSelectedVariant] =
+        useState<ProductVariant | null>(null);
     const { addItem, openCart } = useCartStore();
 
-    // Precio activo: precio de la variante seleccionada (si tiene) o precio base
-    const activePrice =
-        selectedVariant?.price != null ? selectedVariant.price : product.price;
-    const activeStock =
-        selectedVariant ? selectedVariant.stock : product.stock;
+    // ✅ CORREGIDO: Precio base con descuento del producto
+    const basePrice = product.has_discount
+        ? product.final_price
+        : product.price;
 
-    // Agrupar variantes por nombre (Ej: "Talla", "Color")
+    // Precio activo: precio de la variante seleccionada o el precio base con descuento
+    const activePrice =
+        selectedVariant?.price != null ? selectedVariant.price : basePrice;
+
+    const activeStock = selectedVariant ? selectedVariant.stock : product.stock;
+
+    // Agrupar variantes por nombre
     const variantGroups = (product.variants ?? []).reduce<
         Record<string, ProductVariant[]>
     >((acc, v) => {
@@ -247,7 +259,7 @@ export default function ProductDetail({
         return acc;
     }, {});
 
-    // Combinar thumbnail con galería, evitando duplicados
+    // Combinar thumbnail con galería
     const allImages: ProductImage[] = [
         ...(product.thumbnail ? [{ id: 0, image_url: product.thumbnail }] : []),
         ...product.images.filter((img) => img.image_url !== product.thumbnail),
@@ -265,7 +277,7 @@ export default function ProductDetail({
             name: selectedVariant
                 ? `${product.name} (${selectedVariant.name}: ${selectedVariant.value})`
                 : product.name,
-            price: activePrice,
+            price: activePrice, // ✅ Precio con descuento
             quantity: quantity,
             image: productImage,
             category: product.category?.name || 'General',
@@ -279,7 +291,7 @@ export default function ProductDetail({
             name: selectedVariant
                 ? `${product.name} (${selectedVariant.name}: ${selectedVariant.value})`
                 : product.name,
-            price: activePrice,
+            price: activePrice, // ✅ Precio con descuento
             quantity: quantity,
             image: productImage,
             category: product.category?.name || 'General',
@@ -287,7 +299,13 @@ export default function ProductDetail({
         router.get('/checkout');
     };
 
-    console.log('DETALLES DEL PRODUCTO::', product);
+    console.log('Producto con descuento:', {
+        original: product.price,
+        final: product.final_price,
+        has_discount: product.has_discount,
+        badge: product.discount_badge,
+        activePrice,
+    });
 
     return (
         <ScrollArea className="h-full">
@@ -411,16 +429,43 @@ export default function ProductDetail({
 
                             <Separator />
 
+                            {/* ✅ PRECIO CORREGIDO - Ahora muestra el descuento */}
                             <div>
-                                <span className="text-3xl font-bold text-primary">
-                                    {formatCurrency(activePrice)}
-                                </span>
-                                {selectedVariant?.price != null &&
-                                    selectedVariant.price !== product.price && (
-                                        <span className="ml-2 text-sm text-muted-foreground line-through">
-                                            {formatCurrency(product.price)}
-                                        </span>
-                                    )}
+                                <div className="flex flex-wrap items-baseline gap-3">
+                                    <span className="text-3xl font-bold text-primary">
+                                        {formatCurrency(activePrice)}
+                                    </span>
+
+                                    {/* Mostrar precio original tachado si hay descuento */}
+                                    {product.has_discount &&
+                                        !selectedVariant?.price && (
+                                            <span className="text-lg text-muted-foreground line-through">
+                                                {formatCurrency(product.price)}
+                                            </span>
+                                        )}
+
+                                    {/* Mostrar precio original tachado para variante */}
+                                    {selectedVariant?.price != null &&
+                                        selectedVariant.price !==
+                                            product.price && (
+                                            <span className="text-lg text-muted-foreground line-through">
+                                                {formatCurrency(product.price)}
+                                            </span>
+                                        )}
+
+                                    {/* Badge de descuento */}
+                                    {product.has_discount &&
+                                        product.discount_badge &&
+                                        !selectedVariant?.price && (
+                                            <Badge
+                                                variant="destructive"
+                                                className="text-sm"
+                                            >
+                                                {product.discount_badge} OFF
+                                            </Badge>
+                                        )}
+                                </div>
+
                                 <div className="mt-2">
                                     {activeStock > 0 ? (
                                         <Badge
@@ -476,7 +521,8 @@ export default function ProductDetail({
                                                                 className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-all ${
                                                                     isSelected
                                                                         ? 'border-primary bg-primary text-primary-foreground'
-                                                                        : v.stock === 0
+                                                                        : v.stock ===
+                                                                            0
                                                                           ? 'cursor-not-allowed border-gray-100 bg-gray-50 text-gray-300 line-through'
                                                                           : 'border-gray-200 hover:border-primary'
                                                                 }`}
@@ -714,40 +760,68 @@ export default function ProductDetail({
                                 Productos relacionados
                             </h2>
                             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                                {relatedProducts.map((related) => (
-                                    <Card
-                                        key={related.id}
-                                        className="group overflow-hidden transition-shadow hover:shadow-lg"
-                                    >
-                                        <a href={`/productos/${related.slug}`}>
-                                            <div className="relative aspect-square overflow-hidden bg-muted">
-                                                {related.thumbnail ? (
-                                                    <img
-                                                        src={`/storage/${related.thumbnail}`}
-                                                        alt={related.name}
-                                                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                                                    />
-                                                ) : (
-                                                    <div className="flex h-full w-full items-center justify-center">
-                                                        <Package className="h-12 w-12 text-muted-foreground/50" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </a>
-                                        <CardContent className="p-4">
+                                {relatedProducts.map((related) => {
+                                    const relatedPrice = related.has_discount
+                                        ? related.final_price
+                                        : related.price;
+
+                                    return (
+                                        <Card
+                                            key={related.id}
+                                            className="group overflow-hidden transition-shadow hover:shadow-lg"
+                                        >
                                             <a
                                                 href={`/productos/${related.slug}`}
                                             >
-                                                <h3 className="line-clamp-2 font-semibold hover:text-primary">
-                                                    {related.name}
-                                                </h3>
+                                                <div className="relative aspect-square overflow-hidden bg-muted">
+                                                    {related.thumbnail ? (
+                                                        <img
+                                                            src={`/storage/${related.thumbnail}`}
+                                                            alt={related.name}
+                                                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center">
+                                                            <Package className="h-12 w-12 text-muted-foreground/50" />
+                                                        </div>
+                                                    )}
+                                                    {/* Badge descuento en relacionados */}
+                                                    {related.has_discount &&
+                                                        related.discount_badge && (
+                                                            <div className="absolute top-2 left-2 z-10 rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                                                                {
+                                                                    related.discount_badge
+                                                                }
+                                                            </div>
+                                                        )}
+                                                </div>
                                             </a>
-                                            <p className="mt-2 text-xl font-bold text-primary">
-                                                {formatCurrency(related.price)}
-                                            </p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                            <CardContent className="p-4">
+                                                <a
+                                                    href={`/productos/${related.slug}`}
+                                                >
+                                                    <h3 className="line-clamp-2 font-semibold hover:text-primary">
+                                                        {related.name}
+                                                    </h3>
+                                                </a>
+                                                <div className="mt-2 flex items-center gap-2">
+                                                    <p className="text-xl font-bold text-primary">
+                                                        {formatCurrency(
+                                                            relatedPrice,
+                                                        )}
+                                                    </p>
+                                                    {related.has_discount && (
+                                                        <p className="text-xs text-muted-foreground line-through">
+                                                            {formatCurrency(
+                                                                related.price,
+                                                            )}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}

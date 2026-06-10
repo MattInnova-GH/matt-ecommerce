@@ -15,6 +15,7 @@ import {
     User,
     PanelLeftClose,
     PanelLeftOpen,
+    TicketPercent,
 } from 'lucide-react';
 import admin from '@/routes/admin';
 
@@ -132,7 +133,10 @@ export default function AdminLayout({
             href: '/admin/productos',
             icon: Package,
             subitems: [
-                { name: 'Todos los productos', href: admin.products.index().url },
+                {
+                    name: 'Todos los productos',
+                    href: admin.products.index().url,
+                },
                 { name: 'Crear producto', href: admin.products.create().url },
                 { name: 'Categorías', href: admin.categories.index().url },
                 { name: 'Marcas', href: admin.brands.index().url },
@@ -157,6 +161,11 @@ export default function AdminLayout({
             name: 'Banners',
             href: admin.banners.index().url,
             icon: Image,
+        },
+        {
+            name: 'Promociones',
+            href: admin.promotions.index().url,
+            icon: TicketPercent,
         },
         {
             name: 'Configuración',
