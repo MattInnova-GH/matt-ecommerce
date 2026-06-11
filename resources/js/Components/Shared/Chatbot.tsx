@@ -38,36 +38,36 @@ import { useEffect, useRef, useState } from 'react';
 
 // Map icon names returned by PHP to Lucide components
 const ICON_MAP: Record<string, React.ElementType> = {
-    'alert-triangle':  AlertTriangle,
-    'bar-chart-2':     BarChart2,
-    'bot':             Bot,
-    'circle-check':    CircleCheck,
-    'clipboard-list':  ClipboardList,
-    'clock':           Clock,
-    'credit-card':     CreditCard,
-    'file-text':       FileText,
-    'heart':           Heart,
-    'help-circle':     HelpCircle,
-    'landmark':        Landmark,
-    'layout-grid':     LayoutGrid,
-    'lock':            Lock,
-    'log-in':          LogIn,
-    'map-pin':         MapPin,
-    'message-circle':  MessageCircle,
-    'package':         Package,
-    'phone':           Phone,
-    'rotate-ccw':      RotateCcw,
-    'search':          Search,
-    'shield-check':    ShieldCheck,
-    'shopping-bag':    ShoppingBag,
-    'shopping-cart':   ShoppingCart,
-    'smartphone':      Smartphone,
-    'sparkles':        Sparkles,
-    'tag':             Tag,
-    'truck':           Truck,
-    'user-cog':        UserCog,
-    'user-plus':       UserPlus,
-    'x-circle':        XCircle,
+    'alert-triangle': AlertTriangle,
+    'bar-chart-2': BarChart2,
+    bot: Bot,
+    'circle-check': CircleCheck,
+    'clipboard-list': ClipboardList,
+    clock: Clock,
+    'credit-card': CreditCard,
+    'file-text': FileText,
+    heart: Heart,
+    'help-circle': HelpCircle,
+    landmark: Landmark,
+    'layout-grid': LayoutGrid,
+    lock: Lock,
+    'log-in': LogIn,
+    'map-pin': MapPin,
+    'message-circle': MessageCircle,
+    package: Package,
+    phone: Phone,
+    'rotate-ccw': RotateCcw,
+    search: Search,
+    'shield-check': ShieldCheck,
+    'shopping-bag': ShoppingBag,
+    'shopping-cart': ShoppingCart,
+    smartphone: Smartphone,
+    sparkles: Sparkles,
+    tag: Tag,
+    truck: Truck,
+    'user-cog': UserCog,
+    'user-plus': UserPlus,
+    'x-circle': XCircle,
 };
 
 interface Message {
@@ -94,7 +94,7 @@ const WELCOME: Message = {
 };
 
 function BotIcon({ name, size = 14 }: { name?: string; size?: number }) {
-    const Icon = (name && ICON_MAP[name]) ? ICON_MAP[name] : HelpCircle;
+    const Icon = name && ICON_MAP[name] ? ICON_MAP[name] : HelpCircle;
     return <Icon size={size} />;
 }
 
@@ -103,7 +103,8 @@ function MessageBubble({ msg }: { msg: Message }) {
 
     const renderContent = (text: string) =>
         text.split('\n').map((line, lineIdx) => {
-            if (line === '') return <span key={lineIdx} className="block h-1.5" />;
+            if (line === '')
+                return <span key={lineIdx} className="block h-1.5" />;
 
             const parts = line.split(/(\*\*[^*]+\*\*)/g);
             return (
@@ -133,7 +134,9 @@ function MessageBubble({ msg }: { msg: Message }) {
                     <div className="rounded-2xl rounded-br-sm bg-gray-900 px-3.5 py-2.5 text-sm leading-relaxed text-white">
                         {renderContent(msg.text)}
                     </div>
-                    <span className="px-1 text-[10px] text-gray-400">{time}</span>
+                    <span className="px-1 text-[10px] text-gray-400">
+                        {time}
+                    </span>
                 </div>
             </div>
         );
@@ -153,8 +156,8 @@ function MessageBubble({ msg }: { msg: Message }) {
                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-900 text-white">
                             <BotIcon name={msg.icon} size={11} />
                         </span>
-                        <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
-                            Asistente
+                        <span className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+                            Mia Bot
                         </span>
                     </div>
                     {/* Message body */}
@@ -179,8 +182,8 @@ function TypingIndicator() {
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-900 text-white">
                         <Bot size={11} />
                     </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">
-                        Asistente
+                    <span className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+                        Mia Bot
                     </span>
                 </div>
                 <div className="px-4 py-3">
@@ -189,7 +192,9 @@ function TypingIndicator() {
                             <span
                                 key={delay}
                                 className="h-1.5 w-1.5 rounded-full bg-gray-400"
-                                style={{ animation: `chatbounce 1s infinite ${delay}ms` }}
+                                style={{
+                                    animation: `chatbounce 1s infinite ${delay}ms`,
+                                }}
                             />
                         ))}
                     </div>
@@ -200,14 +205,14 @@ function TypingIndicator() {
 }
 
 export default function Chatbot() {
-    const [isOpen, setIsOpen]         = useState(false);
-    const [messages, setMessages]     = useState<Message[]>([WELCOME]);
+    const [isOpen, setIsOpen] = useState(false);
+    const [messages, setMessages] = useState<Message[]>([WELCOME]);
     const [inputValue, setInputValue] = useState('');
-    const [isLoading, setIsLoading]   = useState(false);
-    const [hasUnread, setHasUnread]   = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [hasUnread, setHasUnread] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const inputRef       = useRef<HTMLInputElement>(null);
-    const nextId         = useRef(1);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const nextId = useRef(1);
 
     useEffect(() => {
         if (isOpen) {
@@ -232,10 +237,10 @@ export default function Chatbot() {
         setIsLoading(true);
 
         try {
-            const { data } = await axios.post<{ response: string; icon: string }>(
-                '/chatbot',
-                { message: trimmed },
-            );
+            const { data } = await axios.post<{
+                response: string;
+                icon: string;
+            }>('/chatbot', { message: trimmed });
             addMessage(data.response, 'bot', data.icon);
             if (!isOpen) setHasUnread(true);
         } catch {
@@ -271,16 +276,11 @@ export default function Chatbot() {
                 Escritorio: panel flotante esquina inferior-derecha, ancho fijo
             */}
             <div
-                className={`
-                    fixed z-1100 flex flex-col bg-white border border-gray-200
-                    inset-x-0 bottom-0 rounded-t-2xl max-h-[90vh]
-                    sm:inset-auto sm:bottom-24 sm:right-6 sm:w-90 sm:rounded-2xl sm:shadow-2xl sm:max-h-none
-                    transition-all duration-300
-                    ${isOpen
+                className={`fixed inset-x-0 bottom-0 z-1100 flex max-h-[90vh] flex-col rounded-t-2xl border border-gray-200 bg-white transition-all duration-300 sm:inset-auto sm:right-6 sm:bottom-24 sm:max-h-none sm:w-90 sm:rounded-2xl sm:shadow-2xl ${
+                    isOpen
                         ? 'translate-y-0 opacity-100'
                         : 'pointer-events-none translate-y-full opacity-0 sm:translate-y-3 sm:scale-95'
-                    }
-                `}
+                } `}
             >
                 {/* Tirador visual para móvil */}
                 <div className="flex justify-center pt-2 pb-1 sm:hidden">
@@ -295,11 +295,13 @@ export default function Chatbot() {
                         </div>
                         <div>
                             <p className="text-sm font-semibold text-white">
-                                Asistente Virtual
+                                Mia Bot
                             </p>
                             <div className="flex items-center gap-1.5">
                                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
-                                <span className="text-[11px] text-gray-400">En línea</span>
+                                <span className="text-[11px] text-gray-400">
+                                    En línea
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -308,7 +310,9 @@ export default function Chatbot() {
                         className="flex items-center gap-1.5 rounded-full px-3 py-2 text-gray-400 transition hover:bg-white/10 hover:text-white sm:p-1.5"
                         aria-label="Cerrar chat"
                     >
-                        <span className="text-xs font-medium sm:hidden">Cerrar</span>
+                        <span className="text-xs font-medium sm:hidden">
+                            Cerrar
+                        </span>
                         <ChevronDown className="h-4 w-4" />
                     </button>
                 </div>
@@ -317,7 +321,7 @@ export default function Chatbot() {
                     Móvil:     flex-1 min-h-0 para que ocupe el espacio disponible y haga scroll
                     Escritorio: altura fija con min/max
                 */}
-                <div className="flex flex-1 min-h-0 flex-col gap-4 overflow-y-auto px-4 py-4 sm:flex-none sm:min-h-70 sm:max-h-90">
+                <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 sm:max-h-90 sm:min-h-70 sm:flex-none">
                     {messages.map((msg) => (
                         <MessageBubble key={msg.id} msg={msg} />
                     ))}
@@ -328,7 +332,7 @@ export default function Chatbot() {
                 {/* Preguntas rápidas */}
                 {showQuickQuestions && (
                     <div className="shrink-0 border-t border-gray-100 px-4 py-3">
-                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+                        <p className="mb-2 text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
                             Preguntas frecuentes
                         </p>
                         <div className="grid grid-cols-1 gap-1.5 sm:flex sm:flex-col">
@@ -377,19 +381,23 @@ export default function Chatbot() {
             */}
             <button
                 onClick={() => setIsOpen((prev) => !prev)}
-                className={`fixed bottom-5 right-4 z-1100 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg shadow-black/20 transition-all hover:scale-105 active:scale-95 sm:right-6 sm:flex ${
+                className={`fixed right-4 bottom-5 z-1100 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg shadow-black/20 transition-all hover:scale-105 active:scale-95 sm:right-6 sm:flex ${
                     isOpen ? 'hidden' : 'flex'
                 }`}
                 aria-label={isOpen ? 'Cerrar chat' : 'Abrir chat'}
             >
-                <span className={`absolute transition-all duration-200 ${isOpen ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
+                <span
+                    className={`absolute transition-all duration-200 ${isOpen ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}
+                >
                     <X className="h-5 w-5 text-white" />
                 </span>
-                <span className={`absolute transition-all duration-200 ${!isOpen ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
+                <span
+                    className={`absolute transition-all duration-200 ${!isOpen ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}
+                >
                     <MessageCircle className="h-5 w-5 text-white" />
                 </span>
                 {!isOpen && hasUnread && (
-                    <span className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full bg-red-500 ring-2 ring-white" />
+                    <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-red-500 ring-2 ring-white" />
                 )}
             </button>
 
