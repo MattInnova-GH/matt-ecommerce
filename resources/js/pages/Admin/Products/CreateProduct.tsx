@@ -296,7 +296,7 @@ export default function CreateProduct({
                                                     </Label>
                                                     <div className="relative">
                                                         <span className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground">
-                                                            $
+                                                            S/
                                                         </span>
                                                         <Input
                                                             id="price"
@@ -709,7 +709,7 @@ export default function CreateProduct({
                                             Precio
                                         </div>
                                         <div className="text-2xl font-bold">
-                                            $
+                                            S/{' '}
                                             {parseFloat(
                                                 data.price || '0',
                                             ).toFixed(2)}

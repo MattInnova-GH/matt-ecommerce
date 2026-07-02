@@ -57,7 +57,7 @@ export default function ProductDetailClient({ product }: Props) {
 
                     <div className="mt-4">
                         <span className="text-3xl font-bold">
-                            ${product.price}
+                            S/ {product.price}
                         </span>
                     </div>
 

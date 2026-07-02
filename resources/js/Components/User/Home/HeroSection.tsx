@@ -92,9 +92,6 @@ export default function HeroSection({ banners }: Props) {
             <div className="relative flex min-h-[70vh] items-center md:min-h-[85vh]">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-2xl text-white">
-                        <div className="animate-fade-in mb-4 inline-block rounded-full bg-white/20 px-3 py-1 text-sm backdrop-blur-sm">
-                            🔥 Hasta 40% OFF
-                        </div>
                         <h1 className="animate-fade-in-up mb-4 text-3xl leading-tight font-bold sm:text-4xl md:text-6xl lg:text-7xl">
                             Encuentra todo
                             <span className="block bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">

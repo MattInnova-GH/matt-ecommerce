@@ -437,7 +437,7 @@ export default function Review({ reviews }: Props) {
                                                     {review.product.name}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
-                                                    ${review.product.price}
+                                                    S/ {review.product.price}
                                                 </p>
                                             </div>
                                         </div>

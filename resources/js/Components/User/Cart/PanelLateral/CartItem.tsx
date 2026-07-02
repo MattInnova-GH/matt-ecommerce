@@ -23,7 +23,7 @@ export function CartItem({ item }: CartItemProps) {
 
                 <p className="mt-0.5 text-xs text-gray-400">{item.category}</p>
 
-                <p className="mt-1 text-sm font-semibold">${item.price}</p>
+                <p className="mt-1 text-sm font-semibold">S/ {item.price}</p>
             </div>
 
             <div className="flex flex-col items-end gap-2">

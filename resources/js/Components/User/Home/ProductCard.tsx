@@ -31,7 +31,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 {/* Price */}
                 <div className="flex items-center gap-2">
                     <span className="text-lg font-bold text-gray-900">
-                        ${product.price}
+                        S/ {product.price}
                     </span>
                 </div>
             </div>

@@ -160,11 +160,11 @@ export default function ProductCard({ product }: Props) {
                     {/* ✅ PRECIO CORREGIDO - Ahora muestra el descuento */}
                     <div className="flex items-center gap-2">
                         <span className="text-base font-bold text-foreground">
-                            ${displayPrice.toFixed(2)}
+                            S/ {displayPrice.toFixed(2)}
                         </span>
                         {product.has_discount && (
                             <span className="text-xs text-muted-foreground line-through">
-                                ${product.price.toFixed(2)}
+                                S/ {product.price.toFixed(2)}
                             </span>
                         )}
                     </div>

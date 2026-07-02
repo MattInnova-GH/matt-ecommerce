@@ -330,7 +330,7 @@ export default function Products({ products }: ProductsProps) {
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="font-semibold">
-                                                        $
+                                                        S/{' '}
                                                         {product.price.toFixed(
                                                             2,
                                                         )}
@@ -572,7 +572,7 @@ export default function Products({ products }: ProductsProps) {
                                                     {product.name}
                                                 </h3>
                                                 <span className="font-semibold">
-                                                    ${product.price.toFixed(2)}
+                                                    S/ {product.price.toFixed(2)}
                                                 </span>
                                             </div>
                                             <div className="flex items-center justify-between text-xs text-muted-foreground">

@@ -209,7 +209,7 @@ function FavoriteCard({ product, isSelected, onToggleSelect, onRemove }: any) {
 
                     <h3 className="font-medium">{product.name}</h3>
 
-                    <p className="mt-1 font-bold">${product.price}</p>
+                    <p className="mt-1 font-bold">S/ {product.price}</p>
                 </Link>
             </div>
         </div>

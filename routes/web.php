@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\Client\CategoryController;
 use App\Http\Controllers\Client\ProductController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicProductController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,7 @@ Route::get('/buscar', [PublicProductController::class, 'search'])->name('product
 Route::post('/chatbot', [ChatbotController::class, 'respond'])->name('chatbot.respond');
 
 Route::get('/libro-de-reclamaciones', fn () => inertia('Client/Reclamaciones'))->name('reclamaciones');
+Route::post('/libro-de-reclamaciones', [ComplaintController::class, 'store'])->name('reclamaciones.store');
 Route::get('/terminos-y-condiciones', fn () => inertia('Client/TerminosCondiciones'))->name('terminos');
 Route::get('/politica-de-privacidad', fn () => inertia('Client/PoliticaPrivacidad'))->name('privacidad');
 Route::get('/preguntas-frecuentes', fn () => inertia('Client/PreguntasFrecuentes'))->name('faq');

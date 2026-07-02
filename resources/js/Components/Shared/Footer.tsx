@@ -1,6 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    Mail,
     Phone,
     MapPin,
     CreditCard,
@@ -12,6 +11,10 @@ import {
     MessageCircle,
     Music,
 } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
+
+const WHATSAPP_NUMBER = '51992422219';
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 export default function Footer() {
     const { settings } = usePage().props as any;
@@ -20,7 +23,7 @@ export default function Footer() {
     return (
         <footer className="bg-gray-900 text-gray-300">
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+                <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     <div>
                         <Link href="/" className="mb-6 inline-block">
                             {settings?.logo ? (
@@ -30,7 +33,7 @@ export default function Footer() {
                                     className="h-10 w-auto object-contain brightness-0 invert"
                                 />
                             ) : (
-                                <span className="text-xl font-bold text-white tracking-tight">
+                                <span className="text-xl font-bold tracking-tight text-white">
                                     {settings?.site_name || 'Matt Store'}
                                 </span>
                             )}
@@ -136,44 +139,6 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link
-                                    href="/libro-de-reclamaciones"
-                                    className="transition hover:text-white"
-                                >
-                                    Libro de Reclamaciones
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="mb-6 font-semibold text-white">Ayuda</h4>
-                        <ul className="space-y-4 text-sm">
-                            <li>
-                                <Link
-                                    href="/contacto"
-                                    className="transition hover:text-white"
-                                >
-                                    Contacto
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    href="/envios"
-                                    className="transition hover:text-white"
-                                >
-                                    Envíos y entregas
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    href="/devoluciones"
-                                    className="transition hover:text-white"
-                                >
-                                    Devoluciones
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
                                     href="/preguntas-frecuentes"
                                     className="transition hover:text-white"
                                 >
@@ -187,6 +152,28 @@ export default function Footer() {
                         <h4 className="mb-6 font-semibold text-white">
                             Contacto
                         </h4>
+                        <a
+                            href={WHATSAPP_LINK}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mb-3 flex items-center gap-3 rounded-lg bg-[#25D366]/10 px-3 py-2.5 text-sm font-medium text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
+                        >
+                            <FaWhatsapp size={20} className="shrink-0" />
+                            Escríbenos por WhatsApp
+                        </a>
+                        {settings?.email && (
+                            <div className="mb-4">
+                                <p className="mb-1 text-sm font-medium text-white">
+                                    Escríbenos por correo
+                                </p>
+                                <a
+                                    href={`mailto:${settings.email}`}
+                                    className="block text-sm whitespace-nowrap transition hover:text-white"
+                                >
+                                    {settings.email}
+                                </a>
+                            </div>
+                        )}
                         <ul className="space-y-4 text-sm">
                             {settings?.address && (
                                 <li className="flex items-start gap-3">
@@ -211,20 +198,18 @@ export default function Footer() {
                                     </a>
                                 </li>
                             )}
-                            {settings?.email && (
-                                <li className="flex items-center gap-3">
-                                    <Mail
-                                        size={18}
-                                        className="text-white-500"
+                            <li>
+                                <Link
+                                    href="/libro-de-reclamaciones"
+                                    className="inline-block transition hover:opacity-80"
+                                >
+                                    <img
+                                        src="/img/libro-reclamaciones.jpeg"
+                                        alt="Libro de Reclamaciones"
+                                        className="h-16 w-auto rounded object-contain"
                                     />
-                                    <a
-                                        href={`mailto:${settings.email}`}
-                                        className="transition hover:text-white"
-                                    >
-                                        {settings.email}
-                                    </a>
-                                </li>
-                            )}
+                                </Link>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -256,8 +241,8 @@ export default function Footer() {
                         </span>
                     </div>
                     <p className="text-xs text-gray-500">
-                        © {currentYear} {settings?.site_name || 'Matt Store'}. Todos los derechos
-                        reservados.
+                        © {currentYear} {settings?.site_name || 'Matt Store'}.
+                        Todos los derechos reservados.
                     </p>
                 </div>
             </div>
@@ -266,4 +251,3 @@ export default function Footer() {
 }
 
 // Se eliminó la función SocialIcon ya que ahora usamos los componentes directos de Lucide con colores específicos
-

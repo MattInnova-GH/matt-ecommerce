@@ -102,7 +102,7 @@ export default function ProductSearchBar({ products }: Props) {
                                 </p>
 
                                 <p className="text-xs text-gray-500">
-                                    ${product.price}
+                                    S/ {product.price}
                                 </p>
                             </div>
 

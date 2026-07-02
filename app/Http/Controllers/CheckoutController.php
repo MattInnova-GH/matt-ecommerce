@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class CheckoutController extends Controller
@@ -75,6 +77,9 @@ class CheckoutController extends Controller
             'yape_code'   => $request->yapeCode,
             'yape_mode'   => $request->yapeMode,
         ]);
+
+        $order->load(['items', 'payment', 'user']);
+        Mail::to($order->user->email)->send(new OrderConfirmation($order));
 
         return redirect()->route('home')->with('success', '¡Gracias por tu compra! Tu pedido está pendiente de verificación de pago.');
     }
