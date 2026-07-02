@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { Lock, Mail, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { useCartStore } from '@/stores/cartStore';
 import { useCheckoutStore } from '@/stores/checkoutStore';
 import { router } from '@inertiajs/react';
@@ -54,17 +55,25 @@ export function CheckoutButton() {
     const handleConfirmOrder = async () => {
         if (!email.trim()) {
             setEmailError('Ingresa tu correo electrónico');
+            toast.error('Ingresa tu correo electrónico para continuar');
             return;
         }
         if (!validateEmail(email)) {
             setEmailError('Ingresa un correo válido');
+            toast.error('Ingresa un correo electrónico válido');
             return;
         }
         if (!termsAccepted) {
             setTermsError(true);
+            toast.error(
+                'Debes aceptar los Términos y la Política de Privacidad',
+            );
             return;
         }
-        if (paymentWarning) return;
+        if (paymentWarning) {
+            toast.error(paymentWarning);
+            return;
+        }
 
         setEmailError('');
         setIsLoading(true);
@@ -92,6 +101,12 @@ export function CheckoutButton() {
                 },
                 onError: (errors) => {
                     console.error('Error al confirmar orden:', errors);
+                    const firstError = Object.values(errors)[0];
+                    toast.error(
+                        typeof firstError === 'string'
+                            ? firstError
+                            : 'No se pudo procesar tu pedido. Revisa los datos e intenta nuevamente.',
+                    );
                 },
                 onFinish: () => {
                     setIsLoading(false);
