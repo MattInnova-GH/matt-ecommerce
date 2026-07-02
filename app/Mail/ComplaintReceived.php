@@ -4,11 +4,10 @@ namespace App\Mail;
 
 use App\Models\Complaint;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ComplaintReceived extends Mailable implements ShouldQueue
+class ComplaintReceived extends Mailable
 {
     use Queueable, SerializesModels;
 

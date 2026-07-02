@@ -21,6 +21,7 @@ import admin from '@/routes/admin';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Toaster } from '@/components/ui/sonner';
 import {
     Tooltip,
     TooltipContent,
@@ -464,6 +465,7 @@ export default function AdminLayout({
             >
                 <div className="p-4 lg:p-6">{children}</div>
             </main>
+            <Toaster richColors />
         </div>
     );
 }

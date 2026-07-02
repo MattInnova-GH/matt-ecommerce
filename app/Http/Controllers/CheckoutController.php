@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmation;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
@@ -42,45 +44,61 @@ class CheckoutController extends Controller
             $notes .= ' | Recojo en tienda: '.($request->selectedStore['name'] ?? 'N/A');
         }
 
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'order_number' => 'ORD-'.strtoupper(uniqid()),
-            'subtotal' => $request->total,
-            'tax' => 0,
-            'total' => $request->total,
-            'status' => 'PENDING',
-            'shipping_address' => $request->deliveryMethod === 'delivery' ? $request->deliveryAddress : null,
-            'notes' => $notes,
-        ]);
-
-        foreach ($request->items as $item) {
-            $order->items()->create([
-                'product_id' => $item['id'],
-                'product_name' => $item['name'],
-                'product_price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'subtotal' => (float) $item['price'] * $item['quantity'],
-            ]);
-        }
-
         $receiptUrl = null;
         if ($request->hasFile('voucher')) {
             $receiptUrl = $request->file('voucher')->store('vouchers', 'public');
         }
 
-        $order->payment()->create([
-            'method' => $request->paymentMethod,
-            'amount' => $request->total,
-            'receipt_url' => $receiptUrl,
-            'status' => 'PENDING',
-            'yape_phone' => $request->yapePhone,
-            'yape_code' => $request->yapeCode,
-            'yape_mode' => $request->yapeMode,
-        ]);
+        try {
+            $order = DB::transaction(function () use ($request, $notes, $receiptUrl) {
+                $order = Order::create([
+                    'user_id' => auth()->id(),
+                    'order_number' => 'ORD-'.strtoupper(uniqid()),
+                    'subtotal' => $request->total,
+                    'tax' => 0,
+                    'total' => $request->total,
+                    'status' => 'PENDING',
+                    'shipping_address' => $request->deliveryMethod === 'delivery' ? $request->deliveryAddress : null,
+                    'notes' => $notes,
+                ]);
+
+                foreach ($request->items as $item) {
+                    $order->items()->create([
+                        'product_id' => $item['id'],
+                        'product_name' => $item['name'],
+                        'product_price' => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'subtotal' => (float) $item['price'] * $item['quantity'],
+                    ]);
+
+                    $product = Product::whereKey($item['id'])->lockForUpdate()->first();
+
+                    if (! $product || $product->stock < $item['quantity']) {
+                        throw new \RuntimeException("No hay suficiente stock de \"{$item['name']}\".");
+                    }
+
+                    $product->decrement('stock', $item['quantity']);
+                }
+
+                $order->payment()->create([
+                    'method' => $request->paymentMethod,
+                    'amount' => $request->total,
+                    'receipt_url' => $receiptUrl,
+                    'status' => 'PENDING',
+                    'yape_phone' => $request->yapePhone,
+                    'yape_code' => $request->yapeCode,
+                    'yape_mode' => $request->yapeMode,
+                ]);
+
+                return $order;
+            });
+        } catch (\RuntimeException $e) {
+            return back()->withErrors(['items' => $e->getMessage()]);
+        }
 
         $order->load(['items', 'payment', 'user']);
         Mail::to($order->user->email)->send(new OrderConfirmation($order));
 
-        return redirect()->route('home')->with('success', '¡Gracias por tu compra! Tu pedido está pendiente de verificación de pago.');
+        return redirect()->route('home')->with('success', '¡Gracias por tu compra! Tu pedido está pendiente de verificación de pago. Te enviamos un correo con el detalle de tu compra.');
     }
 }

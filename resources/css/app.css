@@ -103,4 +103,12 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Leaflet's internal panes/controls use z-index up to 1000, which
+       bleeds through modals (Radix Dialog overlay/content use z-50).
+       Isolate the map in its own stacking context so its internal
+       z-indices never compete with elements outside of it. */
+    .leaflet-container {
+        isolation: isolate;
+    }
 }

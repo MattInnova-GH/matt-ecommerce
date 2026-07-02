@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 export function useFlashToast(): void {
     const { props } = usePage();
@@ -11,15 +12,14 @@ export function useFlashToast(): void {
 
         if (!flash) return;
 
-        // Integration point: display flash messages via your toast library
         if (flash.success) {
-            console.info('[Flash]', flash.success);
+            toast.success(flash.success);
         }
         if (flash.error) {
-            console.error('[Flash]', flash.error);
+            toast.error(flash.error);
         }
         if (flash.message) {
-            console.info('[Flash]', flash.message);
+            toast(flash.message);
         }
     }, [props]);
 }

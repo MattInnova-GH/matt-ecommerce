@@ -2,6 +2,7 @@ import { AuthModal } from '@/Components/Shared/AuthModal';
 import Chatbot from '@/Components/Shared/Chatbot';
 import Footer from '@/Components/Shared/Footer';
 import Navbar from '@/Components/Shared/Navbar';
+import { Toaster } from '@/components/ui/sonner';
 
 import { useState } from 'react';
 
@@ -19,6 +20,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 defaultTab="login"
             />
             <Chatbot />
+            <Toaster richColors />
         </>
     );
 }
