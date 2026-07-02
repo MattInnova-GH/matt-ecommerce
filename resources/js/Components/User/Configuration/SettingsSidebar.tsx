@@ -5,11 +5,11 @@ import {
     LogOut,
     ShoppingBag,
     ChevronRight,
-    Heart
+    Heart,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Section, User } from './types/settings';
+import type { Section, User } from './types/settings';
 
 interface SettingsSidebarProps {
     user: User;

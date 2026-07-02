@@ -527,7 +527,8 @@ export default function Payments({ payments }: PaymentsProps) {
                                                                 }}
                                                             >
                                                                 <Eye className="h-4 w-4" />
-                                                                Ver orden de compra
+                                                                Ver orden de
+                                                                compra
                                                             </DropdownMenuItem>
                                                         )}
                                                         <DropdownMenuItem

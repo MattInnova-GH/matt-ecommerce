@@ -12,7 +12,6 @@ import {
     Hash,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -25,7 +24,13 @@ import OrderTimeline from './OrderTimeline';
 import { formatCurrency, formatDate } from '../utils';
 import type { Order } from '../types';
 
-function ProductThumbnail({ thumbnail, name }: { thumbnail: string | null; name: string }) {
+function ProductThumbnail({
+    thumbnail,
+    name,
+}: {
+    thumbnail: string | null;
+    name: string;
+}) {
     return (
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border bg-muted">
             {thumbnail ? (
@@ -85,7 +90,9 @@ export default function OrderCard({ order }: { order: Order }) {
                                 <span className="flex items-center gap-1.5">
                                     <Package className="h-3.5 w-3.5" />
                                     {order.items.length}{' '}
-                                    {order.items.length === 1 ? 'producto' : 'productos'}
+                                    {order.items.length === 1
+                                        ? 'producto'
+                                        : 'productos'}
                                 </span>
                                 <span className="ml-auto font-semibold text-foreground">
                                     {formatCurrency(order.total)}
@@ -115,8 +122,11 @@ export default function OrderCard({ order }: { order: Order }) {
                                     </div>
                                 )}
                                 <span className="ml-1 text-xs text-muted-foreground">
-                                    {previewItems.map((i) => i.product_name).join(', ')}
-                                    {remainingCount > 0 && ` y ${remainingCount} más`}
+                                    {previewItems
+                                        .map((i) => i.product_name)
+                                        .join(', ')}
+                                    {remainingCount > 0 &&
+                                        ` y ${remainingCount} más`}
                                 </span>
                             </div>
                         </div>
@@ -128,7 +138,9 @@ export default function OrderCard({ order }: { order: Order }) {
                     <div className="space-y-6 p-5">
                         {/* Seguimiento */}
                         <section>
-                            <h4 className="mb-4 text-sm font-semibold">Seguimiento del pedido</h4>
+                            <h4 className="mb-4 text-sm font-semibold">
+                                Seguimiento del pedido
+                            </h4>
                             <OrderTimeline order={order} />
                             {order.tracking_code && (
                                 <div className="mt-3 flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2">
@@ -147,10 +159,15 @@ export default function OrderCard({ order }: { order: Order }) {
 
                         {/* Productos */}
                         <section>
-                            <h4 className="mb-3 text-sm font-semibold">Productos</h4>
+                            <h4 className="mb-3 text-sm font-semibold">
+                                Productos
+                            </h4>
                             <div className="space-y-3">
                                 {order.items.map((item) => (
-                                    <div key={item.id} className="flex items-center gap-3">
+                                    <div
+                                        key={item.id}
+                                        className="flex items-center gap-3"
+                                    >
                                         <ProductThumbnail
                                             thumbnail={item.product_thumbnail}
                                             name={item.product_name}
@@ -160,7 +177,10 @@ export default function OrderCard({ order }: { order: Order }) {
                                                 {item.product_name}
                                             </p>
                                             <p className="text-xs text-muted-foreground">
-                                                {item.quantity} × {formatCurrency(item.unit_price)}
+                                                {item.quantity} ×{' '}
+                                                {formatCurrency(
+                                                    item.unit_price,
+                                                )}
                                             </p>
                                         </div>
                                         <span className="shrink-0 text-sm font-semibold">
@@ -180,7 +200,9 @@ export default function OrderCard({ order }: { order: Order }) {
                                     value={
                                         order.shipping_cost === 0
                                             ? 'Gratis'
-                                            : formatCurrency(order.shipping_cost)
+                                            : formatCurrency(
+                                                  order.shipping_cost,
+                                              )
                                     }
                                 />
                                 <Separator className="my-1.5" />
@@ -216,7 +238,8 @@ export default function OrderCard({ order }: { order: Order }) {
                                     </p>
                                     {order.shipping_address.reference && (
                                         <p className="text-xs italic">
-                                            Ref: {order.shipping_address.reference}
+                                            Ref:{' '}
+                                            {order.shipping_address.reference}
                                         </p>
                                     )}
                                 </div>
@@ -240,17 +263,26 @@ export default function OrderCard({ order }: { order: Order }) {
 
                         {/* Acciones */}
                         <div className="flex flex-wrap gap-2">
-                            <Button variant="outline" size="sm" className="gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-2"
+                            >
                                 <Download className="h-3.5 w-3.5" />
                                 Comprobante
                             </Button>
                             {order.status === 'delivered' && (
-                                <Button variant="outline" size="sm" className="gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-2"
+                                >
                                     <RotateCcw className="h-3.5 w-3.5" />
                                     Reordenar
                                 </Button>
                             )}
-                            {(order.status === 'pending' || order.status === 'confirmed') && (
+                            {(order.status === 'pending' ||
+                                order.status === 'confirmed') && (
                                 <Button
                                     variant="outline"
                                     size="sm"

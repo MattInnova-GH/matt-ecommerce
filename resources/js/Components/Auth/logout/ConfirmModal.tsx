@@ -115,6 +115,6 @@ export function ConfirmModal({
                 </div>
             </div>
         </div>,
-        document.body
+        document.body,
     );
 }

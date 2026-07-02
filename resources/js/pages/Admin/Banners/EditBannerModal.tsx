@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Form } from '@inertiajs/react';
 import { Star, Upload, X, Loader2, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -44,13 +44,6 @@ export function EditBannerModal({ banner }: EditBannerModalProps) {
     const [editType, setEditType] = useState<string>('promotional');
     const [editImageFile, setEditImageFile] = useState<File | null>(null);
     const editFileInputRef = useRef<HTMLInputElement>(null);
-
-    // Actualizar el tipo cuando cambia el banner
-    useEffect(() => {
-        if (banner) {
-            setEditType(banner.type);
-        }
-    }, [banner]);
 
     const handleEditImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -241,7 +234,10 @@ export function EditBannerModal({ banner }: EditBannerModalProps) {
                                         ) : (
                                             <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
                                                 <img
-                                                    src={currentImage ?? undefined}
+                                                    src={
+                                                        currentImage ??
+                                                        undefined
+                                                    }
                                                     alt="Preview"
                                                     className="h-40 w-full object-cover"
                                                 />

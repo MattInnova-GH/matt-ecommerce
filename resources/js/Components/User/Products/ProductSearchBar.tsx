@@ -1,8 +1,8 @@
 import { Link } from '@inertiajs/react';
 import { Search, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { PublicProduct } from './types';
+import type { PublicProduct } from './types';
 
 type Props = {
     products: PublicProduct[];
@@ -10,7 +10,6 @@ type Props = {
 
 export default function ProductSearchBar({ products }: Props) {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<PublicProduct[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 
     const searchRef = useRef<HTMLDivElement>(null);
@@ -32,21 +31,22 @@ export default function ProductSearchBar({ products }: Props) {
         };
     }, []);
 
-    useEffect(() => {
-        if (query.length >= 2) {
-            const filtered = products.filter(
-                (p) =>
-                    p.name.toLowerCase().includes(query.toLowerCase()) ||
-                    p.category.toLowerCase().includes(query.toLowerCase()),
-            );
+    const results = useMemo(() => {
+        if (query.length < 2) return [];
 
-            setResults(filtered.slice(0, 8));
-            setIsOpen(true);
-        } else {
-            setResults([]);
-            setIsOpen(false);
-        }
+        const filtered = products.filter(
+            (p) =>
+                p.name.toLowerCase().includes(query.toLowerCase()) ||
+                p.category.toLowerCase().includes(query.toLowerCase()),
+        );
+
+        return filtered.slice(0, 8);
     }, [query, products]);
+
+    function handleQueryChange(value: string) {
+        setQuery(value);
+        setIsOpen(value.length >= 2);
+    }
 
     return (
         <div ref={searchRef} className="relative mx-auto max-w-2xl">
@@ -59,7 +59,7 @@ export default function ProductSearchBar({ products }: Props) {
                 <input
                     type="text"
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e) => handleQueryChange(e.target.value)}
                     placeholder="Buscar productos..."
                     className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pr-10 pl-11 text-sm transition focus:border-gray-400 focus:bg-white focus:outline-none"
                 />

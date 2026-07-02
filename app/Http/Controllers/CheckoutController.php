@@ -18,16 +18,16 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'items'           => 'required|array',
-            'total'           => 'required|numeric',
-            'paymentMethod'   => 'required|string|in:transfer,yape',
-            'voucher'         => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'deliveryMethod'  => 'required|string|in:delivery,pickup',
+            'items' => 'required|array',
+            'total' => 'required|numeric',
+            'paymentMethod' => 'required|string|in:transfer,yape',
+            'voucher' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'deliveryMethod' => 'required|string|in:delivery,pickup',
             'deliveryAddress' => 'nullable|array',
-            'selectedStore'   => 'nullable|array',
-            'yapePhone'       => 'nullable|string',
-            'yapeCode'        => 'nullable|string',
-            'yapeMode'        => 'nullable|string|in:code,qr',
+            'selectedStore' => 'nullable|array',
+            'yapePhone' => 'nullable|string',
+            'yapeCode' => 'nullable|string',
+            'yapeMode' => 'nullable|string|in:code,qr',
         ]);
 
         if ($request->deliveryMethod === 'delivery' && empty($request->deliveryAddress)) {
@@ -39,27 +39,27 @@ class CheckoutController extends Controller
 
         $notes = "Método de pago: {$request->paymentMethod}";
         if ($request->deliveryMethod === 'pickup' && $request->selectedStore) {
-            $notes .= ' | Recojo en tienda: ' . ($request->selectedStore['name'] ?? 'N/A');
+            $notes .= ' | Recojo en tienda: '.($request->selectedStore['name'] ?? 'N/A');
         }
 
         $order = Order::create([
-            'user_id'          => auth()->id(),
-            'order_number'     => 'ORD-' . strtoupper(uniqid()),
-            'subtotal'         => $request->total,
-            'tax'              => 0,
-            'total'            => $request->total,
-            'status'           => 'PENDING',
+            'user_id' => auth()->id(),
+            'order_number' => 'ORD-'.strtoupper(uniqid()),
+            'subtotal' => $request->total,
+            'tax' => 0,
+            'total' => $request->total,
+            'status' => 'PENDING',
             'shipping_address' => $request->deliveryMethod === 'delivery' ? $request->deliveryAddress : null,
-            'notes'            => $notes,
+            'notes' => $notes,
         ]);
 
         foreach ($request->items as $item) {
             $order->items()->create([
-                'product_id'    => $item['id'],
-                'product_name'  => $item['name'],
+                'product_id' => $item['id'],
+                'product_name' => $item['name'],
                 'product_price' => $item['price'],
-                'quantity'      => $item['quantity'],
-                'subtotal'      => (float) $item['price'] * $item['quantity'],
+                'quantity' => $item['quantity'],
+                'subtotal' => (float) $item['price'] * $item['quantity'],
             ]);
         }
 
@@ -69,13 +69,13 @@ class CheckoutController extends Controller
         }
 
         $order->payment()->create([
-            'method'      => $request->paymentMethod,
-            'amount'      => $request->total,
+            'method' => $request->paymentMethod,
+            'amount' => $request->total,
             'receipt_url' => $receiptUrl,
-            'status'      => 'PENDING',
-            'yape_phone'  => $request->yapePhone,
-            'yape_code'   => $request->yapeCode,
-            'yape_mode'   => $request->yapeMode,
+            'status' => 'PENDING',
+            'yape_phone' => $request->yapePhone,
+            'yape_code' => $request->yapeCode,
+            'yape_mode' => $request->yapeMode,
         ]);
 
         $order->load(['items', 'payment', 'user']);

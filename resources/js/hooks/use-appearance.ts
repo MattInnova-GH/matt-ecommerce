@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
@@ -13,17 +13,20 @@ function resolveAppearance(appearance: Appearance): ResolvedAppearance {
     return appearance;
 }
 
-export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>('system');
-    const [resolvedAppearance, setResolvedAppearance] =
-        useState<ResolvedAppearance>('light');
+function getStoredAppearance(): Appearance {
+    if (typeof window === 'undefined') return 'system';
+    return (
+        (localStorage.getItem('appearance') as Appearance | null) ?? 'system'
+    );
+}
 
-    useEffect(() => {
-        const stored = localStorage.getItem('appearance') as Appearance | null;
-        const initial = stored ?? 'system';
-        setAppearance(initial);
-        setResolvedAppearance(resolveAppearance(initial));
-    }, []);
+export function useAppearance() {
+    const [appearance, setAppearance] =
+        useState<Appearance>(getStoredAppearance);
+    const [resolvedAppearance, setResolvedAppearance] =
+        useState<ResolvedAppearance>(() =>
+            resolveAppearance(getStoredAppearance()),
+        );
 
     const updateAppearance = (value: Appearance) => {
         setAppearance(value);

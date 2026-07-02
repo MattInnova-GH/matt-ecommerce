@@ -23,7 +23,8 @@ export default function OrdersPage() {
             !search ||
             order.order_number.toLowerCase().includes(q) ||
             order.items.some((i) => i.product_name.toLowerCase().includes(q));
-        const matchStatus = statusFilter === 'all' || order.status === statusFilter;
+        const matchStatus =
+            statusFilter === 'all' || order.status === statusFilter;
         return matchSearch && matchStatus;
     });
 
@@ -31,7 +32,9 @@ export default function OrdersPage() {
         <div className="min-h-screen bg-background">
             <div className="container mx-auto px-4 py-8 lg:px-8">
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold tracking-tight">Mis Pedidos</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Mis Pedidos
+                    </h1>
                     <p className="mt-1 text-sm text-muted-foreground">
                         Revisa el estado y detalles de todas tus compras
                     </p>
@@ -49,15 +52,22 @@ export default function OrdersPage() {
                             className="pl-9"
                         />
                     </div>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <Select
+                        value={statusFilter}
+                        onValueChange={setStatusFilter}
+                    >
                         <SelectTrigger className="w-full sm:w-48">
                             <Filter className="mr-2 h-4 w-4 text-muted-foreground" />
                             <SelectValue placeholder="Estado" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">Todos los estados</SelectItem>
+                            <SelectItem value="all">
+                                Todos los estados
+                            </SelectItem>
                             <SelectItem value="pending">Pendiente</SelectItem>
-                            <SelectItem value="confirmed">Confirmado</SelectItem>
+                            <SelectItem value="confirmed">
+                                Confirmado
+                            </SelectItem>
                             <SelectItem value="shipped">En camino</SelectItem>
                             <SelectItem value="delivered">Entregado</SelectItem>
                             <SelectItem value="cancelled">Cancelado</SelectItem>
@@ -77,7 +87,9 @@ export default function OrdersPage() {
                     {filtered.length === 0 ? (
                         <EmptyOrders />
                     ) : (
-                        filtered.map((order) => <OrderCard key={order.id} order={order} />)
+                        filtered.map((order) => (
+                            <OrderCard key={order.id} order={order} />
+                        ))
                     )}
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react';
-import { FlashMessageProps } from './types/settings';
+import type { FlashMessageProps } from './types/settings';
 
 export function FlashMessage({ message }: FlashMessageProps) {
     return (

@@ -16,7 +16,6 @@ class ChatbotResponseFinder
     /**
      * Encuentra la mejor respuesta según el mensaje del usuario
      *
-     * @param string $message
      * @return array{response: string, icon: string}
      */
     public function findBestResponse(string $message): array
@@ -25,7 +24,7 @@ class ChatbotResponseFinder
         $dataset = ChatbotDataset::get();
 
         $bestMatch = null;
-        $bestIcon  = 'help-circle';
+        $bestIcon = 'help-circle';
         $bestScore = 0;
 
         foreach ($dataset as $entry) {
@@ -34,14 +33,14 @@ class ChatbotResponseFinder
             if ($score > $bestScore) {
                 $bestScore = $score;
                 $bestMatch = $entry['response'];
-                $bestIcon  = $entry['icon'];
+                $bestIcon = $entry['icon'];
             }
         }
 
         if ($bestMatch !== null && $bestScore > 0) {
             return [
                 'response' => $bestMatch,
-                'icon'     => $bestIcon
+                'icon' => $bestIcon,
             ];
         }
 
@@ -50,10 +49,6 @@ class ChatbotResponseFinder
 
     /**
      * Calcula el score de coincidencia entre el mensaje y las palabras clave
-     *
-     * @param string $message
-     * @param array $keywords
-     * @return int
      */
     private function calculateScore(string $message, array $keywords): int
     {
@@ -64,6 +59,7 @@ class ChatbotResponseFinder
                 $score += strlen($normalizedKeyword);
             }
         }
+
         return $score;
     }
 
@@ -75,7 +71,7 @@ class ChatbotResponseFinder
     private function getDefaultResponse(): array
     {
         return [
-            'icon'     => 'help-circle',
+            'icon' => 'help-circle',
             'response' => "No estoy seguro de cómo ayudarte con eso. Puedo orientarte sobre:\n\n• Productos y categorías\n• Envíos y tiempos de entrega\n• Métodos de pago (Yape, transferencia)\n• Estado de pedidos\n• Devoluciones y cambios\n• Tu cuenta y perfil\n\n¿Puedes reformular tu pregunta?",
         ];
     }

@@ -13,14 +13,16 @@ class OrderItem extends Model
 
     protected $casts = [
         'product_price' => 'decimal:2',
-        'subtotal'      => 'decimal:2',
+        'subtotal' => 'decimal:2',
     ];
 
-    public function order() {
+    public function order()
+    {
         return $this->belongsTo(Order::class);
     }
 
-    public function product() {
+    public function product()
+    {
         return $this->belongsTo(Product::class);
     }
 }

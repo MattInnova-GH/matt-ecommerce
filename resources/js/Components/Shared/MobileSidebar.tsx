@@ -1,4 +1,5 @@
-import { X, Store, LogOut, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { X, Store, LogOut } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 
 interface NavItem {

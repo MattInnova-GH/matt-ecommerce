@@ -150,8 +150,7 @@ export default function PoliticaPrivacidad() {
 
                             <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
                                 <p className="text-sm text-gray-500">
-                                    ¿Deseas ejercer tus derechos o tienes
-                                    dudas?{' '}
+                                    ¿Deseas ejercer tus derechos o tienes dudas?{' '}
                                     <a
                                         href="mailto:privacidad@empresa.com"
                                         className="font-medium text-emerald-600 hover:underline"

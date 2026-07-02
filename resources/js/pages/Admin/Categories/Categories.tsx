@@ -10,7 +10,6 @@ import {
     Package,
     FolderTree,
 } from 'lucide-react';
-import AdminLayout from '@/layouts/AdminLayout';
 import CreateModal from './CreateModal';
 import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';

@@ -1,85 +1,90 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Support\Facades\Hash;
+
+beforeEach(function () {
+    $this->seed(RoleSeeder::class);
+});
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();
+    $user->assignRole('client');
 
     $response = $this
         ->actingAs($user)
-        ->get(route('profile.edit'));
+        ->get(route('client.profile.index'));
 
     $response->assertOk();
 });
 
 test('profile information can be updated', function () {
     $user = User::factory()->create();
+    $user->assignRole('client');
 
     $response = $this
         ->actingAs($user)
-        ->patch(route('profile.update'), [
-            'name' => 'Test User',
+        ->put(route('client.profile.update'), [
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email' => 'test@example.com',
         ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('profile.edit'));
+    $response->assertSessionHasNoErrors();
 
     $user->refresh();
 
-    expect($user->name)->toBe('Test User');
+    expect($user->first_name)->toBe('Test');
+    expect($user->last_name)->toBe('User');
     expect($user->email)->toBe('test@example.com');
-    expect($user->email_verified_at)->toBeNull();
 });
 
-test('email verification status is unchanged when the email address is unchanged', function () {
+test('profile update requires valid email', function () {
     $user = User::factory()->create();
+    $user->assignRole('client');
 
     $response = $this
         ->actingAs($user)
-        ->patch(route('profile.update'), [
-            'name' => 'Test User',
-            'email' => $user->email,
+        ->put(route('client.profile.update'), [
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'not-an-email',
         ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('profile.edit'));
-
-    expect($user->refresh()->email_verified_at)->not->toBeNull();
+    $response->assertSessionHasErrors('email');
 });
 
-test('user can delete their account', function () {
+test('password can be updated', function () {
     $user = User::factory()->create();
+    $user->assignRole('client');
 
     $response = $this
         ->actingAs($user)
-        ->delete(route('profile.destroy'), [
-            'password' => 'password',
+        ->put(route('client.profile.password'), [
+            'current_password' => 'password',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
         ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('home'));
+    $response->assertSessionHasNoErrors();
 
-    $this->assertGuest();
-    expect($user->fresh())->toBeNull();
+    expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
 });
 
-test('correct password must be provided to delete account', function () {
+test('correct current password must be provided to update password', function () {
     $user = User::factory()->create();
+    $user->assignRole('client');
 
     $response = $this
         ->actingAs($user)
-        ->from(route('profile.edit'))
-        ->delete(route('profile.destroy'), [
-            'password' => 'wrong-password',
+        ->put(route('client.profile.password'), [
+            'current_password' => 'wrong-password',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
         ]);
 
-    $response
-        ->assertSessionHasErrors('password')
-        ->assertRedirect(route('profile.edit'));
+    $response->assertSessionHasErrors('current_password');
 
-    expect($user->fresh())->not->toBeNull();
+    expect(Hash::check('password', $user->refresh()->password))->toBeTrue();
 });

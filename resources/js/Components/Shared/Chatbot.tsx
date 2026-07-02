@@ -214,11 +214,20 @@ export default function Chatbot() {
     const inputRef = useRef<HTMLInputElement>(null);
     const nextId = useRef(1);
 
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+    if (isOpen !== prevIsOpen) {
+        setPrevIsOpen(isOpen);
+        if (isOpen) {
+            setHasUnread(false);
+        }
+    }
+
     useEffect(() => {
         if (isOpen) {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-            setTimeout(() => inputRef.current?.focus(), 120);
-            setHasUnread(false);
+            const timer = setTimeout(() => inputRef.current?.focus(), 120);
+
+            return () => clearTimeout(timer);
         }
     }, [messages, isOpen]);
 

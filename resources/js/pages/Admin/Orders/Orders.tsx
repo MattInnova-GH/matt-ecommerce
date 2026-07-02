@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
+import type { User } from 'lucide-react';
 import {
     Eye,
     Search,
@@ -11,7 +12,6 @@ import {
     Package,
     MapPin,
     Phone,
-    User,
     FileText,
     SlidersHorizontal,
     TrendingUp,
@@ -253,6 +253,60 @@ function StatCard({
     );
 }
 
+// ── Filter panel (shared between mobile sheet & desktop inline) ─────────────────
+function FilterPanel({
+    searchTerm,
+    setSearchTerm,
+    statusFilter,
+    setStatusFilter,
+    hasActiveFilters,
+    clearFilters,
+}: {
+    searchTerm: string;
+    setSearchTerm: (value: string) => void;
+    statusFilter: string;
+    setStatusFilter: (value: string) => void;
+    hasActiveFilters: boolean;
+    clearFilters: () => void;
+}) {
+    return (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+                <Search className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                    placeholder="Buscar por N° pedido, cliente o correo…"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-9 pl-9 text-sm"
+                />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-9 w-full text-sm sm:w-44">
+                    <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">Todos los estados</SelectItem>
+                    {Object.entries(STATUS_CONFIG).map(([k, v]) => (
+                        <SelectItem key={k} value={k}>
+                            {v.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            {hasActiveFilters && (
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="h-9 text-muted-foreground hover:text-foreground"
+                >
+                    Limpiar
+                </Button>
+            )}
+        </div>
+    );
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────────
 export default function Orders({ orders: initialOrders }: Props) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -303,44 +357,6 @@ export default function Orders({ orders: initialOrders }: Props) {
         setSelectedOrder(order);
         setIsDetailOpen(true);
     };
-
-    // ── Filter panel (shared between mobile sheet & desktop inline) ──────────
-    const FilterPanel = () => (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-                <Search className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                    placeholder="Buscar por N° pedido, cliente o correo…"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="h-9 pl-9 text-sm"
-                />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-9 w-full text-sm sm:w-44">
-                    <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">Todos los estados</SelectItem>
-                    {Object.entries(STATUS_CONFIG).map(([k, v]) => (
-                        <SelectItem key={k} value={k}>
-                            {v.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-            {hasActiveFilters && (
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="h-9 text-muted-foreground hover:text-foreground"
-                >
-                    Limpiar
-                </Button>
-            )}
-        </div>
-    );
 
     return (
         <TooltipProvider>
@@ -434,7 +450,14 @@ export default function Orders({ orders: initialOrders }: Props) {
                                     Filtrar órdenes
                                 </SheetTitle>
                             </SheetHeader>
-                            <FilterPanel />
+                            <FilterPanel
+                                searchTerm={searchTerm}
+                                setSearchTerm={setSearchTerm}
+                                statusFilter={statusFilter}
+                                setStatusFilter={setStatusFilter}
+                                hasActiveFilters={hasActiveFilters}
+                                clearFilters={clearFilters}
+                            />
                         </SheetContent>
                     </Sheet>
                 </div>
@@ -442,7 +465,14 @@ export default function Orders({ orders: initialOrders }: Props) {
                 {/* Desktop */}
                 <Card className="hidden lg:block">
                     <CardContent className="px-5 py-4">
-                        <FilterPanel />
+                        <FilterPanel
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            statusFilter={statusFilter}
+                            setStatusFilter={setStatusFilter}
+                            hasActiveFilters={hasActiveFilters}
+                            clearFilters={clearFilters}
+                        />
                     </CardContent>
                 </Card>
 
@@ -960,7 +990,7 @@ export default function Orders({ orders: initialOrders }: Props) {
                                                                 className="max-h-32 w-full cursor-zoom-in rounded-lg border object-contain"
                                                                 onClick={() =>
                                                                     window.open(
-                                                                        `/storage/${selectedOrder.payment?.receipt_url!}`,
+                                                                        `/storage/${selectedOrder.payment.receipt_url}`,
                                                                         '_blank',
                                                                     )
                                                                 }

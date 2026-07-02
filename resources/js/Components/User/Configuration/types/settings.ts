@@ -70,7 +70,12 @@ export interface SettingsProps {
     };
 }
 
-export type Section = 'profile' | 'password' | 'addresses' | 'orders' | 'favorites';
+export type Section =
+    | 'profile'
+    | 'password'
+    | 'addresses'
+    | 'orders'
+    | 'favorites';
 
 export interface PasswordStrengthProps {
     password: string;

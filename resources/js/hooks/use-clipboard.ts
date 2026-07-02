@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
-export function useClipboard(timeout = 2000): [string | null, (text: string) => void] {
+export function useClipboard(
+    timeout = 2000,
+): [string | null, (text: string) => void] {
     const [copiedText, setCopiedText] = useState<string | null>(null);
 
     const copy = (text: string) => {

@@ -30,7 +30,7 @@ class RegisterController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        $user->assignRole('client'); 
+        $user->assignRole('client');
 
         event(new Registered($user));
         Auth::login($user);

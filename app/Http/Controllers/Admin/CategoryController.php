@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
@@ -15,10 +15,11 @@ class CategoryController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {   
+    {
         $categories = Category::withCount('products')
             ->latest()
             ->paginate(10);
+
         return Inertia::render('Admin/Categories/Categories', [
             'categories' => $categories,
         ]);
@@ -38,10 +39,10 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'slug'        => ['nullable', 'string', 'max:255', 'unique:categories,slug'],
-            'is_active'   => ['boolean'],
-            'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', 'unique:categories,slug'],
+            'is_active' => ['boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
         // Generar slug si no viene
@@ -80,10 +81,10 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'slug'        => ['nullable', 'string', 'max:255', 'unique:categories,slug,' . $category->id],
-            'is_active'   => ['boolean'],
-            'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', 'unique:categories,slug,'.$category->id],
+            'is_active' => ['boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
         $validated['slug'] = $validated['slug'] ?? Str::slug($validated['name']);
@@ -120,7 +121,7 @@ class CategoryController extends Controller
     public function toggleStatus(Category $category)
     {
         $category->update([
-            'is_active' => !$category->is_active,
+            'is_active' => ! $category->is_active,
         ]);
 
         return redirect()->back()->with('success', 'Estado actualizado.');

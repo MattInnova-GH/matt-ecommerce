@@ -34,6 +34,6 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <LoginForm onSuccess={onClose} />
             </div>
         </div>,
-        document.body
+        document.body,
     );
 }

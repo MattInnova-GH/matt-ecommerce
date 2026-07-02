@@ -10,7 +10,9 @@ export default function OrderTimeline({ order }: { order: Order }) {
             <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
                 <XCircle className="h-5 w-5 shrink-0 text-red-500" />
                 <div>
-                    <p className="text-sm font-medium text-red-700">Pedido cancelado</p>
+                    <p className="text-sm font-medium text-red-700">
+                        Pedido cancelado
+                    </p>
                     <p className="text-xs text-red-500">
                         Cancelado el {formatDate(order.updated_at)}
                     </p>
@@ -59,7 +61,9 @@ export default function OrderTimeline({ order }: { order: Order }) {
                             {idx < TIMELINE_STEPS.length - 1 && (
                                 <div
                                     className={`mt-4 h-0.5 flex-1 transition-colors ${
-                                        idx < currentStep ? 'bg-primary/40' : 'bg-muted'
+                                        idx < currentStep
+                                            ? 'bg-primary/40'
+                                            : 'bg-muted'
                                     }`}
                                 />
                             )}

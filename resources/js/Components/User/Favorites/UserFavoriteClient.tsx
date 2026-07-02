@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
-import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
+import { Heart, Trash2 } from 'lucide-react';
 
 import type { PublicProduct } from '@/lib/types/type.public';
 
@@ -15,9 +15,7 @@ type PageProps = {
 export default function FavoritesPage() {
     const { favorites: initialFavorites } = usePage<PageProps>().props;
 
-    const [favorites, setFavorites] = useState<FavoriteProduct[]>(
-        initialFavorites ?? [],
-    );
+    const [favorites] = useState<FavoriteProduct[]>(initialFavorites ?? []);
 
     const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
@@ -28,9 +26,11 @@ export default function FavoritesPage() {
     const handleToggleSelect = (productId: number) => {
         setSelectedItems((prev) => {
             const newSet = new Set(prev);
-            newSet.has(productId)
-                ? newSet.delete(productId)
-                : newSet.add(productId);
+            if (newSet.has(productId)) {
+                newSet.delete(productId);
+            } else {
+                newSet.add(productId);
+            }
 
             return newSet;
         });
@@ -46,10 +46,14 @@ export default function FavoritesPage() {
 
     const handleRemoveSelected = () => {
         const ids = Array.from(selectedItems);
-        router.post('/favoritos/bulk-delete', { ids }, {
-            preserveScroll: true,
-            onSuccess: () => setSelectedItems(new Set()),
-        });
+        router.post(
+            '/favoritos/bulk-delete',
+            { ids },
+            {
+                preserveScroll: true,
+                onSuccess: () => setSelectedItems(new Set()),
+            },
+        );
     };
 
     const handleAddAllToCart = () => {
@@ -62,8 +66,6 @@ export default function FavoritesPage() {
         // aquí normalmente harías:
         // router.post('/cart/bulk', selectedProducts)
     };
-
-    const isLoading = false; // Inertia ya controla esto con navigation state
 
     return (
         <main className="min-h-screen bg-gray-50">

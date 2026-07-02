@@ -44,8 +44,7 @@ export function CheckoutButton() {
                 return 'Vincula tu número Yape haciendo clic en "Yape"';
             if (yapeMode === 'code' && !yapeCode)
                 return 'Ingresa el código de aprobación Yape';
-            if (!voucherFile)
-                return 'Debes subir el comprobante de pago Yape';
+            if (!voucherFile) return 'Debes subir el comprobante de pago Yape';
         }
         return null;
     };
@@ -173,7 +172,8 @@ export function CheckoutButton() {
                 </label>
                 {termsError && (
                     <p className="pl-7 text-xs text-red-500">
-                        Debes aceptar los Términos y la Política de Privacidad para continuar
+                        Debes aceptar los Términos y la Política de Privacidad
+                        para continuar
                     </p>
                 )}
             </div>

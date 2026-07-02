@@ -118,8 +118,8 @@ export default function TerminosCondiciones() {
                         <div className="flex-1 space-y-6">
                             <div className="rounded-2xl border border-indigo-100 bg-indigo-50 p-5">
                                 <p className="text-sm text-indigo-800">
-                                    Por favor, lee detenidamente estos Términos y
-                                    Condiciones antes de utilizar nuestra
+                                    Por favor, lee detenidamente estos Términos
+                                    y Condiciones antes de utilizar nuestra
                                     plataforma. Al acceder o usar nuestros
                                     servicios, confirmas que has leído,
                                     comprendido y aceptado estos términos.

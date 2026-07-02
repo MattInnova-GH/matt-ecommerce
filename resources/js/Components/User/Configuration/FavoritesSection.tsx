@@ -3,7 +3,7 @@ import { router } from '@inertiajs/react';
 import { Heart, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Favorite } from './types/settings';
+import type { Favorite } from './types/settings';
 
 export function FavoritesSection({ favorites }: { favorites: Favorite[] }) {
     const handleRemove = (productId: number) => {

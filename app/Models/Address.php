@@ -11,7 +11,8 @@ class Address extends Model
         'address', 'reference', 'postal_code',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

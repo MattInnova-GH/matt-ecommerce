@@ -31,25 +31,6 @@ function getInitials(name: string) {
 export function AdminHeader({ onOpenMobileSidebar, user }: AdminHeaderProps) {
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const [isMobile, setIsMobile] = useState(false);
-
-    // Si el usuario no existe, devolvemos un placeholder o null
-    if (!user) {
-        return (
-            <header className="border-b border-gray-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-                Cargando...
-            </header>
-        );
-    }
-
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 1024);
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
@@ -64,6 +45,15 @@ export function AdminHeader({ onOpenMobileSidebar, user }: AdminHeaderProps) {
         return () =>
             document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Si el usuario no existe, devolvemos un placeholder o null
+    if (!user) {
+        return (
+            <header className="border-b border-gray-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+                Cargando...
+            </header>
+        );
+    }
 
     return (
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">

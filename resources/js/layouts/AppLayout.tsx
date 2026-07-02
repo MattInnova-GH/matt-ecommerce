@@ -7,9 +7,6 @@ import { useState } from 'react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [authModalTab, _setAuthModalTab] = useState<'login' | 'register'>(
-        'login',
-    );
 
     return (
         <>
@@ -19,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <AuthModal
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
-                defaultTab={authModalTab}
+                defaultTab="login"
             />
             <Chatbot />
         </>

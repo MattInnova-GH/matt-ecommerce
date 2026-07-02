@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-        'name', 'slug', 'description', 'price', 'stock', 'thumbnail', 
+        'name', 'slug', 'description', 'price', 'stock', 'thumbnail',
         'is_active', 'is_featured', 'category_id', 'brand_id', 'supplier_id',
     ];
 
@@ -79,6 +79,7 @@ class Product extends Model
         if ($promotion && $promotion->isCurrentlyActive()) {
             return $promotion->applyDiscount($this->price);
         }
+
         return (float) $this->price;
     }
 
@@ -91,6 +92,7 @@ class Product extends Model
         if ($promotion && $promotion->isCurrentlyActive()) {
             return $promotion->getDiscountBadgeText();
         }
+
         return null;
     }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import {
     Clock,
     CheckCircle2,
@@ -69,10 +69,32 @@ export const MOCK_ORDERS: Order[] = [
         updated_at: '2025-05-02T14:20:00Z',
         tracking_code: 'PE123456789',
         items: [
-            { id: 1, product_name: 'Zapatillas Running Pro X200', product_thumbnail: null, quantity: 1, unit_price: 189.9, subtotal: 189.9 },
-            { id: 2, product_name: 'Medias Deportivas Pack x3', product_thumbnail: null, quantity: 2, unit_price: 40.0, subtotal: 80.0 },
+            {
+                id: 1,
+                product_name: 'Zapatillas Running Pro X200',
+                product_thumbnail: null,
+                quantity: 1,
+                unit_price: 189.9,
+                subtotal: 189.9,
+            },
+            {
+                id: 2,
+                product_name: 'Medias Deportivas Pack x3',
+                product_thumbnail: null,
+                quantity: 2,
+                unit_price: 40.0,
+                subtotal: 80.0,
+            },
         ],
-        shipping_address: { full_name: 'Carlos Mendoza', address: 'Av. Javier Prado Este 1234', city: 'Lima', district: 'San Isidro', country: 'Perú', postal_code: '15073', reference: 'Frente al parque Kennedy' },
+        shipping_address: {
+            full_name: 'Carlos Mendoza',
+            address: 'Av. Javier Prado Este 1234',
+            city: 'Lima',
+            district: 'San Isidro',
+            country: 'Perú',
+            postal_code: '15073',
+            reference: 'Frente al parque Kennedy',
+        },
     },
     {
         id: 2,
@@ -86,11 +108,38 @@ export const MOCK_ORDERS: Order[] = [
         updated_at: '2025-05-07T11:00:00Z',
         tracking_code: 'PE987654321',
         items: [
-            { id: 3, product_name: 'Laptop Stand Ergonómico Aluminio', product_thumbnail: null, quantity: 1, unit_price: 229.0, subtotal: 229.0 },
-            { id: 4, product_name: 'Mouse Inalámbrico Silencioso', product_thumbnail: null, quantity: 1, unit_price: 120.0, subtotal: 120.0 },
-            { id: 5, product_name: 'Mousepad XL Gaming', product_thumbnail: null, quantity: 1, unit_price: 80.0, subtotal: 80.0 },
+            {
+                id: 3,
+                product_name: 'Laptop Stand Ergonómico Aluminio',
+                product_thumbnail: null,
+                quantity: 1,
+                unit_price: 229.0,
+                subtotal: 229.0,
+            },
+            {
+                id: 4,
+                product_name: 'Mouse Inalámbrico Silencioso',
+                product_thumbnail: null,
+                quantity: 1,
+                unit_price: 120.0,
+                subtotal: 120.0,
+            },
+            {
+                id: 5,
+                product_name: 'Mousepad XL Gaming',
+                product_thumbnail: null,
+                quantity: 1,
+                unit_price: 80.0,
+                subtotal: 80.0,
+            },
         ],
-        shipping_address: { full_name: 'Carlos Mendoza', address: 'Jr. Las Flores 567', city: 'Lima', district: 'Miraflores', country: 'Perú' },
+        shipping_address: {
+            full_name: 'Carlos Mendoza',
+            address: 'Jr. Las Flores 567',
+            city: 'Lima',
+            district: 'Miraflores',
+            country: 'Perú',
+        },
     },
     {
         id: 3,
@@ -103,10 +152,31 @@ export const MOCK_ORDERS: Order[] = [
         created_at: '2025-05-08T16:45:00Z',
         updated_at: '2025-05-08T17:00:00Z',
         items: [
-            { id: 6, product_name: 'Libro "Diseño UX Avanzado"', product_thumbnail: null, quantity: 1, unit_price: 89.9, subtotal: 89.9 },
-            { id: 7, product_name: 'Cuaderno A5 Cuadriculado', product_thumbnail: null, quantity: 2, unit_price: 30.0, subtotal: 60.0 },
+            {
+                id: 6,
+                product_name: 'Libro "Diseño UX Avanzado"',
+                product_thumbnail: null,
+                quantity: 1,
+                unit_price: 89.9,
+                subtotal: 89.9,
+            },
+            {
+                id: 7,
+                product_name: 'Cuaderno A5 Cuadriculado',
+                product_thumbnail: null,
+                quantity: 2,
+                unit_price: 30.0,
+                subtotal: 60.0,
+            },
         ],
-        shipping_address: { full_name: 'Carlos Mendoza', address: 'Calle Los Pinos 890', city: 'Lima', district: 'Surco', country: 'Perú', reference: 'Detrás del supermercado' },
+        shipping_address: {
+            full_name: 'Carlos Mendoza',
+            address: 'Calle Los Pinos 890',
+            city: 'Lima',
+            district: 'Surco',
+            country: 'Perú',
+            reference: 'Detrás del supermercado',
+        },
     },
     {
         id: 4,
@@ -119,9 +189,22 @@ export const MOCK_ORDERS: Order[] = [
         created_at: '2025-04-10T08:00:00Z',
         updated_at: '2025-04-11T09:30:00Z',
         items: [
-            { id: 8, product_name: 'Auriculares Bluetooth Premium', product_thumbnail: null, quantity: 1, unit_price: 300.0, subtotal: 300.0 },
+            {
+                id: 8,
+                product_name: 'Auriculares Bluetooth Premium',
+                product_thumbnail: null,
+                quantity: 1,
+                unit_price: 300.0,
+                subtotal: 300.0,
+            },
         ],
-        shipping_address: { full_name: 'Carlos Mendoza', address: 'Av. Benavides 2000', city: 'Lima', district: 'Miraflores', country: 'Perú' },
+        shipping_address: {
+            full_name: 'Carlos Mendoza',
+            address: 'Av. Benavides 2000',
+            city: 'Lima',
+            district: 'Miraflores',
+            country: 'Perú',
+        },
     },
     {
         id: 5,
@@ -134,8 +217,21 @@ export const MOCK_ORDERS: Order[] = [
         created_at: '2025-05-09T07:20:00Z',
         updated_at: '2025-05-09T07:20:00Z',
         items: [
-            { id: 9, product_name: 'Botella Térmica 1L Acero', product_thumbnail: null, quantity: 1, unit_price: 65.5, subtotal: 65.5 },
+            {
+                id: 9,
+                product_name: 'Botella Térmica 1L Acero',
+                product_thumbnail: null,
+                quantity: 1,
+                unit_price: 65.5,
+                subtotal: 65.5,
+            },
         ],
-        shipping_address: { full_name: 'Carlos Mendoza', address: 'Av. La Marina 123', city: 'Lima', district: 'San Miguel', country: 'Perú' },
+        shipping_address: {
+            full_name: 'Carlos Mendoza',
+            address: 'Av. La Marina 123',
+            city: 'Lima',
+            district: 'San Miguel',
+            country: 'Perú',
+        },
     },
 ];

@@ -1,4 +1,4 @@
-import { InputErrorProps } from './types/settings';
+import type { InputErrorProps } from './types/settings';
 
 export function InputError({ message }: InputErrorProps) {
     if (!message) {

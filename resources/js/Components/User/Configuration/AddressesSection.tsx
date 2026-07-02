@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { FlashMessage } from './FlashMessage';
 import { InputError } from './InputError';
-import { Address } from './types/settings';
+import type { Address } from './types/settings';
 
 interface AddressesSectionProps {
     addresses: Address[];

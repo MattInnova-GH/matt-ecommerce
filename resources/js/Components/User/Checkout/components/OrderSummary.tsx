@@ -14,10 +14,7 @@ export function OrderSummary() {
     const { deliveryMethod } = useCheckoutStore();
 
     // total calculado aquí, en este componente
-    const { subtotal, deliveryCost, total } = calcOrderTotals(
-        items,
-        deliveryMethod,
-    );
+    const { subtotal, total } = calcOrderTotals(items, deliveryMethod);
 
     return (
         <div className="space-y-5 rounded-2xl border border-gray-100 bg-white p-6">

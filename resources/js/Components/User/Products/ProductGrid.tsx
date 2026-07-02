@@ -3,7 +3,7 @@ import { Filter } from 'lucide-react';
 
 import ProductCard from './ProductCard';
 
-import { Category, PublicProduct } from './types';
+import type { Category, PublicProduct } from './types';
 
 type Props = {
     initialProducts: PublicProduct[];

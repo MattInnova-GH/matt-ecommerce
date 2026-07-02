@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { Card, CardContent } from '@/components/ui/card';
-import {
+import type {
     Section,
     SettingsProps,
 } from '@/Components/User/Configuration/types/settings';
@@ -19,32 +19,33 @@ export default function SettingsPage({
     favorites,
     flash,
 }: SettingsProps) {
+    const VALID_SECTIONS: Section[] = [
+        'profile',
+        'password',
+        'addresses',
+        'orders',
+        'favorites',
+    ];
+
     const { url } = usePage();
     // Get section from URL if present
     const urlParams = new URLSearchParams(window.location.search);
     const initialSection = (urlParams.get('section') as Section) || 'profile';
-    
+
     const [activeSection, setActiveSection] = useState<Section>(
-        ['profile', 'password', 'addresses', 'orders', 'favorites'].includes(
-            initialSection,
-        )
-            ? initialSection
-            : 'profile',
+        VALID_SECTIONS.includes(initialSection) ? initialSection : 'profile',
     );
 
     // Update section when URL changes (e.g. clicking "Mis Compras" from header while on profile)
-    useEffect(() => {
+    const [prevUrl, setPrevUrl] = useState(url);
+    if (url !== prevUrl) {
+        setPrevUrl(url);
         const params = new URLSearchParams(window.location.search);
         const section = params.get('section') as Section;
-        if (
-            section &&
-            ['profile', 'password', 'addresses', 'orders', 'favorites'].includes(
-                section,
-            )
-        ) {
+        if (section && VALID_SECTIONS.includes(section)) {
             setActiveSection(section);
         }
-    }, [url]);
+    }
 
     const handleLogout = () => {
         router.post('/logout');

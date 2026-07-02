@@ -78,8 +78,8 @@ export function TransferModal() {
                 {!confirmed ? (
                     <>
                         <p className="text-sm text-gray-500">
-                            Realiza la transferencia a la siguiente cuenta y sube
-                            tu comprobante para confirmar el pago.
+                            Realiza la transferencia a la siguiente cuenta y
+                            sube tu comprobante para confirmar el pago.
                         </p>
 
                         {/* Datos bancarios */}
@@ -215,7 +215,7 @@ export function TransferModal() {
                 )}
             </div>
         </div>,
-        document.body
+        document.body,
     );
 }
 

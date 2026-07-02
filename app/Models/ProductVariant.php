@@ -8,7 +8,8 @@ class ProductVariant extends Model
 {
     protected $fillable = ['product_id', 'name', 'value', 'stock', 'price'];
 
-    public function product() {
+    public function product()
+    {
         return $this->belongsTo(Product::class);
     }
 }

@@ -125,15 +125,24 @@ export default function EditProduct({
         gallery: [] as File[],
         is_active: product.is_active ?? true,
         is_featured: product.is_featured ?? false,
-        variants: (product.variants && product.variants.length > 0)
-            ? product.variants.map((v) => ({
-                id: v.id.toString(),
-                name: v.name,
-                value: v.value,
-                stock: v.stock,
-                price: (v.price ?? '') as number | '',
-            }))
-            : [{ id: '1', name: '', value: '', stock: 0, price: '' as number | '' }] as VariantField[],
+        variants:
+            product.variants && product.variants.length > 0
+                ? product.variants.map((v) => ({
+                      id: v.id.toString(),
+                      name: v.name,
+                      value: v.value,
+                      stock: v.stock,
+                      price: (v.price ?? '') as number | '',
+                  }))
+                : ([
+                      {
+                          id: '1',
+                          name: '',
+                          value: '',
+                          stock: 0,
+                          price: '' as number | '',
+                      },
+                  ] as VariantField[]),
         deleted_images: [] as number[],
     });
 
@@ -148,20 +157,36 @@ export default function EditProduct({
     const addVariant = () => {
         setData('variants', [
             ...data.variants,
-            { id: Date.now().toString(), name: '', value: '', stock: 0, price: '' },
+            {
+                id: Date.now().toString(),
+                name: '',
+                value: '',
+                stock: 0,
+                price: '',
+            },
         ]);
     };
 
     const removeVariant = (id: string) => {
         if (data.variants.length > 1) {
-            setData('variants', data.variants.filter((v) => v.id !== id));
+            setData(
+                'variants',
+                data.variants.filter((v) => v.id !== id),
+            );
         }
     };
 
-    const updateVariant = (id: string, field: keyof VariantField, value: string | number) => {
-        setData('variants', data.variants.map((v) =>
-            v.id === id ? { ...v, [field]: value } : v,
-        ));
+    const updateVariant = (
+        id: string,
+        field: keyof VariantField,
+        value: string | number,
+    ) => {
+        setData(
+            'variants',
+            data.variants.map((v) =>
+                v.id === id ? { ...v, [field]: value } : v,
+            ),
+        );
     };
 
     const handleThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -770,78 +795,140 @@ export default function EditProduct({
                                             </div>
 
                                             <div className="space-y-3">
-                                                {data.variants.map((variant) => (
-                                                    <div
-                                                        key={variant.id}
-                                                        className="flex flex-col gap-3 rounded-lg border bg-card p-4 transition-all sm:flex-row sm:items-end"
-                                                    >
-                                                        <div className="flex-1 space-y-1.5">
-                                                            <Label className="text-xs font-medium">
-                                                                Nombre
-                                                            </Label>
-                                                            <Input
-                                                                placeholder="Ej: Talla"
-                                                                value={variant.name}
-                                                                onChange={(e) =>
-                                                                    updateVariant(variant.id, 'name', e.target.value)
-                                                                }
-                                                                className="h-9"
-                                                            />
-                                                        </div>
-                                                        <div className="flex-1 space-y-1.5">
-                                                            <Label className="text-xs font-medium">
-                                                                Valor
-                                                            </Label>
-                                                            <Input
-                                                                placeholder="Ej: XL"
-                                                                value={variant.value}
-                                                                onChange={(e) =>
-                                                                    updateVariant(variant.id, 'value', e.target.value)
-                                                                }
-                                                                className="h-9"
-                                                            />
-                                                        </div>
-                                                        <div className="w-28 space-y-1.5">
-                                                            <Label className="text-xs font-medium">
-                                                                Stock
-                                                            </Label>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="0"
-                                                                value={variant.stock}
-                                                                onChange={(e) =>
-                                                                    updateVariant(variant.id, 'stock', parseInt(e.target.value) || 0)
-                                                                }
-                                                                className="h-9"
-                                                            />
-                                                        </div>
-                                                        <div className="w-28 space-y-1.5">
-                                                            <Label className="text-xs font-medium">
-                                                                Precio (S/)
-                                                            </Label>
-                                                            <Input
-                                                                type="number"
-                                                                step="0.01"
-                                                                placeholder="0.00"
-                                                                value={variant.price}
-                                                                onChange={(e) =>
-                                                                    updateVariant(variant.id, 'price', e.target.value === '' ? '' : parseFloat(e.target.value) || '')
-                                                                }
-                                                                className="h-9"
-                                                            />
-                                                        </div>
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => removeVariant(variant.id)}
-                                                            disabled={data.variants.length === 1}
-                                                            className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
+                                                {data.variants.map(
+                                                    (variant) => (
+                                                        <div
+                                                            key={variant.id}
+                                                            className="flex flex-col gap-3 rounded-lg border bg-card p-4 transition-all sm:flex-row sm:items-end"
                                                         >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                ))}
+                                                            <div className="flex-1 space-y-1.5">
+                                                                <Label className="text-xs font-medium">
+                                                                    Nombre
+                                                                </Label>
+                                                                <Input
+                                                                    placeholder="Ej: Talla"
+                                                                    value={
+                                                                        variant.name
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        updateVariant(
+                                                                            variant.id,
+                                                                            'name',
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                        )
+                                                                    }
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 space-y-1.5">
+                                                                <Label className="text-xs font-medium">
+                                                                    Valor
+                                                                </Label>
+                                                                <Input
+                                                                    placeholder="Ej: XL"
+                                                                    value={
+                                                                        variant.value
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        updateVariant(
+                                                                            variant.id,
+                                                                            'value',
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                        )
+                                                                    }
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
+                                                            <div className="w-28 space-y-1.5">
+                                                                <Label className="text-xs font-medium">
+                                                                    Stock
+                                                                </Label>
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="0"
+                                                                    value={
+                                                                        variant.stock
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        updateVariant(
+                                                                            variant.id,
+                                                                            'stock',
+                                                                            parseInt(
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                            ) ||
+                                                                                0,
+                                                                        )
+                                                                    }
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
+                                                            <div className="w-28 space-y-1.5">
+                                                                <Label className="text-xs font-medium">
+                                                                    Precio (S/)
+                                                                </Label>
+                                                                <Input
+                                                                    type="number"
+                                                                    step="0.01"
+                                                                    placeholder="0.00"
+                                                                    value={
+                                                                        variant.price
+                                                                    }
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) =>
+                                                                        updateVariant(
+                                                                            variant.id,
+                                                                            'price',
+                                                                            e
+                                                                                .target
+                                                                                .value ===
+                                                                                ''
+                                                                                ? ''
+                                                                                : parseFloat(
+                                                                                      e
+                                                                                          .target
+                                                                                          .value,
+                                                                                  ) ||
+                                                                                      '',
+                                                                        )
+                                                                    }
+                                                                    className="h-9"
+                                                                />
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() =>
+                                                                    removeVariant(
+                                                                        variant.id,
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    data
+                                                                        .variants
+                                                                        .length ===
+                                                                    1
+                                                                }
+                                                                className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ),
+                                                )}
                                             </div>
 
                                             {data.variants.some(

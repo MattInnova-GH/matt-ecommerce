@@ -13,20 +13,23 @@ class Order extends Model
 
     protected $casts = [
         'shipping_address' => 'array',
-        'subtotal'         => 'decimal:2',
-        'tax'              => 'decimal:2',
-        'total'            => 'decimal:2',
+        'subtotal' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function items() {
+    public function items()
+    {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function payment() {
+    public function payment()
+    {
         return $this->hasOne(Payment::class);
     }
 }

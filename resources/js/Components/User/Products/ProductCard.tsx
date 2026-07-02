@@ -3,7 +3,7 @@ import { Heart, Package } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { PublicProduct } from './types';
+import type { PublicProduct } from './types';
 
 type Props = {
     product: PublicProduct;

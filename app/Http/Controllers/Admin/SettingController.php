@@ -12,9 +12,9 @@ class SettingController extends Controller
     public function index()
     {
         $settings = Setting::first();
-        
+
         return Inertia::render('Admin/Settings/Settings', [
-            'settings' => $settings ?? new Setting()
+            'settings' => $settings ?? new Setting,
         ]);
     }
 
@@ -34,9 +34,9 @@ class SettingController extends Controller
         ]);
 
         $setting = Setting::first();
-        
-        if (!$setting) {
-            $setting = new Setting();
+
+        if (! $setting) {
+            $setting = new Setting;
         }
 
         // Subir logo
@@ -45,7 +45,7 @@ class SettingController extends Controller
                 unlink(public_path($setting->logo));
             }
             $path = $request->file('logo')->store('settings', 'public');
-            $validated['logo'] = '/storage/' . $path;
+            $validated['logo'] = '/storage/'.$path;
         }
 
         // Subir favicon
@@ -54,7 +54,7 @@ class SettingController extends Controller
                 unlink(public_path($setting->favicon));
             }
             $path = $request->file('favicon')->store('settings', 'public');
-            $validated['favicon'] = '/storage/' . $path;
+            $validated['favicon'] = '/storage/'.$path;
         }
 
         $setting->fill($validated);

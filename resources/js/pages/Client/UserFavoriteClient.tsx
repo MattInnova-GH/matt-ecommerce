@@ -45,7 +45,11 @@ export default function FavoritesPage() {
         setSelectedItems((prev) => {
             const next = new Set(prev);
 
-            next.has(id) ? next.delete(id) : next.add(id);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
 
             return next;
         });
@@ -420,7 +424,9 @@ function FavoriteCard({
                     <h3 className="line-clamp-2 text-sm leading-snug font-medium group-hover/link:underline">
                         {product.name}
                     </h3>
-                    <p className="mt-2 text-base font-bold">S/ {product.price}</p>
+                    <p className="mt-2 text-base font-bold">
+                        S/ {product.price}
+                    </p>
                 </Link>
 
                 <Button

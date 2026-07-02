@@ -1,4 +1,4 @@
-import { PasswordStrengthProps } from './types/settings';
+import type { PasswordStrengthProps } from './types/settings';
 
 export function PasswordStrength({ password }: PasswordStrengthProps) {
     const checks = [

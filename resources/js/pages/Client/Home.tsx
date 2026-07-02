@@ -71,9 +71,7 @@ export default function Home({
     categories = [],
     activePromotions = [], // ✅ NUEVO
     banners = [],
-    reviews: _reviews = [],
 }: Props) {
-    //console.log('REVIEWS::', reviews);
     return (
         <div>
             <Head title="Inicio" />

@@ -50,25 +50,25 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }, []);
 
     useEffect(() => {
-        if (isOpen && isInitialLoading) {
-            fetchData('/buscar').then((data) => {
-                setProducts(data.products || []);
-                setCategories(data.categories || []);
-                setIsInitialLoading(false);
-            });
-        }
+        if (!isOpen || !isInitialLoading) return;
+
+        let ignore = false;
+
+        (async () => {
+            const data = await fetchData('/buscar');
+            if (ignore) return;
+            setProducts(data.products || []);
+            setCategories(data.categories || []);
+            setIsInitialLoading(false);
+        })();
+
+        return () => {
+            ignore = true;
+        };
     }, [isOpen, isInitialLoading, fetchData]);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            performSearch(query);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [query]);
-
     const performSearch = useCallback(
-        (searchTerm: string) => {
+        (searchTerm: string, ignoreRef: { current: boolean }) => {
             if (searchTerm.length < 2) {
                 setResults([]);
 
@@ -77,12 +77,26 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
             fetchData(`/buscar?q=${encodeURIComponent(searchTerm)}`).then(
                 (data) => {
+                    if (ignoreRef.current) return;
                     setResults(data.products || []);
                 },
             );
         },
         [fetchData],
     );
+
+    useEffect(() => {
+        const ignoreRef = { current: false };
+
+        const timer = setTimeout(() => {
+            performSearch(query, ignoreRef);
+        }, 300);
+
+        return () => {
+            ignoreRef.current = true;
+            clearTimeout(timer);
+        };
+    }, [query, performSearch]);
 
     const handleClose = () => {
         setQuery('');

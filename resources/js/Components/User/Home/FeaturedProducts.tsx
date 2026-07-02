@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import ProductCard, { ProductCardSkeleton } from '@/Components/User/Products/ProductCard';
+import ProductCard, {
+    ProductCardSkeleton,
+} from '@/Components/User/Products/ProductCard';
 
 interface Product {
     id: number;
@@ -23,10 +25,10 @@ export function FeaturedProductsSkeleton() {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-10 flex items-end justify-between">
                     <div className="space-y-3">
-                        <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-                        <div className="h-8 w-64 bg-muted animate-pulse rounded" />
+                        <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+                        <div className="h-8 w-64 animate-pulse rounded bg-muted" />
                     </div>
-                    <div className="h-10 w-32 bg-muted animate-pulse rounded" />
+                    <div className="h-10 w-32 animate-pulse rounded bg-muted" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4 lg:gap-x-8">
@@ -56,7 +58,7 @@ export default function FeaturedProducts({ products = [] }: Props) {
     }
 
     return (
-        <section className="bg-background py-16 sm:py-24 animate-in fade-in duration-700">
+        <section className="animate-in bg-background py-16 duration-700 fade-in sm:py-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-10 flex items-end justify-between">
                     <div>
@@ -68,7 +70,10 @@ export default function FeaturedProducts({ products = [] }: Props) {
                         </h2>
                     </div>
                     <Button variant="ghost" asChild className="group">
-                        <Link href="/productos" className="flex items-center gap-2">
+                        <Link
+                            href="/productos"
+                            className="flex items-center gap-2"
+                        >
                             Ver todo el catálogo
                             <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                         </Link>

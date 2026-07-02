@@ -1,9 +1,23 @@
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
-import { HelpCircle, ChevronDown, ChevronUp, Truck, CreditCard, RotateCcw, UserCircle } from 'lucide-react';
+import {
+    HelpCircle,
+    ChevronDown,
+    ChevronUp,
+    Truck,
+    CreditCard,
+    RotateCcw,
+    UserCircle,
+} from 'lucide-react';
 
 type FaqItem = { id: string; question: string; answer: string };
-type FaqCategory = { id: string; title: string; icon: React.ElementType; color: string; items: FaqItem[] };
+type FaqCategory = {
+    id: string;
+    title: string;
+    icon: React.ElementType;
+    color: string;
+    items: FaqItem[];
+};
 
 const categories: FaqCategory[] = [
     {
@@ -164,7 +178,8 @@ export default function PreguntasFrecuentes() {
                                     Preguntas Frecuentes
                                 </h1>
                                 <p className="mt-1 text-sm text-gray-500">
-                                    Encuentra respuestas rápidas a las dudas más comunes
+                                    Encuentra respuestas rápidas a las dudas más
+                                    comunes
                                 </p>
                             </div>
                         </div>
@@ -176,7 +191,7 @@ export default function PreguntasFrecuentes() {
                         {/* Índice lateral */}
                         <aside className="mb-8 lg:mb-0 lg:w-64 lg:shrink-0">
                             <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                                <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-400">
+                                <p className="mb-3 text-xs font-semibold tracking-widest text-gray-400 uppercase">
                                     Categorías
                                 </p>
                                 <nav className="space-y-1">
@@ -188,8 +203,13 @@ export default function PreguntasFrecuentes() {
                                                 href={`#${cat.id}`}
                                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition hover:bg-sky-50 hover:text-sky-700"
                                             >
-                                                <Icon size={14} className="shrink-0" />
-                                                <span className="truncate">{cat.title}</span>
+                                                <Icon
+                                                    size={14}
+                                                    className="shrink-0"
+                                                />
+                                                <span className="truncate">
+                                                    {cat.title}
+                                                </span>
                                             </a>
                                         );
                                     })}
@@ -201,7 +221,9 @@ export default function PreguntasFrecuentes() {
                         <div className="flex-1 space-y-6">
                             <div className="rounded-2xl border border-sky-100 bg-sky-50 p-5">
                                 <p className="text-sm text-sky-800">
-                                    ¿No encuentras lo que buscas? Escríbenos y te ayudamos a resolver tu duda lo antes posible.
+                                    ¿No encuentras lo que buscas? Escríbenos y
+                                    te ayudamos a resolver tu duda lo antes
+                                    posible.
                                 </p>
                             </div>
 
@@ -214,14 +236,20 @@ export default function PreguntasFrecuentes() {
                                         className="scroll-mt-24 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
                                     >
                                         <div className="mb-4 flex items-center gap-3">
-                                            <Icon size={20} className={cat.color} />
+                                            <Icon
+                                                size={20}
+                                                className={cat.color}
+                                            />
                                             <h2 className="text-base font-semibold text-gray-900">
                                                 {cat.title}
                                             </h2>
                                         </div>
                                         <div>
                                             {cat.items.map((item) => (
-                                                <AccordionItem key={item.id} item={item} />
+                                                <AccordionItem
+                                                    key={item.id}
+                                                    item={item}
+                                                />
                                             ))}
                                         </div>
                                     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-import L, { LeafletMouseEvent } from 'leaflet';
+import type { LeafletMouseEvent } from 'leaflet';
+import L from 'leaflet';
 
 import 'leaflet/dist/leaflet.css';
 

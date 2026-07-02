@@ -44,7 +44,10 @@ export default function UserDropdown({ user, onClose }: Props) {
         { href: profile.index().url, label: 'Configuración', icon: Settings },
     ];
 
-    const roleLinks: Record<string, { href: string; label: string; icon: React.ElementType }[]> = {
+    const roleLinks: Record<
+        string,
+        { href: string; label: string; icon: React.ElementType }[]
+    > = {
         client: [],
         admin: [
             {

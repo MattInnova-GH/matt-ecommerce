@@ -12,7 +12,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { User } from './types/settings';
+import type { User } from './types/settings';
 
 function getInitials(first: string, last: string) {
     return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();

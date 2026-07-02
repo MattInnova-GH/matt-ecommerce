@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 
 import { Check, Heart, Minus, Plus, ShoppingCart } from 'lucide-react';
 
-import { PublicProduct } from './types';
+import type { PublicProduct } from './types';
 
 type Props = {
     product: PublicProduct;

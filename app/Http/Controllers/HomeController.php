@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Promotion;
 use App\Models\Review;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -26,7 +27,7 @@ class HomeController extends Controller
             ]);
 
         // ✅ NUEVO: Promociones activas con datos de categoría
-        $activePromotions = \App\Models\Promotion::active()
+        $activePromotions = Promotion::active()
             ->with('category')
             ->get()
             ->map(fn ($promo) => [
@@ -72,7 +73,7 @@ class HomeController extends Controller
             ->get()
             ->map(fn ($r) => [
                 'id' => $r->id,
-                'name' => $r->user->first_name . ' ' . $r->user->last_name,
+                'name' => $r->user->first_name.' '.$r->user->last_name,
                 'comment' => $r->comment,
                 'rating' => $r->rating,
                 'avatar' => $r->user->avatar ? Storage::url($r->user->avatar) : null,

@@ -28,7 +28,9 @@ export default function StatsBar({ orders }: { orders: Order[] }) {
                             <Icon className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <div className="min-w-0">
-                            <p className="truncate text-xs text-muted-foreground">{label}</p>
+                            <p className="truncate text-xs text-muted-foreground">
+                                {label}
+                            </p>
                             <p className="text-base font-bold">{value}</p>
                         </div>
                     </CardContent>

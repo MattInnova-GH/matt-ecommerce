@@ -1,6 +1,5 @@
 import { useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
 import { register } from '@/routes';
 
 const BUSINESS_TYPES = [
@@ -15,7 +14,7 @@ const BUSINESS_TYPES = [
 ];
 
 export function SellerRegisterForm() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing } = useForm({
         name: '',
         last_name: '',
         email: '',
@@ -29,9 +28,6 @@ export function SellerRegisterForm() {
         address: '',
         experience: '',
     });
-
-    const [showPass, setShowPass] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();

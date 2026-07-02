@@ -27,6 +27,7 @@ class Promotion extends Model
     public function isCurrentlyActive(): bool
     {
         $today = Carbon::today();
+
         return $this->is_active && $this->starts_at->lte($today) && $this->ends_at->gte($today);
     }
 
@@ -35,20 +36,23 @@ class Promotion extends Model
         if ($this->discount_type === 'percentage') {
             return max(0, $price - ($price * $this->discount_value / 100));
         }
+
         return max(0, $price - (float) $this->discount_value);
     }
 
     public function getDiscountBadgeText(): string
     {
         if ($this->discount_type === 'percentage') {
-            return '-' . $this->discount_value . '%';
+            return '-'.$this->discount_value.'%';
         }
-        return '-S/' . number_format($this->discount_value, 2);
+
+        return '-S/'.number_format($this->discount_value, 2);
     }
 
     public function scopeActive($query)
     {
         $today = Carbon::today()->toDateString();
+
         return $query->where('is_active', true)
             ->where('starts_at', '<=', $today)
             ->where('ends_at', '>=', $today);

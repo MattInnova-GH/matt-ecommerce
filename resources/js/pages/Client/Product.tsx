@@ -27,8 +27,9 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import { Slider } from '@/components/ui/slider';
-import { useCartStore } from '@/stores/cartStore';
-import ProductCard, { ProductCardSkeleton } from '@/Components/User/Products/ProductCard';
+import ProductCard, {
+    ProductCardSkeleton,
+} from '@/Components/User/Products/ProductCard';
 
 interface Category {
     id: number;
@@ -98,14 +99,19 @@ export default function Product({
         filters.max_price ? parseInt(filters.max_price) : priceRange.max,
     ]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const { addItem, openCart } = useCartStore();
+
+    // Suave transición al cargar nueva data
+    const [prevProductsData, setPrevProductsData] = useState(products.data);
+    if (products.data !== prevProductsData) {
+        setPrevProductsData(products.data);
+        setIsLoading(true);
+    }
 
     useEffect(() => {
-        // Suave transición al cargar nueva data
-        setIsLoading(true);
+        if (!isLoading) return;
         const timer = setTimeout(() => setIsLoading(false), 400);
         return () => clearTimeout(timer);
-    }, [products.data]);
+    }, [isLoading]);
 
     const buildParams = (overrides: Partial<Filters> = {}) => {
         const merged = { ...localFilters, ...overrides };
@@ -164,8 +170,10 @@ export default function Product({
         if (newFilters.search) params.append('search', newFilters.search);
         if (newFilters.category) params.append('category', newFilters.category);
         if (newFilters.brand) params.append('brand', newFilters.brand);
-        if (newFilters.min_price) params.append('min_price', newFilters.min_price);
-        if (newFilters.max_price) params.append('max_price', newFilters.max_price);
+        if (newFilters.min_price)
+            params.append('min_price', newFilters.min_price);
+        if (newFilters.max_price)
+            params.append('max_price', newFilters.max_price);
         if (value !== 'latest') params.append('sort', value);
 
         router.get(`/productos?${params.toString()}`);
@@ -179,8 +187,8 @@ export default function Product({
     const hasActiveFilters = !!(
         localFilters.category ||
         localFilters.brand ||
-        (priceValue[0] > priceRange.min) ||
-        (priceValue[1] < priceRange.max) ||
+        priceValue[0] > priceRange.min ||
+        priceValue[1] < priceRange.max ||
         localFilters.search
     );
 
@@ -307,7 +315,7 @@ export default function Product({
                                                     category: null,
                                                 })
                                             }
-                                            className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${!localFilters.category ? 'bg-primary text-primary-foreground font-medium' : 'hover:bg-muted text-muted-foreground'}`}
+                                            className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${!localFilters.category ? 'bg-primary font-medium text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
                                         >
                                             Todas las categorías
                                         </button>
@@ -321,7 +329,7 @@ export default function Product({
                                                             category.id.toString(),
                                                     })
                                                 }
-                                                className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${localFilters.category === category.id.toString() ? 'bg-primary text-primary-foreground font-medium' : 'hover:bg-muted text-muted-foreground'}`}
+                                                className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${localFilters.category === category.id.toString() ? 'bg-primary font-medium text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
                                             >
                                                 {category.name}
                                             </button>
@@ -341,7 +349,7 @@ export default function Product({
                                                     brand: null,
                                                 })
                                             }
-                                            className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${!localFilters.brand ? 'bg-primary text-primary-foreground font-medium' : 'hover:bg-muted text-muted-foreground'}`}
+                                            className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${!localFilters.brand ? 'bg-primary font-medium text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
                                         >
                                             Todas las marcas
                                         </button>
@@ -354,7 +362,7 @@ export default function Product({
                                                         brand: brand.id.toString(),
                                                     })
                                                 }
-                                                className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${localFilters.brand === brand.id.toString() ? 'bg-primary text-primary-foreground font-medium' : 'hover:bg-muted text-muted-foreground'}`}
+                                                className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${localFilters.brand === brand.id.toString() ? 'bg-primary font-medium text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
                                             >
                                                 {brand.name}
                                             </button>
@@ -372,14 +380,18 @@ export default function Product({
                                             max={priceRange.max}
                                             step={1}
                                             value={priceValue}
-                                            onValueChange={(v) => setPriceValue(v as [number, number])}
+                                            onValueChange={(v) =>
+                                                setPriceValue(
+                                                    v as [number, number],
+                                                )
+                                            }
                                             className="mt-6"
                                         />
                                         <div className="flex items-center justify-between text-sm font-medium">
                                             <span>
                                                 {formatCurrency(priceValue[0])}
                                             </span>
-                                            <span className="text-muted-foreground font-normal">
+                                            <span className="font-normal text-muted-foreground">
                                                 -
                                             </span>
                                             <span>
@@ -396,7 +408,7 @@ export default function Product({
                                     >
                                         Aplicar filtros
                                     </Button>
-                                    
+
                                     {hasActiveFilters && (
                                         <Button
                                             variant="ghost"
@@ -459,15 +471,16 @@ export default function Product({
                                     ))}
                                 </div>
                             ) : products.data.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-24 text-center animate-in fade-in zoom-in duration-500">
+                                <div className="flex animate-in flex-col items-center justify-center py-24 text-center duration-500 fade-in zoom-in">
                                     <div className="rounded-full bg-muted/50 p-6">
                                         <Package className="h-12 w-12 text-muted-foreground/40" />
                                     </div>
                                     <h3 className="mt-6 text-xl font-semibold">
                                         No se encontraron productos
                                     </h3>
-                                    <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-                                        Prueba con otros términos de búsqueda o ajusta los filtros.
+                                    <p className="mt-2 max-w-xs text-sm text-muted-foreground">
+                                        Prueba con otros términos de búsqueda o
+                                        ajusta los filtros.
                                     </p>
                                     <Button
                                         onClick={clearFilters}
@@ -478,12 +491,17 @@ export default function Product({
                                     </Button>
                                 </div>
                             ) : (
-                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
+                                <div className="animate-in duration-700 ease-out fill-mode-both fade-in slide-in-from-bottom-4">
                                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                         {products.data.map((product) => (
                                             <ProductCard
                                                 key={product.id}
-                                                product={{ ...product, imageUrl: product.imageUrl ?? undefined }}
+                                                product={{
+                                                    ...product,
+                                                    imageUrl:
+                                                        product.imageUrl ??
+                                                        undefined,
+                                                }}
                                             />
                                         ))}
                                     </div>
@@ -506,41 +524,45 @@ export default function Product({
                                                     <ChevronLeft className="size-4" />
                                                 )}
                                             </Button>
-                                            
+
                                             <div className="flex items-center gap-1.5">
-                                                {paginationLinks.map((link, i) => (
-                                                    <Button
-                                                        key={i}
-                                                        variant={
-                                                            link.active
-                                                                ? 'default'
-                                                                : 'outline'
-                                                        }
-                                                        size="sm"
-                                                        disabled={!link.url}
-                                                        asChild={
-                                                            !!link.url &&
-                                                            !link.active
-                                                        }
-                                                        className="min-w-10 h-10"
-                                                    >
-                                                        {link.url &&
-                                                        !link.active ? (
-                                                            <a
-                                                                href={link.url}
-                                                                dangerouslySetInnerHTML={{
-                                                                    __html: link.label,
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <span
-                                                                dangerouslySetInnerHTML={{
-                                                                    __html: link.label,
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </Button>
-                                                ))}
+                                                {paginationLinks.map(
+                                                    (link, i) => (
+                                                        <Button
+                                                            key={i}
+                                                            variant={
+                                                                link.active
+                                                                    ? 'default'
+                                                                    : 'outline'
+                                                            }
+                                                            size="sm"
+                                                            disabled={!link.url}
+                                                            asChild={
+                                                                !!link.url &&
+                                                                !link.active
+                                                            }
+                                                            className="h-10 min-w-10"
+                                                        >
+                                                            {link.url &&
+                                                            !link.active ? (
+                                                                <a
+                                                                    href={
+                                                                        link.url
+                                                                    }
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: link.label,
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <span
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: link.label,
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </Button>
+                                                    ),
+                                                )}
                                             </div>
 
                                             <Button
@@ -584,13 +606,15 @@ function MobileFilters({
     return (
         <div className="space-y-8 pb-8">
             <div>
-                <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Categorías</h3>
+                <h3 className="mb-4 text-sm font-bold tracking-wider text-muted-foreground uppercase">
+                    Categorías
+                </h3>
                 <div className="grid grid-cols-2 gap-2">
                     <button
                         onClick={() =>
                             setLocalFilters({ ...localFilters, category: null })
                         }
-                        className={`rounded-lg px-3 py-3 text-center text-sm transition-all border ${!localFilters.category ? 'bg-primary text-primary-foreground border-primary font-medium' : 'bg-background hover:bg-muted border-input'}`}
+                        className={`rounded-lg border px-3 py-3 text-center text-sm transition-all ${!localFilters.category ? 'border-primary bg-primary font-medium text-primary-foreground' : 'border-input bg-background hover:bg-muted'}`}
                     >
                         Todas
                     </button>
@@ -603,7 +627,7 @@ function MobileFilters({
                                     category: category.id.toString(),
                                 })
                             }
-                            className={`rounded-lg px-3 py-3 text-center text-sm transition-all border ${localFilters.category === category.id.toString() ? 'bg-primary text-primary-foreground border-primary font-medium' : 'bg-background hover:bg-muted border-input'}`}
+                            className={`rounded-lg border px-3 py-3 text-center text-sm transition-all ${localFilters.category === category.id.toString() ? 'border-primary bg-primary font-medium text-primary-foreground' : 'border-input bg-background hover:bg-muted'}`}
                         >
                             {category.name}
                         </button>
@@ -612,13 +636,15 @@ function MobileFilters({
             </div>
 
             <div>
-                <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Marcas</h3>
+                <h3 className="mb-4 text-sm font-bold tracking-wider text-muted-foreground uppercase">
+                    Marcas
+                </h3>
                 <div className="grid grid-cols-2 gap-2">
                     <button
                         onClick={() =>
                             setLocalFilters({ ...localFilters, brand: null })
                         }
-                        className={`rounded-lg px-3 py-3 text-center text-sm transition-all border ${!localFilters.brand ? 'bg-primary text-primary-foreground border-primary font-medium' : 'bg-background hover:bg-muted border-input'}`}
+                        className={`rounded-lg border px-3 py-3 text-center text-sm transition-all ${!localFilters.brand ? 'border-primary bg-primary font-medium text-primary-foreground' : 'border-input bg-background hover:bg-muted'}`}
                     >
                         Todas
                     </button>
@@ -631,7 +657,7 @@ function MobileFilters({
                                     brand: brand.id.toString(),
                                 })
                             }
-                            className={`rounded-lg px-3 py-3 text-center text-sm transition-all border ${localFilters.brand === brand.id.toString() ? 'bg-primary text-primary-foreground border-primary font-medium' : 'bg-background hover:bg-muted border-input'}`}
+                            className={`rounded-lg border px-3 py-3 text-center text-sm transition-all ${localFilters.brand === brand.id.toString() ? 'border-primary bg-primary font-medium text-primary-foreground' : 'border-input bg-background hover:bg-muted'}`}
                         >
                             {brand.name}
                         </button>
@@ -640,7 +666,9 @@ function MobileFilters({
             </div>
 
             <div>
-                <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">Precio</h3>
+                <h3 className="mb-4 text-sm font-bold tracking-wider text-muted-foreground uppercase">
+                    Precio
+                </h3>
                 <div className="space-y-6 px-2">
                     <Slider
                         min={priceRange.min}
@@ -651,17 +679,26 @@ function MobileFilters({
                     />
                     <div className="flex items-center justify-between text-base font-bold">
                         <span>{formatCurrency(priceValue[0])}</span>
-                        <span className="text-muted-foreground font-normal">-</span>
+                        <span className="font-normal text-muted-foreground">
+                            -
+                        </span>
                         <span>{formatCurrency(priceValue[1])}</span>
                     </div>
                 </div>
             </div>
 
-            <div className="flex gap-3 pt-6 sticky bottom-0 bg-background border-t mt-auto">
-                <Button variant="outline" onClick={clearFilters} className="flex-1 h-12">
+            <div className="sticky bottom-0 mt-auto flex gap-3 border-t bg-background pt-6">
+                <Button
+                    variant="outline"
+                    onClick={clearFilters}
+                    className="h-12 flex-1"
+                >
                     Limpiar
                 </Button>
-                <Button onClick={applyFilters} className="flex-1 h-12 shadow-lg">
+                <Button
+                    onClick={applyFilters}
+                    className="h-12 flex-1 shadow-lg"
+                >
                     Aplicar filtros
                 </Button>
             </div>

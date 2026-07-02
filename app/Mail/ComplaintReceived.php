@@ -12,9 +12,7 @@ class ComplaintReceived extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public Complaint $complaint)
-    {
-    }
+    public function __construct(public Complaint $complaint) {}
 
     public function build()
     {

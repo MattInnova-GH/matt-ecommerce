@@ -129,8 +129,13 @@ export const useCheckoutStore = create<CheckoutState>()(
         {
             name: 'checkout-storage',
             partialize: (state) => {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const { voucherFile, isTransferModalOpen, isYapeModalOpen, isCardModalOpen, ...rest } = state;
+                const {
+                    voucherFile,
+                    isTransferModalOpen,
+                    isYapeModalOpen,
+                    isCardModalOpen,
+                    ...rest
+                } = state;
                 return rest;
             },
         },

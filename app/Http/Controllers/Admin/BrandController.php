@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -16,7 +17,7 @@ class BrandController extends Controller
             ->get();
 
         return Inertia::render('Admin/Brands/Brands', [
-            'brands' => $brands
+            'brands' => $brands,
         ]);
     }
 

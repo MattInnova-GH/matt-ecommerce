@@ -1,5 +1,12 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { AlertCircle, CheckCircle2, Loader2, Phone, Mail, MapPin } from 'lucide-react';
+import {
+    AlertCircle,
+    CheckCircle2,
+    Loader2,
+    Phone,
+    Mail,
+    MapPin,
+} from 'lucide-react';
 import React from 'react';
 
 type ComplaintForm = {
@@ -238,7 +245,9 @@ export default function Reclamaciones() {
                                         placeholder="Ej: Juan"
                                         required
                                         value={data.first_name}
-                                        onChange={(v) => setData('first_name', v)}
+                                        onChange={(v) =>
+                                            setData('first_name', v)
+                                        }
                                         onBlur={() => handleBlur('first_name')}
                                         error={getError('first_name')}
                                     />
@@ -247,7 +256,9 @@ export default function Reclamaciones() {
                                         placeholder="Ej: García Pérez"
                                         required
                                         value={data.last_name}
-                                        onChange={(v) => setData('last_name', v)}
+                                        onChange={(v) =>
+                                            setData('last_name', v)
+                                        }
                                         onBlur={() => handleBlur('last_name')}
                                         error={getError('last_name')}
                                     />

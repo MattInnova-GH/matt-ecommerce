@@ -236,8 +236,8 @@ export function YapeModal() {
                 {step === 'code' && (
                     <div className="space-y-4">
                         <p className="text-center text-sm text-gray-500">
-                            Abre tu app Yape, realiza el pago y luego ingresa
-                            el código de aprobación que aparece en pantalla.
+                            Abre tu app Yape, realiza el pago y luego ingresa el
+                            código de aprobación que aparece en pantalla.
                         </p>
                         <div>
                             <label className="mb-1 block text-xs font-medium text-gray-700">
@@ -391,6 +391,6 @@ export function YapeModal() {
                 )}
             </div>
         </div>,
-        document.body
+        document.body,
     );
 }

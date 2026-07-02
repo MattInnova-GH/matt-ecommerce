@@ -8,7 +8,8 @@ class Supplier extends Model
 {
     protected $fillable = ['name', 'email', 'phone', 'address'];
 
-    public function products() {
+    public function products()
+    {
         return $this->hasMany(Product::class);
     }
 }

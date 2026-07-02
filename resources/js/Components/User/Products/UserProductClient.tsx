@@ -1,7 +1,7 @@
 import ProductGrid from './ProductGrid';
 import ProductSearchBar from './ProductSearchBar';
 
-import { Category, PublicProduct } from './types';
+import type { Category, PublicProduct } from './types';
 
 type Props = {
     initialProducts: PublicProduct[];

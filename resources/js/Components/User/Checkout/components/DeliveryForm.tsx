@@ -25,7 +25,7 @@ export function DeliveryForm() {
                 recipientName,
             });
         }
-    }, [coords, address, reference, phone, recipientName]);
+    }, [coords, address, reference, phone, recipientName, setDeliveryAddress]);
 
     return (
         <div className="space-y-5 border-t border-gray-100 pt-4">

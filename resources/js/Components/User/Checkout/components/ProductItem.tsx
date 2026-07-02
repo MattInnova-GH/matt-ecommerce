@@ -1,7 +1,7 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { useCartStore } from '@/stores/cartStore';
 import { formatPrice } from '../utils/checkout.utils';
-import { CheckoutItem } from '../types/checkout.types';
+import type { CheckoutItem } from '../types/checkout.types';
 
 interface ProductItemProps {
     item: CheckoutItem;

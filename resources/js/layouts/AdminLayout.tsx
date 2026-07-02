@@ -78,104 +78,27 @@ function CollapsedNavItem({
     );
 }
 
-export default function AdminLayout({
-    children,
+// -- Sidebar Content (reutilizado en desktop y mobile) --
+function SidebarContent({
+    mobile = false,
+    isSidebarOpen,
+    setIsSidebarOpen,
+    setIsMobileMenuOpen,
+    navItems,
+    expandedMenus,
+    toggleMenu,
+    isActive,
 }: {
-    children: React.ReactNode;
+    mobile?: boolean;
+    isSidebarOpen: boolean;
+    setIsSidebarOpen: (value: boolean) => void;
+    setIsMobileMenuOpen: (value: boolean) => void;
+    navItems: NavItem[];
+    expandedMenus: string[];
+    toggleMenu: (menu: string) => void;
+    isActive: (path: string) => boolean;
 }) {
-    const { url } = usePage();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [expandedMenus, setExpandedMenus] = useState<string[]>(['productos']);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 1024) {
-                setIsSidebarOpen(false);
-            } else {
-                setIsSidebarOpen(true);
-            }
-        };
-        handleResize();
-        window.addEventListener('resize', handleResize);
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const toggleMenu = (menu: string) => {
-        setExpandedMenus((prev) =>
-            prev.includes(menu)
-                ? prev.filter((m) => m !== menu)
-                : [...prev, menu],
-        );
-    };
-
-    const isActive = (path: string) => {
-        if (path === '/admin' && url === '/admin') {
-            return true;
-        }
-
-        if (path !== '/admin' && url.startsWith(path)) {
-            return true;
-        }
-
-        return false;
-    };
-
-    const navItems: NavItem[] = [
-        {
-            name: 'Dashboard',
-            href: admin.dashboard().url,
-            icon: LayoutDashboard,
-        },
-        {
-            name: 'Productos',
-            href: '/admin/productos',
-            icon: Package,
-            subitems: [
-                {
-                    name: 'Todos los productos',
-                    href: admin.products.index().url,
-                },
-                { name: 'Crear producto', href: admin.products.create().url },
-                { name: 'Categorías', href: admin.categories.index().url },
-                { name: 'Marcas', href: admin.brands.index().url },
-            ],
-        },
-        {
-            name: 'Órdenes',
-            href: admin.orders.index().url,
-            icon: ShoppingCart,
-        },
-        {
-            name: 'Usuarios',
-            href: admin.users.index().url,
-            icon: User,
-        },
-        {
-            name: 'Reseñas',
-            href: admin.reviews.index().url,
-            icon: Star,
-        },
-        {
-            name: 'Banners',
-            href: admin.banners.index().url,
-            icon: Image,
-        },
-        {
-            name: 'Promociones',
-            href: admin.promotions.index().url,
-            icon: TicketPercent,
-        },
-        {
-            name: 'Configuración',
-            href: admin.settings.index().url,
-            icon: Settings,
-        },
-    ];
-
-    // -- Sidebar Content (reutilizado en desktop y mobile) --
-    const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
+    return (
         <div className="flex h-full flex-col">
             {/* Logo / Header */}
             <div
@@ -361,6 +284,103 @@ export default function AdminLayout({
             </div>
         </div>
     );
+}
+
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const { url } = usePage();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [expandedMenus, setExpandedMenus] = useState<string[]>(['productos']);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 1024) {
+                setIsSidebarOpen(false);
+            } else {
+                setIsSidebarOpen(true);
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const toggleMenu = (menu: string) => {
+        setExpandedMenus((prev) =>
+            prev.includes(menu)
+                ? prev.filter((m) => m !== menu)
+                : [...prev, menu],
+        );
+    };
+
+    const isActive = (path: string) => {
+        if (path === '/admin' && url === '/admin') {
+            return true;
+        }
+
+        if (path !== '/admin' && url.startsWith(path)) {
+            return true;
+        }
+
+        return false;
+    };
+
+    const navItems: NavItem[] = [
+        {
+            name: 'Dashboard',
+            href: admin.dashboard().url,
+            icon: LayoutDashboard,
+        },
+        {
+            name: 'Productos',
+            href: '/admin/productos',
+            icon: Package,
+            subitems: [
+                {
+                    name: 'Todos los productos',
+                    href: admin.products.index().url,
+                },
+                { name: 'Crear producto', href: admin.products.create().url },
+                { name: 'Categorías', href: admin.categories.index().url },
+                { name: 'Marcas', href: admin.brands.index().url },
+            ],
+        },
+        {
+            name: 'Órdenes',
+            href: admin.orders.index().url,
+            icon: ShoppingCart,
+        },
+        {
+            name: 'Usuarios',
+            href: admin.users.index().url,
+            icon: User,
+        },
+        {
+            name: 'Reseñas',
+            href: admin.reviews.index().url,
+            icon: Star,
+        },
+        {
+            name: 'Banners',
+            href: admin.banners.index().url,
+            icon: Image,
+        },
+        {
+            name: 'Promociones',
+            href: admin.promotions.index().url,
+            icon: TicketPercent,
+        },
+        {
+            name: 'Configuración',
+            href: admin.settings.index().url,
+            icon: Settings,
+        },
+    ];
 
     return (
         <div className="min-h-screen bg-background">
@@ -371,7 +391,15 @@ export default function AdminLayout({
                     isSidebarOpen ? 'w-60' : 'w-[60px]',
                 )}
             >
-                <SidebarContent />
+                <SidebarContent
+                    isSidebarOpen={isSidebarOpen}
+                    setIsSidebarOpen={setIsSidebarOpen}
+                    setIsMobileMenuOpen={setIsMobileMenuOpen}
+                    navItems={navItems}
+                    expandedMenus={expandedMenus}
+                    toggleMenu={toggleMenu}
+                    isActive={isActive}
+                />
             </aside>
 
             {/* ── Mobile Overlay ── */}
@@ -382,7 +410,16 @@ export default function AdminLayout({
                         onClick={() => setIsMobileMenuOpen(false)}
                     />
                     <aside className="fixed top-0 left-0 z-50 h-full w-72 border-r bg-card shadow-xl lg:hidden">
-                        <SidebarContent mobile />
+                        <SidebarContent
+                            mobile
+                            isSidebarOpen={isSidebarOpen}
+                            setIsSidebarOpen={setIsSidebarOpen}
+                            setIsMobileMenuOpen={setIsMobileMenuOpen}
+                            navItems={navItems}
+                            expandedMenus={expandedMenus}
+                            toggleMenu={toggleMenu}
+                            isActive={isActive}
+                        />
                     </aside>
                 </>
             )}

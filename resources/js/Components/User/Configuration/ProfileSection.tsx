@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { FlashMessage } from './FlashMessage';
 import { InputError } from './InputError';
 import { AvatarSubSection } from './AvatarSubSection';
-import { User } from './types/settings';
+import type { User } from './types/settings';
 
 interface ProfileSectionProps {
     user: User;
