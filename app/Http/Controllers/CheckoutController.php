@@ -63,6 +63,16 @@ class CheckoutController extends Controller
                 ]);
 
                 foreach ($request->items as $item) {
+                    $product = Product::whereKey($item['id'])->lockForUpdate()->first();
+
+                    if (! $product) {
+                        throw new \RuntimeException("El producto \"{$item['name']}\" ya no está disponible.");
+                    }
+
+                    if ($product->stock < $item['quantity']) {
+                        throw new \RuntimeException("No hay suficiente stock de \"{$item['name']}\".");
+                    }
+
                     $order->items()->create([
                         'product_id' => $item['id'],
                         'product_name' => $item['name'],
@@ -70,12 +80,6 @@ class CheckoutController extends Controller
                         'quantity' => $item['quantity'],
                         'subtotal' => (float) $item['price'] * $item['quantity'],
                     ]);
-
-                    $product = Product::whereKey($item['id'])->lockForUpdate()->first();
-
-                    if (! $product || $product->stock < $item['quantity']) {
-                        throw new \RuntimeException("No hay suficiente stock de \"{$item['name']}\".");
-                    }
 
                     $product->decrement('stock', $item['quantity']);
                 }
