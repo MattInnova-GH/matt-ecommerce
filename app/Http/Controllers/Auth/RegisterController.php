@@ -35,6 +35,9 @@ class RegisterController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        return redirect()->route('home');
+        return redirect()->route('verification.notice')->with(
+            'success',
+            'Cuenta creada. Revisa tu correo y confirma tu cuenta para poder comprar.',
+        );
     }
 }

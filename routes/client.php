@@ -9,7 +9,7 @@ use App\Http\Controllers\User\ConfigurationController;
 use App\Http\Controllers\User\FavoriteController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:client|admin'])
+Route::middleware(['auth', 'verified', 'role:client|admin'])
     ->name('client.')
     ->group(function () {
 
