@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderStatusUpdated;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -26,7 +28,14 @@ class OrderController extends Controller
             'status' => 'required|in:PENDING,ACCEPTED,REJECTED,SHIPPED,DELIVERED,CANCELLED',
         ]);
 
+        $statusChanged = $order->status !== $validated['status'];
+
         $order->update($validated);
+
+        if ($statusChanged) {
+            $order->load(['items', 'user']);
+            Mail::to($order->user->email)->send(new OrderStatusUpdated($order));
+        }
 
         return back();
     }
