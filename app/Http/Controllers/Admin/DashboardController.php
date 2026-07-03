@@ -25,6 +25,11 @@ class DashboardController extends Controller
 
         $totalOrders = Order::count();
         $totalCustomers = User::count(); // Podría filtrarse por rol si existiera una columna
+
+        $lowStockProducts = Product::where('stock', '<', 10)
+            ->orderBy('stock', 'asc')
+            ->take(3)
+            ->get(['id', 'name', 'stock']);
         $lowStockCount = Product::where('stock', '<', 10)->count();
 
         // Datos para gráfico de ventas (últimos 7 días)
@@ -71,6 +76,7 @@ class DashboardController extends Controller
                 'totalCustomers' => $totalCustomers,
                 'lowStockCount' => $lowStockCount,
                 'pendingReviewsCount' => $pendingReviewsCount,
+                'lowStockProducts' => $lowStockProducts,
             ],
             'salesData' => $salesData,
             'recentOrders' => $recentOrders,

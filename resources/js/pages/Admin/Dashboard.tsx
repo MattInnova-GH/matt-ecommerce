@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
     AreaChart,
     Area,
@@ -38,12 +39,19 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 
+interface LowStockProduct {
+    id: number;
+    name: string;
+    stock: number;
+}
+
 interface DashboardStats {
     totalRevenue: number;
     totalOrders: number;
     totalCustomers: number;
     lowStockCount: number;
     pendingReviewsCount: number;
+    lowStockProducts: LowStockProduct[];
 }
 
 interface SalesDataItem {
@@ -200,7 +208,13 @@ export default function Dashboard({
             {(stats.pendingReviewsCount > 0 || stats.lowStockCount > 0) && (
                 <div className="grid gap-4 md:grid-cols-2">
                     {stats.pendingReviewsCount > 0 && (
-                        <div className="flex items-center gap-4 rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-blue-900 shadow-sm">
+                        <div
+                            className={cn(
+                                'flex items-center gap-4 rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-blue-900 shadow-sm',
+                                stats.lowStockCount === 0 &&
+                                    'md:col-span-2',
+                            )}
+                        >
                             <div className="rounded-full bg-blue-100 p-3">
                                 <MessageSquare className="size-5 text-blue-600" />
                             </div>
@@ -224,7 +238,13 @@ export default function Dashboard({
                         </div>
                     )}
                     {stats.lowStockCount > 0 && (
-                        <div className="flex items-center gap-4 rounded-xl border border-amber-100 bg-amber-50/50 p-4 text-amber-900 shadow-sm">
+                        <div
+                            className={cn(
+                                'flex items-center gap-4 rounded-xl border border-amber-100 bg-amber-50/50 p-4 text-amber-900 shadow-sm',
+                                stats.pendingReviewsCount === 0 &&
+                                    'md:col-span-2',
+                            )}
+                        >
                             <div className="rounded-full bg-amber-100 p-3">
                                 <Package className="size-5 text-amber-600" />
                             </div>
@@ -233,9 +253,28 @@ export default function Dashboard({
                                     Reabastecimiento
                                 </p>
                                 <p className="text-sm opacity-80">
-                                    {stats.lowStockCount} productos están por
-                                    agotarse pronto.
+                                    {stats.lowStockCount} producto
+                                    {stats.lowStockCount !== 1 && 's'}{' '}
+                                    {stats.lowStockCount !== 1
+                                        ? 'están'
+                                        : 'está'}{' '}
+                                    por agotarse pronto.
                                 </p>
+                                {stats.lowStockProducts.length > 0 && (
+                                    <p className="mt-1 text-xs opacity-70">
+                                        {stats.lowStockProducts
+                                            .map(
+                                                (p) =>
+                                                    `${p.name} (${p.stock} unid.)`,
+                                            )
+                                            .join(', ')}
+                                        {stats.lowStockCount >
+                                            stats.lowStockProducts.length &&
+                                            ` y ${stats.lowStockCount - stats.lowStockProducts.length} más`}
+                                        . Recomendamos reponer pronto para no
+                                        perder ventas.
+                                    </p>
+                                )}
                             </div>
                             <Button
                                 size="sm"
