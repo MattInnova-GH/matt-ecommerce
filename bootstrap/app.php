@@ -37,7 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if (! $request->expectsJson()) {
                 return redirect()->guest(route('login'))
-                    ->with('error', 'Debes iniciar sesión para continuar con la compra.');
+                    ->with('error', 'Tu sesión expiró. Inicia sesión de nuevo para continuar.');
             }
         });
     })->create();

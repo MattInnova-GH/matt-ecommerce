@@ -36,8 +36,12 @@ class UserController extends Controller
         return redirect()->back();
     }
 
-    public function toggleBlock(User $user)
+    public function toggleBlock(Request $request, User $user)
     {
+        if ($user->id === $request->user()->id) {
+            return redirect()->back()->with('error', 'No puedes bloquear tu propia cuenta.');
+        }
+
         $user->update([
             'is_active' => ! $user->is_active,
         ]);
@@ -45,8 +49,12 @@ class UserController extends Controller
         return redirect()->back();
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
+        if ($user->id === $request->user()->id) {
+            return redirect()->back()->with('error', 'No puedes eliminar tu propia cuenta.');
+        }
+
         if ($user->orders()->exists()) {
             return redirect()->back()->with(
                 'error',
