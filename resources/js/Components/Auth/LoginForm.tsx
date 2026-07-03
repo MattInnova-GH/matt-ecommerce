@@ -1,12 +1,15 @@
 import { Form } from '@inertiajs/react';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import login from '@/routes/login';
+import { useCartStore } from '@/stores/cartStore';
 
 type LoginFormProps = {
     onSuccess?: () => void;
 };
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
+    const closeCart = useCartStore((state) => state.closeCart);
+
     return (
         <div>
             <Form
@@ -80,7 +83,11 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
             <p className="mt-4 text-center text-sm text-gray-500">
                 No tienes una cuenta?{' '}
-                <a href="/register" className="font-medium text-gray-900">
+                <a
+                    href="/register"
+                    onClick={closeCart}
+                    className="font-medium text-gray-900"
+                >
                     Registrate
                 </a>
             </p>
