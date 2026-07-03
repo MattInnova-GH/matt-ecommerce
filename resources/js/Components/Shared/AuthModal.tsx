@@ -2,17 +2,16 @@ import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
 import { LoginForm } from '../Auth/LoginForm';
-import { RegisterForm } from '../Auth/RegisterForm';
 import { useAuthModalStore } from '@/stores/authModalStore';
 
 export function AuthModal() {
-    const { isOpen, tab, onSuccess, close, setTab } = useAuthModalStore();
+    const { isOpen, onSuccess, close } = useAuthModalStore();
 
     if (!isOpen || typeof document === 'undefined') {
         return null;
     }
 
-    const handleLoginSuccess = () => {
+    const handleSuccess = () => {
         const callback = onSuccess;
         close();
         callback?.();
@@ -32,40 +31,10 @@ export function AuthModal() {
                     <X size={20} />
                 </button>
 
-                <div className="mb-6 flex gap-1 rounded-lg bg-gray-100 p-1">
-                    <button
-                        type="button"
-                        onClick={() => setTab('login')}
-                        className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
-                            tab === 'login'
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                    >
-                        Iniciar sesión
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setTab('register')}
-                        className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
-                            tab === 'register'
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-500 hover:text-gray-700'
-                        }`}
-                    >
-                        Crear cuenta
-                    </button>
-                </div>
-
                 <h2 className="mb-6 text-2xl font-bold text-gray-900">
-                    {tab === 'login' ? 'Bienvenido de nuevo' : 'Crea tu cuenta'}
+                    Bienvenido de nuevo
                 </h2>
-
-                {tab === 'login' ? (
-                    <LoginForm onSuccess={handleLoginSuccess} />
-                ) : (
-                    <RegisterForm onSuccess={close} />
-                )}
+                <LoginForm onSuccess={handleSuccess} />
             </div>
         </div>,
         document.body,

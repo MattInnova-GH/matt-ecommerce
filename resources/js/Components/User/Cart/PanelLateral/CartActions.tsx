@@ -12,7 +12,6 @@ export function CartActions() {
         if (!auth?.user) {
             toast.error('Debes iniciar sesión para continuar con la compra');
             openAuthModal({
-                tab: 'login',
                 onSuccess: () => {
                     closeCart();
                     router.get('/checkout');
