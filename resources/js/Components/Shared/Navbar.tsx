@@ -2,10 +2,10 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import UserMenu from './UserMenu';
-import { AuthModal } from './AuthModal';
 import SearchModal from './SearchModal';
 import CartDrawer from '@/Components/User/Cart';
 import { useCartStore } from '@/stores/cartStore';
+import { useAuthModalStore } from '@/stores/authModalStore';
 import { products } from '@/routes';
 
 type AuthUser = {
@@ -20,10 +20,10 @@ export default function Navbar() {
     const { url, props } = usePage();
     const auth = (props as any).auth as { user: AuthUser };
     const user = auth?.user ?? null;
-    const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { openCart, totalItems } = useCartStore();
+    const openAuthModal = useAuthModalStore((state) => state.open);
     const cartCount = totalItems();
 
     return (
@@ -87,7 +87,7 @@ export default function Navbar() {
                             {/* UserMenu — maneja autenticado y no autenticado */}
                             <UserMenu
                                 user={user}
-                                onOpenLogin={() => setIsLoginOpen(true)}
+                                onOpenLogin={() => openAuthModal()}
                             />
 
                             <button
@@ -103,11 +103,6 @@ export default function Navbar() {
 
             {/* DRAWER DEL CARRITO */}
             <CartDrawer />
-
-            <AuthModal
-                isOpen={isLoginOpen}
-                onClose={() => setIsLoginOpen(false)}
-            />
 
             <SearchModal
                 isOpen={isSearchOpen}

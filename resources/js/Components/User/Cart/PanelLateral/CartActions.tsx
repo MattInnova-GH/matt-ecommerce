@@ -1,20 +1,27 @@
 import { useCartStore } from '@/stores/cartStore';
+import { useAuthModalStore } from '@/stores/authModalStore';
 import { router, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 
 export function CartActions() {
     const { items, clearCart, closeCart } = useCartStore();
     const { auth } = usePage().props as any;
+    const openAuthModal = useAuthModalStore((state) => state.open);
 
     const handleCheckout = () => {
-        closeCart();
-
         if (!auth?.user) {
             toast.error('Debes iniciar sesión para continuar con la compra');
-            router.get('/login');
+            openAuthModal({
+                tab: 'login',
+                onSuccess: () => {
+                    closeCart();
+                    router.get('/checkout');
+                },
+            });
             return;
         }
 
+        closeCart();
         router.get('/checkout');
     };
 

@@ -4,21 +4,13 @@ import Footer from '@/Components/Shared/Footer';
 import Navbar from '@/Components/Shared/Navbar';
 import { Toaster } from '@/components/ui/sonner';
 
-import { useState } from 'react';
-
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
     return (
         <>
             <Navbar />
             <main>{children}</main>
             <Footer />
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-                defaultTab="login"
-            />
+            <AuthModal />
             <Chatbot />
             <Toaster richColors />
         </>
