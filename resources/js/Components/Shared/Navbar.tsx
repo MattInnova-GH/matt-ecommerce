@@ -21,6 +21,7 @@ export default function Navbar() {
     const { url, props } = usePage();
     const auth = (props as any).auth as { user: AuthUser };
     const user = auth?.user ?? null;
+    const { settings } = props as any;
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { openCart, totalItems } = useCartStore();
@@ -35,8 +36,8 @@ export default function Navbar() {
                         {/* Logo */}
                         <Link href="/" className="shrink-0">
                             <img
-                                src="/static/logo.webp"
-                                alt="Logo"
+                                src={settings?.logo || '/static/logo.webp'}
+                                alt={settings?.site_name || 'Logo'}
                                 className="h-10 w-auto object-contain"
                             />
                         </Link>
@@ -153,6 +154,7 @@ function MobileDrawer({
 
     currentUrl: string;
 }) {
+    const { settings } = usePage().props as any;
     const menuItems = [
         {
             href: '/',
@@ -180,8 +182,8 @@ function MobileDrawer({
             <div className="fixed top-0 right-0 bottom-0 z-50 flex w-80 flex-col bg-white shadow-xl">
                 <div className="flex items-center justify-between border-b border-gray-100 p-4">
                     <img
-                        src="/static/logo.webp"
-                        alt="Logo"
+                        src={settings?.logo || '/static/logo.webp'}
+                        alt={settings?.site_name || 'Logo'}
                         className="h-8 w-auto object-contain"
                     />
 

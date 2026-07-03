@@ -31,15 +31,15 @@
         }
     </style>
 
-    <link rel="icon" href="/img/carrito-ecommerce.jpeg" type="image/jpeg">
-    <link rel="apple-touch-icon" href="/img/carrito-ecommerce.jpeg">
+    <link rel="icon" href="{{ data_get($page, 'props.settings.favicon') ?: '/img/carrito-ecommerce.jpeg' }}" type="image/jpeg">
+    <link rel="apple-touch-icon" href="{{ data_get($page, 'props.settings.favicon') ?: '/img/carrito-ecommerce.jpeg' }}">
 
     @fonts
 
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
     <x-inertia::head>
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ data_get($page, 'props.settings.site_name') ?: config('app.name', 'Laravel') }}</title>
     </x-inertia::head>
 </head>
 
