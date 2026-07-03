@@ -63,6 +63,6 @@ class UserController extends Controller
         // Eliminar usuario
         $user->delete();
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Usuario eliminado correctamente.');
     }
 }

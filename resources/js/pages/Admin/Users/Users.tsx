@@ -123,7 +123,6 @@ export default function Users({ users, roles }: Props) {
         router.delete(admin.users.destroy(id), {
             onSuccess: () => {
                 setUserToDelete(null);
-                toast.success('Usuario eliminado exitosamente');
                 setIsProcessing(false);
             },
             onError: () => {
@@ -591,8 +590,10 @@ export default function Users({ users, roles }: Props) {
                                 {userToDelete?.first_name}{' '}
                                 {userToDelete?.last_name}
                             </strong>
-                            ? Esta acción es irreversible y eliminará todos sus
-                            datos (pedidos, reseñas, etc.).
+                            ? Esta acción es irreversible y eliminará sus
+                            datos (direcciones, reseñas, carrito, etc.). Si
+                            tiene pedidos registrados, no podrá eliminarse
+                            (bloquéalo en su lugar).
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
