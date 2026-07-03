@@ -5,6 +5,8 @@ namespace App\Providers;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -29,6 +31,16 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         Event::listen(Registered::class, SendEmailVerificationNotification::class);
+
+        VerifyEmail::toMailUsing(function ($notifiable, string $url) {
+            return (new MailMessage)
+                ->subject('Verifica tu correo electrónico')
+                ->greeting('¡Hola'.($notifiable->first_name ? ' '.$notifiable->first_name : '').'!')
+                ->line('Gracias por registrarte en Matt Store. Para completar tu registro y poder realizar compras, confirma que este correo es tuyo.')
+                ->action('Verificar mi correo', $url)
+                ->line('Si tú no creaste esta cuenta, puedes ignorar este mensaje sin problema.')
+                ->salutation('Saludos, el equipo de Matt Store');
+        });
     }
 
     /**
