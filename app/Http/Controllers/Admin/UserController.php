@@ -47,6 +47,13 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if ($user->orders()->exists()) {
+            return redirect()->back()->with(
+                'error',
+                'No se puede eliminar este usuario porque tiene pedidos registrados (son evidencia de ventas/reembolsos). Bloquéalo en su lugar para impedirle iniciar sesión.'
+            );
+        }
+
         // Eliminar datos relacionados
         $user->addresses()->delete();
         $user->reviews()->delete();
