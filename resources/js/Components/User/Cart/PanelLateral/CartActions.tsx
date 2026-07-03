@@ -1,11 +1,20 @@
 import { useCartStore } from '@/stores/cartStore';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 export function CartActions() {
     const { items, clearCart, closeCart } = useCartStore();
+    const { auth } = usePage().props as any;
 
     const handleCheckout = () => {
         closeCart();
+
+        if (!auth?.user) {
+            toast.error('Debes iniciar sesión para continuar con la compra');
+            router.get('/login');
+            return;
+        }
+
         router.get('/checkout');
     };
 

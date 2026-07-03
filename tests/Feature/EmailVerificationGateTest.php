@@ -46,3 +46,10 @@ test('verified users can access client routes', function () {
 
     $response->assertOk();
 });
+
+test('guests are redirected to login with a helpful message when trying to checkout', function () {
+    $response = $this->get(route('client.checkout.index'));
+
+    $response->assertRedirect(route('login'));
+    $response->assertSessionHas('error');
+});
