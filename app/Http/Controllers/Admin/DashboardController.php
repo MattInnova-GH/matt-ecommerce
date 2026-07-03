@@ -16,9 +16,14 @@ class DashboardController extends Controller
     public function index()
     {
         // Totales principales
+        // Solo cuenta como ingreso un pago aprobado cuyo pedido no haya sido
+        // rechazado/cancelado despues, y que no se le haya hecho un reembolso.
         $totalRevenue = DB::table('payments')
-            ->where('status', 'APPROVED')
-            ->sum('amount');
+            ->join('orders', 'orders.id', '=', 'payments.order_id')
+            ->where('payments.status', 'APPROVED')
+            ->whereNull('payments.refunded_at')
+            ->whereNotIn('orders.status', ['REJECTED', 'CANCELLED'])
+            ->sum('payments.amount');
 
         $totalOrders = Order::count();
         $totalCustomers = User::count(); // Podría filtrarse por rol si existiera una columna
@@ -29,7 +34,7 @@ class DashboardController extends Controller
             ->select(
                 DB::raw('date(orders.created_at) as date'),
                 DB::raw('count(distinct orders.id) as total_orders'),
-                DB::raw('coalesce(sum(case when payments.status = \'APPROVED\' then orders.total else 0 end), 0) as revenue')
+                DB::raw("coalesce(sum(case when payments.status = 'APPROVED' and payments.refunded_at is null and orders.status not in ('REJECTED', 'CANCELLED') then orders.total else 0 end), 0) as revenue")
             )
             ->leftJoin('payments', 'payments.order_id', '=', 'orders.id')
             ->where('orders.created_at', '>=', Carbon::now()->subDays(7))

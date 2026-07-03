@@ -45,6 +45,7 @@ Route::middleware(['auth', 'role:admin'])
 
         // PAGOS
         Route::resource('payments', PaymentController::class);
+        Route::put('payments/{payment}/refund', [PaymentController::class, 'refund'])->name('payments.refund');
 
         // COMENTARIOS DE PRODUCTOS
         Route::resource('reviews', ReviewController::class)->only(['index', 'destroy']);

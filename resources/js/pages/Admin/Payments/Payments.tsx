@@ -52,9 +52,17 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Order {
     id: number;
+    status:
+        | 'PENDING'
+        | 'ACCEPTED'
+        | 'REJECTED'
+        | 'SHIPPED'
+        | 'DELIVERED'
+        | 'CANCELLED';
     user?: {
         id: number;
         first_name: string;
@@ -69,6 +77,8 @@ interface Payment {
     amount: string | number;
     receipt_url: string | null;
     status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    refunded_at: string | null;
+    refund_notes: string | null;
     created_at: string;
     order?: Order;
 }
@@ -155,6 +165,8 @@ export default function Payments({ payments }: PaymentsProps) {
         null,
     );
     const [showReceiptDialog, setShowReceiptDialog] = useState(false);
+    const [refundPrompt, setRefundPrompt] = useState<Payment | null>(null);
+    const [refundNotes, setRefundNotes] = useState('');
 
     const filtered = payments.data.filter((payment) => {
         const matchSearch =
@@ -208,6 +220,30 @@ export default function Payments({ payments }: PaymentsProps) {
             router.delete(`/admin/payments/${payment.id}`);
         }
     };
+
+    const confirmRefund = () => {
+        if (!refundPrompt || !refundNotes.trim()) {
+            return;
+        }
+
+        router.put(
+            `/admin/payments/${refundPrompt.id}/refund`,
+            { refund_notes: refundNotes.trim() },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setRefundPrompt(null);
+                    setRefundNotes('');
+                },
+            },
+        );
+    };
+
+    const canBeRefunded = (payment: Payment) =>
+        payment.status === 'APPROVED' &&
+        !payment.refunded_at &&
+        (payment.order?.status === 'REJECTED' ||
+            payment.order?.status === 'CANCELLED');
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString('es-ES', {
@@ -458,9 +494,22 @@ export default function Payments({ payments }: PaymentsProps) {
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                <StatusBadge
-                                                    status={payment.status}
-                                                />
+                                                <div className="flex flex-wrap items-center gap-1.5">
+                                                    <StatusBadge
+                                                        status={
+                                                            payment.status
+                                                        }
+                                                    />
+                                                    {payment.refunded_at && (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="gap-1.5 border-sky-200 bg-sky-50 text-sky-700"
+                                                        >
+                                                            <RefreshCw className="h-3 w-3" />
+                                                            Reembolsado
+                                                        </Badge>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="text-sm text-muted-foreground">
                                                 {formatDate(payment.created_at)}
@@ -530,6 +579,28 @@ export default function Payments({ payments }: PaymentsProps) {
                                                                 Ver orden de
                                                                 compra
                                                             </DropdownMenuItem>
+                                                        )}
+                                                        {canBeRefunded(
+                                                            payment,
+                                                        ) && (
+                                                            <>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem
+                                                                    className="cursor-pointer gap-2 text-sky-600 focus:text-sky-600"
+                                                                    onClick={() => {
+                                                                        setRefundNotes(
+                                                                            '',
+                                                                        );
+                                                                        setRefundPrompt(
+                                                                            payment,
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <RefreshCw className="h-4 w-4" />
+                                                                    Marcar como
+                                                                    reembolsado
+                                                                </DropdownMenuItem>
+                                                            </>
                                                         )}
                                                         <DropdownMenuItem
                                                             className="cursor-pointer gap-2 text-destructive focus:text-destructive"
@@ -693,6 +764,51 @@ export default function Payments({ payments }: PaymentsProps) {
                                         Descargar
                                     </Button>
                                 )}
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* Refund confirmation */}
+                    <Dialog
+                        open={refundPrompt !== null}
+                        onOpenChange={(open) => !open && setRefundPrompt(null)}
+                    >
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Marcar pago como reembolsado
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Este pedido fue rechazado/cancelado y el
+                                    pago ya estaba aprobado. La devolución del
+                                    dinero se hace manualmente (Yape,
+                                    transferencia, etc.) fuera del sistema;
+                                    aquí solo dejas constancia de cómo y cuándo
+                                    se hizo.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <Textarea
+                                value={refundNotes}
+                                onChange={(e) =>
+                                    setRefundNotes(e.target.value)
+                                }
+                                placeholder="Ej: Devuelto por Yape el 03/07/2026, operación #123456."
+                                rows={4}
+                                autoFocus
+                            />
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setRefundPrompt(null)}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    onClick={confirmRefund}
+                                    disabled={!refundNotes.trim()}
+                                >
+                                    Confirmar reembolso
+                                </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>

@@ -26,9 +26,14 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:PENDING,ACCEPTED,REJECTED,SHIPPED,DELIVERED,CANCELLED',
+            'rejection_reason' => 'required_if:status,REJECTED,CANCELLED|nullable|string|max:1000',
         ]);
 
         $statusChanged = $order->status !== $validated['status'];
+
+        if (! in_array($validated['status'], ['REJECTED', 'CANCELLED'])) {
+            $validated['rejection_reason'] = null;
+        }
 
         $order->update($validated);
 

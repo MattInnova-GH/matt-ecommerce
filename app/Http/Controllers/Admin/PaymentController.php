@@ -44,4 +44,22 @@ class PaymentController extends Controller
 
         return redirect()->back();
     }
+
+    /**
+     * Mark the payment as manually refunded (no gateway involved; the
+     * refund itself happens outside the system, e.g. via Yape/transferencia).
+     */
+    public function refund(Request $request, Payment $payment)
+    {
+        $validated = $request->validate([
+            'refund_notes' => 'required|string|max:1000',
+        ]);
+
+        $payment->update([
+            'refunded_at' => now(),
+            'refund_notes' => $validated['refund_notes'],
+        ]);
+
+        return redirect()->back();
+    }
 }

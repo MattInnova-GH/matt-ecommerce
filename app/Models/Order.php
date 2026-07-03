@@ -8,7 +8,7 @@ class Order extends Model
 {
     protected $fillable = [
         'user_id', 'order_number', 'subtotal', 'tax', 'total',
-        'status', 'shipping_address', 'notes',
+        'status', 'shipping_address', 'notes', 'rejection_reason',
     ];
 
     protected $casts = [

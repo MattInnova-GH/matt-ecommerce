@@ -45,6 +45,17 @@
                                 </p>
                             @endif
 
+                            @if (in_array($order->status, ['REJECTED', 'CANCELLED']) && $order->rejection_reason)
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fef2f2; border-radius:8px; margin-bottom:16px;">
+                                    <tr>
+                                        <td style="padding:12px 16px;">
+                                            <p style="margin:0 0 4px; font-size:12px; font-weight:bold; color:#991b1b; text-transform:uppercase;">Motivo</p>
+                                            <p style="margin:0; font-size:14px; line-height:1.5; color:#7f1d1d;">{{ $order->rejection_reason }}</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            @endif
+
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin-bottom:16px;">
                                 <thead>
                                     <tr>

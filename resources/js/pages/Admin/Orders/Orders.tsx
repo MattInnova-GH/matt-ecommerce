@@ -37,7 +37,14 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
 import {
     Sheet,
     SheetContent,
@@ -99,6 +106,7 @@ interface Order {
         | 'CANCELLED';
     shipping_address: Address;
     notes: string | null;
+    rejection_reason: string | null;
     created_at: string;
     user?: User;
     items?: OrderItem[];
@@ -314,6 +322,11 @@ export default function Orders({ orders: initialOrders }: Props) {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [reasonPrompt, setReasonPrompt] = useState<{
+        order: Order;
+        status: 'REJECTED' | 'CANCELLED';
+    } | null>(null);
+    const [reasonText, setReasonText] = useState('');
 
     const filtered = initialOrders.data.filter((order) => {
         const matchSearch =
@@ -331,10 +344,19 @@ export default function Orders({ orders: initialOrders }: Props) {
 
     const hasActiveFilters = searchTerm !== '' || statusFilter !== 'all';
 
-    const handleStatusChange = (order: Order, newStatus: Order['status']) => {
+    const handleStatusChange = (
+        order: Order,
+        newStatus: Order['status'],
+        rejectionReason?: string,
+    ) => {
         router.put(
             admin.orders.update(order.id),
-            { status: newStatus },
+            {
+                status: newStatus,
+                ...(rejectionReason
+                    ? { rejection_reason: rejectionReason }
+                    : {}),
+            },
             {
                 preserveScroll: true,
                 onSuccess: () => {
@@ -346,6 +368,29 @@ export default function Orders({ orders: initialOrders }: Props) {
                 onError: () => toast.error('Error al actualizar el pedido'),
             },
         );
+    };
+
+    const openReasonPrompt = (
+        order: Order,
+        status: 'REJECTED' | 'CANCELLED',
+    ) => {
+        setReasonText('');
+        setReasonPrompt({ order, status });
+    };
+
+    const confirmReasonPrompt = () => {
+        if (!reasonPrompt || !reasonText.trim()) {
+            toast.error('Debes escribir un motivo');
+            return;
+        }
+
+        handleStatusChange(
+            reasonPrompt.order,
+            reasonPrompt.status,
+            reasonText.trim(),
+        );
+        setReasonPrompt(null);
+        setReasonText('');
     };
 
     const clearFilters = () => {
@@ -865,6 +910,28 @@ export default function Orders({ orders: initialOrders }: Props) {
                                             </div>
                                         )}
 
+                                        {/* Rejection / cancellation reason */}
+                                        {selectedOrder.rejection_reason && (
+                                            <div className="flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm">
+                                                <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
+                                                <div>
+                                                    <span className="font-medium text-destructive">
+                                                        Motivo{' '}
+                                                        {selectedOrder.status ===
+                                                        'CANCELLED'
+                                                            ? 'de cancelación'
+                                                            : 'de rechazo'}
+                                                        :{' '}
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                        {
+                                                            selectedOrder.rejection_reason
+                                                        }
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {/* Products */}
                                         <div className="overflow-hidden rounded-xl border">
                                             <div className="border-b bg-muted/30 px-4 py-2.5">
@@ -1094,7 +1161,7 @@ export default function Orders({ orders: initialOrders }: Props) {
                                                                 variant="destructive"
                                                                 className="gap-1.5"
                                                                 onClick={() =>
-                                                                    handleStatusChange(
+                                                                    openReasonPrompt(
                                                                         selectedOrder,
                                                                         'REJECTED',
                                                                     )
@@ -1143,7 +1210,7 @@ export default function Orders({ orders: initialOrders }: Props) {
                                                         variant="outline"
                                                         className="gap-1.5 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                         onClick={() =>
-                                                            handleStatusChange(
+                                                            openReasonPrompt(
                                                                 selectedOrder,
                                                                 'CANCELLED',
                                                             )
@@ -1159,6 +1226,53 @@ export default function Orders({ orders: initialOrders }: Props) {
                                 </ScrollArea>
                             </>
                         )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Reason prompt for rejecting/cancelling an order */}
+                <Dialog
+                    open={reasonPrompt !== null}
+                    onOpenChange={(open) => !open && setReasonPrompt(null)}
+                >
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>
+                                {reasonPrompt?.status === 'CANCELLED'
+                                    ? 'Cancelar pedido'
+                                    : 'Rechazar pedido'}
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">
+                                Explica el motivo. Se guardará en el pedido
+                                como evidencia y se enviará por correo al
+                                cliente.
+                            </p>
+                            <Textarea
+                                value={reasonText}
+                                onChange={(e) =>
+                                    setReasonText(e.target.value)
+                                }
+                                placeholder="Ej: No se pudo verificar el comprobante de pago enviado."
+                                rows={4}
+                                autoFocus
+                            />
+                        </div>
+                        <DialogFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() => setReasonPrompt(null)}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={confirmReasonPrompt}
+                                disabled={!reasonText.trim()}
+                            >
+                                Confirmar
+                            </Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
