@@ -17,21 +17,22 @@ class DashboardController extends Controller
     {
         // Totales principales
         $totalRevenue = DB::table('payments')
-            ->where('status', 'PAID')
+            ->where('status', 'APPROVED')
             ->sum('amount');
 
         $totalOrders = Order::count();
         $totalCustomers = User::count(); // Podría filtrarse por rol si existiera una columna
-        $lowStockCount = Product::where('stock', '<', 5)->count();
+        $lowStockCount = Product::where('stock', '<', 10)->count();
 
         // Datos para gráfico de ventas (últimos 7 días)
         $salesData = DB::table('orders')
             ->select(
-                DB::raw('date(created_at) as date'),
-                DB::raw('count(*) as total_orders'),
-                DB::raw('sum(total) as revenue')
+                DB::raw('date(orders.created_at) as date'),
+                DB::raw('count(distinct orders.id) as total_orders'),
+                DB::raw('coalesce(sum(case when payments.status = \'APPROVED\' then orders.total else 0 end), 0) as revenue')
             )
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->leftJoin('payments', 'payments.order_id', '=', 'orders.id')
+            ->where('orders.created_at', '>=', Carbon::now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();

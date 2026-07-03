@@ -86,6 +86,9 @@ interface ProductsProps {
     brands: Brand[];
 }
 
+// Debe coincidir con el umbral usado en Admin/DashboardController para "Productos con bajo stock".
+const LOW_STOCK_THRESHOLD = 10;
+
 export default function Products({ products }: ProductsProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [isGridView, setIsGridView] = useState(false);
@@ -341,7 +344,7 @@ export default function Products({ products }: ProductsProps) {
                                                         <span
                                                             className={
                                                                 product.stock <
-                                                                10
+                                                                LOW_STOCK_THRESHOLD
                                                                     ? 'font-semibold text-destructive'
                                                                     : ''
                                                             }
@@ -349,7 +352,8 @@ export default function Products({ products }: ProductsProps) {
                                                             {product.stock}{' '}
                                                             unid.
                                                         </span>
-                                                        {product.stock < 10 &&
+                                                        {product.stock <
+                                                            LOW_STOCK_THRESHOLD &&
                                                             product.stock >
                                                                 0 && (
                                                                 <p className="text-[10px] font-medium text-destructive">
@@ -608,7 +612,8 @@ export default function Products({ products }: ProductsProps) {
                                                     </span>
                                                     <span
                                                         className={
-                                                            product.stock < 10
+                                                            product.stock <
+                                                            LOW_STOCK_THRESHOLD
                                                                 ? 'font-semibold text-destructive'
                                                                 : 'font-medium'
                                                         }
