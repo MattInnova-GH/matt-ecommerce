@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import {
     Eye,
     CheckCircle,
@@ -79,6 +79,8 @@ interface Payment {
     status: 'PENDING' | 'APPROVED' | 'REJECTED';
     refunded_at: string | null;
     refund_notes: string | null;
+    refund_yape_phone: string | null;
+    refund_proof_url: string | null;
     created_at: string;
     order?: Order;
 }
@@ -166,7 +168,13 @@ export default function Payments({ payments }: PaymentsProps) {
     );
     const [showReceiptDialog, setShowReceiptDialog] = useState(false);
     const [refundPrompt, setRefundPrompt] = useState<Payment | null>(null);
-    const [refundNotes, setRefundNotes] = useState('');
+    const refundForm = useForm<{
+        refund_notes: string;
+        refund_proof: File | null;
+    }>({
+        refund_notes: '',
+        refund_proof: null,
+    });
 
     const filtered = payments.data.filter((payment) => {
         const matchSearch =
@@ -222,21 +230,17 @@ export default function Payments({ payments }: PaymentsProps) {
     };
 
     const confirmRefund = () => {
-        if (!refundPrompt || !refundNotes.trim()) {
+        if (!refundPrompt || !refundForm.data.refund_notes.trim()) {
             return;
         }
 
-        router.put(
-            `/admin/payments/${refundPrompt.id}/refund`,
-            { refund_notes: refundNotes.trim() },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setRefundPrompt(null);
-                    setRefundNotes('');
-                },
+        refundForm.put(`/admin/payments/${refundPrompt.id}/refund`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setRefundPrompt(null);
+                refundForm.reset();
             },
-        );
+        });
     };
 
     const canBeRefunded = (payment: Payment) =>
@@ -588,9 +592,7 @@ export default function Payments({ payments }: PaymentsProps) {
                                                                 <DropdownMenuItem
                                                                     className="cursor-pointer gap-2 text-sky-600 focus:text-sky-600"
                                                                     onClick={() => {
-                                                                        setRefundNotes(
-                                                                            '',
-                                                                        );
+                                                                        refundForm.reset();
                                                                         setRefundPrompt(
                                                                             payment,
                                                                         );
@@ -787,15 +789,52 @@ export default function Payments({ payments }: PaymentsProps) {
                                     se hizo.
                                 </DialogDescription>
                             </DialogHeader>
+
+                            {refundPrompt?.refund_yape_phone ? (
+                                <div className="rounded-lg border border-sky-100 bg-sky-50 px-3 py-2 text-sm">
+                                    <span className="font-medium text-sky-900">
+                                        Número de Yape del cliente:{' '}
+                                    </span>
+                                    <span className="font-mono text-sky-700">
+                                        {refundPrompt.refund_yape_phone}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                                    El cliente todavía no ha registrado su
+                                    número de Yape.
+                                </div>
+                            )}
+
                             <Textarea
-                                value={refundNotes}
+                                value={refundForm.data.refund_notes}
                                 onChange={(e) =>
-                                    setRefundNotes(e.target.value)
+                                    refundForm.setData(
+                                        'refund_notes',
+                                        e.target.value,
+                                    )
                                 }
                                 placeholder="Ej: Devuelto por Yape el 03/07/2026, operación #123456."
                                 rows={4}
                                 autoFocus
                             />
+
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium">
+                                    Comprobante del reembolso (opcional)
+                                </label>
+                                <Input
+                                    type="file"
+                                    accept="image/png,image/jpeg,application/pdf"
+                                    onChange={(e) =>
+                                        refundForm.setData(
+                                            'refund_proof',
+                                            e.target.files?.[0] ?? null,
+                                        )
+                                    }
+                                />
+                            </div>
+
                             <DialogFooter>
                                 <Button
                                     variant="outline"
@@ -805,7 +844,10 @@ export default function Payments({ payments }: PaymentsProps) {
                                 </Button>
                                 <Button
                                     onClick={confirmRefund}
-                                    disabled={!refundNotes.trim()}
+                                    disabled={
+                                        !refundForm.data.refund_notes.trim() ||
+                                        refundForm.processing
+                                    }
                                 >
                                     Confirmar reembolso
                                 </Button>

@@ -11,13 +11,17 @@ import {
 import OrderCard from './components/OrderCard';
 import EmptyOrders from './components/EmptyOrders';
 import StatsBar from './components/StatsBar';
-import { MOCK_ORDERS } from './data';
+import type { Order } from './types';
 
-export default function OrdersPage() {
+interface OrdersPageProps {
+    orders: Order[];
+}
+
+export default function OrdersPage({ orders }: OrdersPageProps) {
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
 
-    const filtered = MOCK_ORDERS.filter((order) => {
+    const filtered = orders.filter((order) => {
         const q = search.toLowerCase();
         const matchSearch =
             !search ||
@@ -40,7 +44,7 @@ export default function OrdersPage() {
                     </p>
                 </div>
 
-                <StatsBar orders={MOCK_ORDERS} />
+                <StatsBar orders={orders} />
 
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                     <div className="relative flex-1">
@@ -64,13 +68,18 @@ export default function OrdersPage() {
                             <SelectItem value="all">
                                 Todos los estados
                             </SelectItem>
-                            <SelectItem value="pending">Pendiente</SelectItem>
-                            <SelectItem value="confirmed">
-                                Confirmado
+                            <SelectItem value="PENDING">Pendiente</SelectItem>
+                            <SelectItem value="ACCEPTED">Aceptado</SelectItem>
+                            <SelectItem value="SHIPPED">En camino</SelectItem>
+                            <SelectItem value="DELIVERED">
+                                Entregado
                             </SelectItem>
-                            <SelectItem value="shipped">En camino</SelectItem>
-                            <SelectItem value="delivered">Entregado</SelectItem>
-                            <SelectItem value="cancelled">Cancelado</SelectItem>
+                            <SelectItem value="REJECTED">
+                                Rechazado
+                            </SelectItem>
+                            <SelectItem value="CANCELLED">
+                                Cancelado
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

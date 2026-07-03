@@ -4,7 +4,6 @@ import {
     ChevronDown,
     MapPin,
     CreditCard,
-    Truck,
     Download,
     RotateCcw,
     XCircle,
@@ -142,17 +141,6 @@ export default function OrderCard({ order }: { order: Order }) {
                                 Seguimiento del pedido
                             </h4>
                             <OrderTimeline order={order} />
-                            {order.tracking_code && (
-                                <div className="mt-3 flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2">
-                                    <Truck className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-xs text-muted-foreground">
-                                        Código de seguimiento:
-                                    </span>
-                                    <span className="font-mono text-xs font-semibold">
-                                        {order.tracking_code}
-                                    </span>
-                                </div>
-                            )}
                         </section>
 
                         <Separator />
@@ -179,7 +167,7 @@ export default function OrderCard({ order }: { order: Order }) {
                                             <p className="text-xs text-muted-foreground">
                                                 {item.quantity} ×{' '}
                                                 {formatCurrency(
-                                                    item.unit_price,
+                                                    item.product_price,
                                                 )}
                                             </p>
                                         </div>
@@ -196,14 +184,8 @@ export default function OrderCard({ order }: { order: Order }) {
                                     value={formatCurrency(order.subtotal)}
                                 />
                                 <OrderSummaryRow
-                                    label="Envío"
-                                    value={
-                                        order.shipping_cost === 0
-                                            ? 'Gratis'
-                                            : formatCurrency(
-                                                  order.shipping_cost,
-                                              )
-                                    }
+                                    label="Impuestos"
+                                    value={formatCurrency(order.tax)}
                                 />
                                 <Separator className="my-1.5" />
                                 <div className="flex justify-between text-sm font-bold">
@@ -220,27 +202,44 @@ export default function OrderCard({ order }: { order: Order }) {
                             <div>
                                 <h4 className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
                                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                                    Dirección de envío
+                                    {order.shipping_address
+                                        ? 'Dirección de envío'
+                                        : 'Entrega'}
                                 </h4>
                                 <div className="space-y-0.5 text-sm text-muted-foreground">
-                                    <p className="font-medium text-foreground">
-                                        {order.shipping_address.full_name}
-                                    </p>
-                                    <p>{order.shipping_address.address}</p>
-                                    <p>
-                                        {order.shipping_address.district},{' '}
-                                        {order.shipping_address.city}
-                                    </p>
-                                    <p>
-                                        {order.shipping_address.country}
-                                        {order.shipping_address.postal_code &&
-                                            ` · ${order.shipping_address.postal_code}`}
-                                    </p>
-                                    {order.shipping_address.reference && (
-                                        <p className="text-xs italic">
-                                            Ref:{' '}
-                                            {order.shipping_address.reference}
-                                        </p>
+                                    {order.shipping_address ? (
+                                        <>
+                                            <p className="font-medium text-foreground">
+                                                {
+                                                    order.shipping_address
+                                                        .recipientName
+                                                }
+                                            </p>
+                                            <p>
+                                                {
+                                                    order.shipping_address
+                                                        .address
+                                                }
+                                            </p>
+                                            <p>
+                                                {
+                                                    order.shipping_address
+                                                        .phone
+                                                }
+                                            </p>
+                                            {order.shipping_address
+                                                .reference && (
+                                                <p className="text-xs italic">
+                                                    Ref:{' '}
+                                                    {
+                                                        order.shipping_address
+                                                            .reference
+                                                    }
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <p>Recojo en tienda</p>
                                     )}
                                 </div>
                             </div>
@@ -250,11 +249,12 @@ export default function OrderCard({ order }: { order: Order }) {
                                     <CreditCard className="h-4 w-4 text-muted-foreground" />
                                     Método de pago
                                 </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    {order.payment_method}
+                                <p className="text-sm text-muted-foreground capitalize">
+                                    {order.payment_method ?? 'No especificado'}
                                 </p>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                    Pagado el {formatDate(order.created_at)}
+                                    Pedido realizado el{' '}
+                                    {formatDate(order.created_at)}
                                 </p>
                             </div>
                         </section>
@@ -271,7 +271,7 @@ export default function OrderCard({ order }: { order: Order }) {
                                 <Download className="h-3.5 w-3.5" />
                                 Comprobante
                             </Button>
-                            {order.status === 'delivered' && (
+                            {order.status === 'DELIVERED' && (
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -281,8 +281,8 @@ export default function OrderCard({ order }: { order: Order }) {
                                     Reordenar
                                 </Button>
                             )}
-                            {(order.status === 'pending' ||
-                                order.status === 'confirmed') && (
+                            {(order.status === 'PENDING' ||
+                                order.status === 'ACCEPTED') && (
                                 <Button
                                     variant="outline"
                                     size="sm"

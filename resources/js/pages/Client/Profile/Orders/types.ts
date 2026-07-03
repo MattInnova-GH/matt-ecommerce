@@ -1,17 +1,25 @@
 export type OrderStatus =
-    | 'pending'
-    | 'confirmed'
-    | 'shipped'
-    | 'delivered'
-    | 'cancelled';
+    | 'PENDING'
+    | 'ACCEPTED'
+    | 'REJECTED'
+    | 'SHIPPED'
+    | 'DELIVERED'
+    | 'CANCELLED';
 
 export interface OrderItem {
     id: number;
     product_name: string;
     product_thumbnail: string | null;
     quantity: number;
-    unit_price: number;
+    product_price: number;
     subtotal: number;
+}
+
+export interface ShippingAddress {
+    address: string;
+    reference?: string;
+    recipientName: string;
+    phone: string;
 }
 
 export interface Order {
@@ -20,19 +28,12 @@ export interface Order {
     status: OrderStatus;
     total: number;
     subtotal: number;
-    shipping_cost: number;
-    payment_method: string;
+    tax: number;
+    rejection_reason: string | null;
+    payment_method: string | null;
+    notes: string | null;
     created_at: string;
     updated_at: string;
     items: OrderItem[];
-    shipping_address: {
-        full_name: string;
-        address: string;
-        city: string;
-        district: string;
-        country: string;
-        postal_code?: string;
-        reference?: string;
-    };
-    tracking_code?: string;
+    shipping_address: ShippingAddress | null;
 }

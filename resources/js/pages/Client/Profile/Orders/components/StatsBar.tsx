@@ -7,13 +7,13 @@ export default function StatsBar({ orders }: { orders: Order[] }) {
         { label: 'Total pedidos', value: orders.length, icon: Package },
         {
             label: 'Entregados',
-            value: orders.filter((o) => o.status === 'delivered').length,
+            value: orders.filter((o) => o.status === 'DELIVERED').length,
             icon: PackageCheck,
         },
         {
             label: 'En progreso',
             value: orders.filter((o) =>
-                ['pending', 'confirmed', 'shipped'].includes(o.status),
+                ['PENDING', 'ACCEPTED', 'SHIPPED'].includes(o.status),
             ).length,
             icon: Truck,
         },

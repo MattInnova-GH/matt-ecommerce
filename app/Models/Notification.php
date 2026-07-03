@@ -6,7 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-    protected $fillable = ['title', 'message', 'is_read'];
+    protected $fillable = ['user_id', 'order_id', 'title', 'message', 'action', 'is_read'];
 
     protected $casts = ['is_read' => 'boolean'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

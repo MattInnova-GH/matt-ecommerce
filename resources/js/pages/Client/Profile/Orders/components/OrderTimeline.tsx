@@ -5,17 +5,25 @@ import { formatDate } from '../utils';
 import type { Order } from '../types';
 
 export default function OrderTimeline({ order }: { order: Order }) {
-    if (order.status === 'cancelled') {
+    if (order.status === 'CANCELLED' || order.status === 'REJECTED') {
+        const isCancelled = order.status === 'CANCELLED';
+
         return (
-            <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
-                <XCircle className="h-5 w-5 shrink-0 text-red-500" />
+            <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
                 <div>
                     <p className="text-sm font-medium text-red-700">
-                        Pedido cancelado
+                        {isCancelled ? 'Pedido cancelado' : 'Pedido rechazado'}
                     </p>
                     <p className="text-xs text-red-500">
-                        Cancelado el {formatDate(order.updated_at)}
+                        {isCancelled ? 'Cancelado' : 'Rechazado'} el{' '}
+                        {formatDate(order.updated_at)}
                     </p>
+                    {order.rejection_reason && (
+                        <p className="mt-1 text-xs text-red-600">
+                            Motivo: {order.rejection_reason}
+                        </p>
+                    )}
                 </div>
             </div>
         );

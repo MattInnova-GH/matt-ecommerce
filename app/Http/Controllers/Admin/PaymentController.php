@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\RefundProcessed;
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class PaymentController extends Controller
@@ -53,12 +55,26 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'refund_notes' => 'required|string|max:1000',
+            'refund_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
+
+        $refundProofUrl = $payment->refund_proof_url;
+
+        if ($request->hasFile('refund_proof')) {
+            $refundProofUrl = $request->file('refund_proof')->store('refund-proofs', 'public');
+        }
 
         $payment->update([
             'refunded_at' => now(),
             'refund_notes' => $validated['refund_notes'],
+            'refund_proof_url' => $refundProofUrl,
         ]);
+
+        $payment->load('order.user');
+
+        if ($payment->order?->user) {
+            Mail::to($payment->order->user->email)->send(new RefundProcessed($payment));
+        }
 
         return redirect()->back();
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Notification;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -49,6 +50,13 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'settings' => Setting::first(),
+            'notifications' => $request->user()
+                ? Notification::where('user_id', $request->user()->id)
+                    ->where('is_read', false)
+                    ->latest()
+                    ->limit(10)
+                    ->get(['id', 'title', 'message', 'action', 'order_id', 'created_at'])
+                : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'success' => $request->session()->get('success'),

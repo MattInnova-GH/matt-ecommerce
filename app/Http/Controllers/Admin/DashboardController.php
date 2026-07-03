@@ -16,14 +16,12 @@ class DashboardController extends Controller
     public function index()
     {
         // Totales principales
-        // Solo cuenta como ingreso un pago aprobado cuyo pedido no haya sido
-        // rechazado/cancelado despues, y que no se le haya hecho un reembolso.
-        $totalRevenue = DB::table('payments')
-            ->join('orders', 'orders.id', '=', 'payments.order_id')
-            ->where('payments.status', 'APPROVED')
-            ->whereNull('payments.refunded_at')
-            ->whereNotIn('orders.status', ['REJECTED', 'CANCELLED'])
-            ->sum('payments.amount');
+        // Ingresos = suma de pedidos ya aceptados (o en una etapa posterior).
+        // Un pedido rechazado/cancelado deja de contar, independientemente
+        // de lo que diga el panel de Pagos (que es solo evidencia manual).
+        $revenueStatuses = ['ACCEPTED', 'SHIPPED', 'DELIVERED'];
+
+        $totalRevenue = Order::whereIn('status', $revenueStatuses)->sum('total');
 
         $totalOrders = Order::count();
         $totalCustomers = User::count(); // Podría filtrarse por rol si existiera una columna
@@ -32,12 +30,11 @@ class DashboardController extends Controller
         // Datos para gráfico de ventas (últimos 7 días)
         $salesData = DB::table('orders')
             ->select(
-                DB::raw('date(orders.created_at) as date'),
-                DB::raw('count(distinct orders.id) as total_orders'),
-                DB::raw("coalesce(sum(case when payments.status = 'APPROVED' and payments.refunded_at is null and orders.status not in ('REJECTED', 'CANCELLED') then orders.total else 0 end), 0) as revenue")
+                DB::raw('date(created_at) as date'),
+                DB::raw('count(*) as total_orders'),
+                DB::raw("coalesce(sum(case when status in ('ACCEPTED', 'SHIPPED', 'DELIVERED') then total else 0 end), 0) as revenue")
             )
-            ->leftJoin('payments', 'payments.order_id', '=', 'orders.id')
-            ->where('orders.created_at', '>=', Carbon::now()->subDays(7))
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();

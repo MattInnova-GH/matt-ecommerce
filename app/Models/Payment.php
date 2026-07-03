@@ -9,7 +9,7 @@ class Payment extends Model
     protected $fillable = [
         'order_id', 'method', 'amount', 'receipt_url', 'status',
         'yape_phone', 'yape_code', 'yape_mode',
-        'refunded_at', 'refund_notes',
+        'refunded_at', 'refund_notes', 'refund_yape_phone', 'refund_proof_url',
     ];
 
     protected $casts = [

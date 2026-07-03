@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import UserMenu from './UserMenu';
 import SearchModal from './SearchModal';
+import NotificationBell from './NotificationBell';
 import CartDrawer from '@/Components/User/Cart';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthModalStore } from '@/stores/authModalStore';
@@ -83,6 +84,8 @@ export default function Navbar() {
                                     </span>
                                 )}
                             </button>
+
+                            {user && <NotificationBell />}
 
                             {/* UserMenu — maneja autenticado y no autenticado */}
                             <UserMenu

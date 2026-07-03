@@ -32,4 +32,9 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Client\NotificationController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\ProfileController;
 use App\Http\Controllers\ReviewController;
@@ -24,6 +25,10 @@ Route::middleware(['auth', 'verified', 'role:client|admin'])
 
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
+        // NOTIFICACIONES
+        Route::put('/notificaciones/{notification}/leer', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::put('/notificaciones/{notification}/yape', [NotificationController::class, 'submitRefundYapePhone'])->name('notifications.refund-yape');
 
         Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
