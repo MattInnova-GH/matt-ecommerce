@@ -32,6 +32,7 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Card, CardContent } from '@/components/ui/card';
+import { MobileDataCard } from '@/Components/ui/mobile-data-card';
 import { Separator } from '@/components/ui/separator';
 import {
     Pagination,
@@ -244,7 +245,8 @@ export default function Products({ products }: ProductsProps) {
                 {/* Products Grid/Table */}
                 {!isGridView ? (
                     // Vista de Tabla
-                    <Card className="overflow-hidden border shadow-sm">
+                    <>
+                    <Card className="hidden overflow-hidden border shadow-sm lg:block">
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader className="bg-muted/30">
@@ -500,6 +502,235 @@ export default function Products({ products }: ProductsProps) {
                             </Table>
                         </div>
                     </Card>
+
+                    {/* Cards (mobile) — misma info que la tabla, en filas etiqueta/valor */}
+                    <div className="grid gap-3 lg:hidden">
+                        {filteredProducts.length > 0 ? (
+                            filteredProducts.map((product) => (
+                                <MobileDataCard
+                                    key={product.id}
+                                    header={
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border bg-muted/50">
+                                                {product.thumbnail ? (
+                                                    <img
+                                                        src={`/storage/${product.thumbnail}`}
+                                                        alt={product.name}
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-full w-full items-center justify-center">
+                                                        <ImageIcon className="h-5 w-5 text-muted-foreground/40" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="min-w-0 flex-1 space-y-1.5">
+                                                <p className="truncate font-medium text-foreground">
+                                                    {product.name}
+                                                </p>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="h-5 gap-1 px-1.5 text-[10px] font-normal"
+                                                    >
+                                                        <ImageIcon className="h-2.5 w-2.5" />
+                                                        {product.images_count}
+                                                    </Badge>
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="h-5 gap-1 px-1.5 text-[10px] font-normal"
+                                                    >
+                                                        <Tags className="h-2.5 w-2.5" />
+                                                        {
+                                                            product.variants_count
+                                                        }
+                                                    </Badge>
+                                                    {product.is_featured && (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="h-5 px-1.5 text-[10px] font-medium"
+                                                        >
+                                                            Destacado
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    rows={[
+                                        {
+                                            label: 'Categoría',
+                                            value: (
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="font-normal"
+                                                >
+                                                    {product.category?.name ||
+                                                        'Sin categoría'}
+                                                </Badge>
+                                            ),
+                                        },
+                                        {
+                                            label: 'Precio',
+                                            value: (
+                                                <span className="font-semibold">
+                                                    S/ {product.price.toFixed(2)}
+                                                </span>
+                                            ),
+                                        },
+                                        {
+                                            label: 'Stock',
+                                            value: (
+                                                <div className="space-y-0.5">
+                                                    <span
+                                                        className={
+                                                            product.stock <
+                                                            LOW_STOCK_THRESHOLD
+                                                                ? 'font-semibold text-destructive'
+                                                                : ''
+                                                        }
+                                                    >
+                                                        {product.stock} unid.
+                                                    </span>
+                                                    {product.stock <
+                                                        LOW_STOCK_THRESHOLD &&
+                                                        product.stock > 0 && (
+                                                            <p className="text-[10px] font-medium text-destructive">
+                                                                Stock bajo
+                                                            </p>
+                                                        )}
+                                                    {product.stock === 0 && (
+                                                        <p className="text-[10px] font-medium text-muted-foreground">
+                                                            Agotado
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ),
+                                        },
+                                        {
+                                            label: 'Estado',
+                                            value: (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className={`h-7 rounded-full px-2.5 text-xs font-medium ${
+                                                        product.is_active
+                                                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                                            : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
+                                                    }`}
+                                                    onClick={() =>
+                                                        toggleStatus(
+                                                            product.id,
+                                                        )
+                                                    }
+                                                >
+                                                    {product.is_active ? (
+                                                        <>
+                                                            <Check className="mr-1 h-3 w-3" />
+                                                            Activo
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <X className="mr-1 h-3 w-3" />
+                                                            Inactivo
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            ),
+                                        },
+                                    ]}
+                                    footer={
+                                        <div className="flex justify-end">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 gap-1.5 px-2.5 text-xs"
+                                                    >
+                                                        <MoreVertical className="h-3.5 w-3.5" />
+                                                        Acciones
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent
+                                                    align="end"
+                                                    className="w-36"
+                                                >
+                                                    <DropdownMenuItem asChild>
+                                                        <Link
+                                                            href={admin.products.edit(
+                                                                product.id,
+                                                            )}
+                                                            className="cursor-pointer"
+                                                        >
+                                                            <Edit className="mr-2 h-4 w-4" />
+                                                            Editar
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            toggleFeatured(
+                                                                product.id,
+                                                            )
+                                                        }
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <Tags className="mr-2 h-4 w-4" />
+                                                        {product.is_featured
+                                                            ? 'Quitar Destacado'
+                                                            : 'Destacar'}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                product.id,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        Eliminar
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    }
+                                />
+                            ))
+                        ) : (
+                            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border bg-white py-16 shadow-sm">
+                                <div className="rounded-full bg-muted/50 p-4">
+                                    <Package className="h-10 w-10 text-muted-foreground/40" />
+                                </div>
+                                <div className="space-y-1 text-center">
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        {searchTerm
+                                            ? 'No se encontraron productos'
+                                            : 'No hay productos aún'}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground/70">
+                                        {searchTerm
+                                            ? 'Intenta con otros términos de búsqueda'
+                                            : 'Comienza creando tu primer producto'}
+                                    </p>
+                                </div>
+                                {!searchTerm && (
+                                    <Link href={admin.products.create()}>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="mt-2 gap-2"
+                                        >
+                                            <Plus className="h-3 w-3" />
+                                            Crear producto
+                                        </Button>
+                                    </Link>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    </>
                 ) : (
                     // Vista de Cuadrícula
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

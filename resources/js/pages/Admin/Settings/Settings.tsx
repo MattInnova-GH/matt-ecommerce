@@ -171,6 +171,8 @@ function ImageUploadField({
 export default function Settings({ settings }: Props) {
     const [previewLogo, setPreviewLogo] = useState<string | null>(null);
     const [previewFavicon, setPreviewFavicon] = useState<string | null>(null);
+    const [logoRemoved, setLogoRemoved] = useState(false);
+    const [faviconRemoved, setFaviconRemoved] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [saved, setSaved] = useState(false);
 
@@ -197,10 +199,14 @@ export default function Settings({ settings }: Props) {
 
         if (data.logo) {
             formData.append('logo', data.logo);
+        } else if (logoRemoved) {
+            formData.append('remove_logo', '1');
         }
 
         if (data.favicon) {
             formData.append('favicon', data.favicon);
+        } else if (faviconRemoved) {
+            formData.append('remove_favicon', '1');
         }
 
         formData.append('email', data.email || '');
@@ -216,6 +222,8 @@ export default function Settings({ settings }: Props) {
             onSuccess: () => {
                 toast.success('Configuración guardada');
                 setSaved(true);
+                setLogoRemoved(false);
+                setFaviconRemoved(false);
                 setTimeout(() => setSaved(false), 3000);
                 setIsSubmitting(false);
             },
@@ -336,16 +344,24 @@ export default function Settings({ settings }: Props) {
                                 id="logo"
                                 label="Logo de la tienda"
                                 hint="PNG, JPG, SVG · Recomendado 200×200 px"
-                                preview={previewLogo || settings?.logo || null}
+                                preview={
+                                    logoRemoved
+                                        ? null
+                                        : previewLogo ||
+                                          settings?.logo ||
+                                          null
+                                }
                                 fallbackIcon={Store}
                                 avatarClass="h-20 w-20 rounded-xl"
                                 onFileChange={(file) => {
                                     setData('logo', file);
                                     readPreview(file, setPreviewLogo);
+                                    setLogoRemoved(false);
                                 }}
                                 onClear={() => {
                                     setPreviewLogo(null);
                                     setData('logo', null);
+                                    setLogoRemoved(true);
                                 }}
                             />
                         </div>
@@ -357,17 +373,23 @@ export default function Settings({ settings }: Props) {
                                 label="Favicon del sitio"
                                 hint="PNG, ICO, SVG · Recomendado 32×32 px"
                                 preview={
-                                    previewFavicon || settings?.favicon || null
+                                    faviconRemoved
+                                        ? null
+                                        : previewFavicon ||
+                                          settings?.favicon ||
+                                          null
                                 }
                                 fallbackIcon={Globe}
                                 avatarClass="h-14 w-14 rounded-lg"
                                 onFileChange={(file) => {
                                     setData('favicon', file);
                                     readPreview(file, setPreviewFavicon);
+                                    setFaviconRemoved(false);
                                 }}
                                 onClear={() => {
                                     setPreviewFavicon(null);
                                     setData('favicon', null);
+                                    setFaviconRemoved(true);
                                 }}
                             />
                         </div>

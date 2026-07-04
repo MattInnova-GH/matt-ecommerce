@@ -24,6 +24,8 @@ class SettingController extends Controller
             'site_name' => 'required|string|max:255',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,svg,webp|max:2048',
             'favicon' => 'nullable|image|mimes:jpg,jpeg,png,svg,ico|max:1024',
+            'remove_logo' => 'nullable|boolean',
+            'remove_favicon' => 'nullable|boolean',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
@@ -32,6 +34,8 @@ class SettingController extends Controller
             'whatsapp' => 'nullable|url|max:255',
             'tiktok' => 'nullable|url|max:255',
         ]);
+
+        unset($validated['remove_logo'], $validated['remove_favicon']);
 
         $setting = Setting::first();
 
@@ -46,6 +50,11 @@ class SettingController extends Controller
             }
             $path = $request->file('logo')->store('settings', 'public');
             $validated['logo'] = '/storage/'.$path;
+        } elseif ($request->boolean('remove_logo')) {
+            if ($setting->logo && file_exists(public_path($setting->logo))) {
+                unlink(public_path($setting->logo));
+            }
+            $validated['logo'] = null;
         }
 
         // Subir favicon
@@ -55,6 +64,11 @@ class SettingController extends Controller
             }
             $path = $request->file('favicon')->store('settings', 'public');
             $validated['favicon'] = '/storage/'.$path;
+        } elseif ($request->boolean('remove_favicon')) {
+            if ($setting->favicon && file_exists(public_path($setting->favicon))) {
+                unlink(public_path($setting->favicon));
+            }
+            $validated['favicon'] = null;
         }
 
         $setting->fill($validated);

@@ -5,10 +5,12 @@ import AdminLayout from '@/layouts/AdminLayout';
 import 'leaflet/dist/leaflet.css';
 import AppLayout from './layouts/AppLayout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
 createInertiaApp({
-    title: (title) => (title ? `${title}` : appName),
+    // No usamos VITE_APP_NAME como fallback porque queda fijo desde el
+    // build y no refleja el nombre configurado en Configuracion. Si la
+    // pagina no define un titulo propio, se conserva el que ya haya en
+    // el documento (el que Laravel renderizo con el nombre real).
+    title: (title) => (title ? `${title}` : document.title),
     layout: (name) => {
         // User Pages
         if (name.startsWith('User/')) {

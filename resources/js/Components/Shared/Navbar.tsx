@@ -230,7 +230,7 @@ function MobileDrawer({
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex flex-1 flex-col overflow-y-auto">
                     <div className="space-y-1 p-4">
                         {menuItems.map((item) => (
                             <Link
@@ -248,8 +248,8 @@ function MobileDrawer({
                         ))}
                     </div>
 
-                    {/* Datos del footer, al final del menú */}
-                    <div className="mt-2 space-y-5 border-t border-gray-100 p-4">
+                    {/* Datos del footer, siempre al final del menú */}
+                    <div className="mt-auto space-y-5 border-t border-gray-100 p-4">
                         <div className="flex gap-3">
                             {settings?.facebook && (
                                 <a
