@@ -9,7 +9,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <>
             <Navbar />
             <main>{children}</main>
-            <Footer />
+            <div className="hidden lg:block">
+                <Footer />
+            </div>
             <AuthModal />
             <Chatbot />
             <Toaster richColors />

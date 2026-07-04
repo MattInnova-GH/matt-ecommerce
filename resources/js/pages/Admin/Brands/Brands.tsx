@@ -106,8 +106,8 @@ export default function Brands({ brands }: Props) {
                 </div>
             </div>
 
-            {/* Tabla */}
-            <div className="rounded-lg border">
+            {/* Tabla (desktop) */}
+            <div className="hidden overflow-x-auto rounded-lg border lg:block">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -194,6 +194,69 @@ export default function Brands({ brands }: Props) {
                         )}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Cards (mobile) */}
+            <div className="grid gap-3 lg:hidden">
+                {filtered.length === 0 ? (
+                    <div className="rounded-lg border py-8 text-center text-muted-foreground">
+                        No se encontraron marcas
+                    </div>
+                ) : (
+                    filtered.map((brand) => (
+                        <Card key={brand.id}>
+                            <CardContent className="flex items-center gap-3 p-4">
+                                <Avatar className="h-10 w-10 shrink-0">
+                                    <AvatarImage
+                                        src={
+                                            '/storage/' + brand.logo ||
+                                            undefined
+                                        }
+                                        alt={brand.name}
+                                    />
+                                    <AvatarFallback>
+                                        {brand.name
+                                            .split(' ')
+                                            .map((word) => word[0])
+                                            .join('')
+                                            .toUpperCase()
+                                            .slice(0, 2)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate font-medium">
+                                        {brand.name}
+                                    </p>
+                                    <Badge
+                                        variant="secondary"
+                                        className="mt-1 gap-1"
+                                    >
+                                        <Package className="h-3 w-3" />
+                                        {brand.products_count || 0} productos
+                                    </Badge>
+                                </div>
+                                <div className="flex shrink-0 items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setEditBrand(brand)}
+                                        className="h-8 w-8"
+                                    >
+                                        <Edit size={16} />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setDeleteBrand(brand)}
+                                        className="h-8 w-8 text-red-500 hover:text-red-700"
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
             </div>
 
             {/* Modales */}

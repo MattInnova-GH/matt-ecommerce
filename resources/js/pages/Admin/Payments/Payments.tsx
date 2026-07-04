@@ -249,6 +249,72 @@ export default function Payments({ payments }: PaymentsProps) {
         (payment.order?.status === 'REJECTED' ||
             payment.order?.status === 'CANCELLED');
 
+    const PaymentActionsMenu = ({ payment }: { payment: Payment }) => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Abrir menú</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+                {payment.status === 'PENDING' && (
+                    <>
+                        <DropdownMenuItem
+                            className="cursor-pointer gap-2 text-emerald-600 focus:text-emerald-600"
+                            onClick={() => handleApprove(payment)}
+                        >
+                            <CheckCircle className="h-4 w-4" />
+                            Aprobar pago
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="cursor-pointer gap-2 text-rose-600 focus:text-rose-600"
+                            onClick={() => handleReject(payment)}
+                        >
+                            <XCircle className="h-4 w-4" />
+                            Rechazar pago
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                    </>
+                )}
+                {payment.receipt_url && (
+                    <DropdownMenuItem
+                        className="cursor-pointer gap-2"
+                        onClick={() => {
+                            setSelectedPayment(payment);
+                            setShowReceiptDialog(true);
+                        }}
+                    >
+                        <Eye className="h-4 w-4" />
+                        Ver orden de compra
+                    </DropdownMenuItem>
+                )}
+                {canBeRefunded(payment) && (
+                    <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            className="cursor-pointer gap-2 text-sky-600 focus:text-sky-600"
+                            onClick={() => {
+                                refundForm.reset();
+                                setRefundPrompt(payment);
+                            }}
+                        >
+                            <RefreshCw className="h-4 w-4" />
+                            Marcar como reembolsado
+                        </DropdownMenuItem>
+                    </>
+                )}
+                <DropdownMenuItem
+                    className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+                    onClick={() => handleDelete(payment)}
+                >
+                    <XCircle className="h-4 w-4" />
+                    Eliminar
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString('es-ES', {
             day: '2-digit',
@@ -363,7 +429,7 @@ export default function Payments({ payments }: PaymentsProps) {
 
                     {/* Filtros */}
                     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex flex-1 gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-1 sm:flex-row">
                             <div className="relative flex-1">
                                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
@@ -379,7 +445,7 @@ export default function Payments({ payments }: PaymentsProps) {
                                 value={statusFilter}
                                 onValueChange={setStatusFilter}
                             >
-                                <SelectTrigger className="w-45">
+                                <SelectTrigger className="w-full sm:w-45">
                                     <SelectValue placeholder="Estado" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -399,7 +465,7 @@ export default function Payments({ payments }: PaymentsProps) {
                                 value={methodFilter}
                                 onValueChange={setMethodFilter}
                             >
-                                <SelectTrigger className="w-50">
+                                <SelectTrigger className="w-full sm:w-50">
                                     <SelectValue placeholder="Método de pago" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -416,9 +482,9 @@ export default function Payments({ payments }: PaymentsProps) {
                         </div>
                     </div>
 
-                    {/* Tabla */}
+                    {/* Tabla (desktop) */}
                     <Card className="overflow-hidden shadow-sm">
-                        <div className="overflow-x-auto">
+                        <div className="hidden overflow-x-auto lg:block">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="border-b bg-muted/30">
@@ -519,109 +585,101 @@ export default function Payments({ payments }: PaymentsProps) {
                                                 {formatDate(payment.created_at)}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger
-                                                        asChild
-                                                    >
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8"
-                                                        >
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                            <span className="sr-only">
-                                                                Abrir menú
-                                                            </span>
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent
-                                                        align="end"
-                                                        className="w-48"
-                                                    >
-                                                        {payment.status ===
-                                                            'PENDING' && (
-                                                            <>
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer gap-2 text-emerald-600 focus:text-emerald-600"
-                                                                    onClick={() =>
-                                                                        handleApprove(
-                                                                            payment,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <CheckCircle className="h-4 w-4" />
-                                                                    Aprobar pago
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer gap-2 text-rose-600 focus:text-rose-600"
-                                                                    onClick={() =>
-                                                                        handleReject(
-                                                                            payment,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <XCircle className="h-4 w-4" />
-                                                                    Rechazar
-                                                                    pago
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuSeparator />
-                                                            </>
-                                                        )}
-                                                        {payment.receipt_url && (
-                                                            <DropdownMenuItem
-                                                                className="cursor-pointer gap-2"
-                                                                onClick={() => {
-                                                                    setSelectedPayment(
-                                                                        payment,
-                                                                    );
-                                                                    setShowReceiptDialog(
-                                                                        true,
-                                                                    );
-                                                                }}
-                                                            >
-                                                                <Eye className="h-4 w-4" />
-                                                                Ver orden de
-                                                                compra
-                                                            </DropdownMenuItem>
-                                                        )}
-                                                        {canBeRefunded(
-                                                            payment,
-                                                        ) && (
-                                                            <>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem
-                                                                    className="cursor-pointer gap-2 text-sky-600 focus:text-sky-600"
-                                                                    onClick={() => {
-                                                                        refundForm.reset();
-                                                                        setRefundPrompt(
-                                                                            payment,
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    <RefreshCw className="h-4 w-4" />
-                                                                    Marcar como
-                                                                    reembolsado
-                                                                </DropdownMenuItem>
-                                                            </>
-                                                        )}
-                                                        <DropdownMenuItem
-                                                            className="cursor-pointer gap-2 text-destructive focus:text-destructive"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    payment,
-                                                                )
-                                                            }
-                                                        >
-                                                            <XCircle className="h-4 w-4" />
-                                                            Eliminar
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <PaymentActionsMenu
+                                                    payment={payment}
+                                                />
                                             </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
+                        </div>
+
+                        {/* Cards (mobile) */}
+                        <div className="grid gap-3 p-4 lg:hidden">
+                            {filtered.map((payment) => (
+                                <Card key={payment.id} className="shadow-none">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div>
+                                                <p className="font-medium">
+                                                    #{payment.order_id} ·{' '}
+                                                    {payment.order?.user
+                                                        ?.first_name || 'N/A'}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {payment.order?.user
+                                                        ?.email ||
+                                                        'Sin email'}
+                                                </p>
+                                            </div>
+                                            <PaymentActionsMenu
+                                                payment={payment}
+                                            />
+                                        </div>
+
+                                        <div className="mt-3 flex items-center justify-between">
+                                            <span className="text-lg font-semibold">
+                                                {formatAmount(
+                                                    payment.amount as number,
+                                                )}
+                                            </span>
+                                            <MethodIcon
+                                                method={payment.method}
+                                            />
+                                        </div>
+
+                                        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                                            <StatusBadge
+                                                status={payment.status}
+                                            />
+                                            {payment.refunded_at && (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="gap-1.5 border-sky-200 bg-sky-50 text-sky-700"
+                                                >
+                                                    <RefreshCw className="h-3 w-3" />
+                                                    Reembolsado
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+                                            <span>
+                                                {formatDate(
+                                                    payment.created_at,
+                                                )}
+                                            </span>
+                                            {payment.receipt_url ? (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setSelectedPayment(
+                                                            payment,
+                                                        );
+                                                        setShowReceiptDialog(
+                                                            true,
+                                                        );
+                                                    }}
+                                                    className="h-auto gap-1.5 p-0 text-xs"
+                                                >
+                                                    <Eye className="h-3.5 w-3.5" />
+                                                    Ver orden de compra
+                                                </Button>
+                                            ) : (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="gap-1"
+                                                >
+                                                    <AlertCircle className="h-3 w-3" />
+                                                    Sin comprobante
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
                         </div>
 
                         {filtered.length === 0 && (

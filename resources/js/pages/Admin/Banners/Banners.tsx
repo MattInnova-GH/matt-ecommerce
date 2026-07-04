@@ -221,8 +221,8 @@ export default function Banners({ banners: initialBanners }: Props) {
                     />
                 </div>
 
-                {/* Table */}
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                {/* Table (desktop) */}
+                <div className="hidden overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm lg:block">
                     <Table>
                         <TableHeader>
                             <TableRow className="border-b border-gray-200 bg-gray-50">
@@ -383,6 +383,135 @@ export default function Banners({ banners: initialBanners }: Props) {
                             )}
                         </TableBody>
                     </Table>
+                </div>
+
+                {/* Cards (mobile) */}
+                <div className="grid gap-3 lg:hidden">
+                    {filtered.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-16 text-center text-gray-500 shadow-sm">
+                            <ImageIcon className="mb-2 h-12 w-12 opacity-50" />
+                            <p>No se encontraron banners</p>
+                        </div>
+                    ) : (
+                        filtered.map((banner) => (
+                            <Card key={banner.id} className="border-0 shadow-sm">
+                                <CardContent className="p-4">
+                                    <div className="flex gap-3">
+                                        <div className="relative h-16 w-28 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                                            {banner.image_path ? (
+                                                <img
+                                                    src={
+                                                        '/storage/' +
+                                                        banner.image_path
+                                                    }
+                                                    alt={banner.type}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center">
+                                                    <ImageIcon className="h-6 w-6 text-gray-400" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                <Badge
+                                                    className={
+                                                        TYPE_COLORS[
+                                                            banner.type
+                                                        ]
+                                                    }
+                                                >
+                                                    {TYPE_LABELS[banner.type]}
+                                                </Badge>
+                                                <Badge
+                                                    className={
+                                                        banner.is_active
+                                                            ? 'border-green-200 bg-green-100 text-green-700'
+                                                            : 'border-gray-200 bg-gray-100 text-gray-600'
+                                                    }
+                                                >
+                                                    {banner.is_active
+                                                        ? 'Activo'
+                                                        : 'Inactivo'}
+                                                </Badge>
+                                            </div>
+                                            <div className="mt-2 flex items-center gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={() =>
+                                                        moveUp(banner)
+                                                    }
+                                                    disabled={
+                                                        banner.order === 1
+                                                    }
+                                                >
+                                                    ↑
+                                                </Button>
+                                                <span className="text-sm font-medium text-gray-500">
+                                                    #{banner.order}
+                                                </span>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={() =>
+                                                        moveDown(banner)
+                                                    }
+                                                    disabled={
+                                                        banner.order ===
+                                                        banners.length
+                                                    }
+                                                >
+                                                    ↓
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 flex items-center justify-end gap-1 border-t border-gray-100 pt-3">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() =>
+                                                handleToggleStatus(banner)
+                                            }
+                                            className="h-8 w-8 hover:bg-gray-100"
+                                            title={
+                                                banner.is_active
+                                                    ? 'Desactivar'
+                                                    : 'Activar'
+                                            }
+                                        >
+                                            {banner.is_active ? (
+                                                <EyeOff className="h-4 w-4 text-gray-500" />
+                                            ) : (
+                                                <Eye className="h-4 w-4 text-green-600" />
+                                            )}
+                                        </Button>
+                                        <EditBannerModal banner={banner} />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() =>
+                                                setDeletingBanner(banner)
+                                            }
+                                            className="h-8 w-8 text-red-600 hover:bg-red-50"
+                                            disabled={!canDelete}
+                                            title={
+                                                !canDelete
+                                                    ? 'Mínimo 2 banners requeridos'
+                                                    : ''
+                                            }
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))
+                    )}
                 </div>
 
                 {/* Recomendaciones */}

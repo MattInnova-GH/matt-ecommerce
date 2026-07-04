@@ -442,64 +442,110 @@ export default function Dashboard({
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader className="bg-slate-50/50">
-                            <TableRow>
-                                <TableHead className="font-semibold">
-                                    Nº Pedido
-                                </TableHead>
-                                <TableHead className="font-semibold">
-                                    Cliente
-                                </TableHead>
-                                <TableHead className="font-semibold">
-                                    Estado
-                                </TableHead>
-                                <TableHead className="text-right font-semibold">
-                                    Total
-                                </TableHead>
-                                <TableHead className="text-right font-semibold">
-                                    Fecha
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {recentOrders.map((order) => (
-                                <TableRow
+                    {/* Tabla (desktop) */}
+                    <div className="hidden overflow-x-auto md:block">
+                        <Table>
+                            <TableHeader className="bg-slate-50/50">
+                                <TableRow>
+                                    <TableHead className="font-semibold">
+                                        Nº Pedido
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Cliente
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Estado
+                                    </TableHead>
+                                    <TableHead className="text-right font-semibold">
+                                        Total
+                                    </TableHead>
+                                    <TableHead className="text-right font-semibold">
+                                        Fecha
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {recentOrders.map((order) => (
+                                    <TableRow
+                                        key={order.id}
+                                        className="transition-colors hover:bg-slate-50/50"
+                                    >
+                                        <TableCell className="font-medium">
+                                            {order.order_number}
+                                        </TableCell>
+                                        <TableCell>
+                                            {order.customer}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                className={`border ${STATUS_COLORS[order.status] || 'bg-slate-100'} font-medium`}
+                                            >
+                                                {order.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right font-bold">
+                                            {formatCurrency(order.total)}
+                                        </TableCell>
+                                        <TableCell className="flex items-center justify-end gap-1 text-right text-muted-foreground">
+                                            <Clock className="size-3" />{' '}
+                                            {order.date}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {recentOrders.length === 0 && (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={5}
+                                            className="h-24 text-center text-muted-foreground"
+                                        >
+                                            No hay pedidos registrados.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+
+                    {/* Cards (mobile) */}
+                    <div className="grid gap-3 md:hidden">
+                        {recentOrders.length === 0 ? (
+                            <p className="py-8 text-center text-sm text-muted-foreground">
+                                No hay pedidos registrados.
+                            </p>
+                        ) : (
+                            recentOrders.map((order) => (
+                                <div
                                     key={order.id}
-                                    className="transition-colors hover:bg-slate-50/50"
+                                    className="rounded-lg border p-3"
                                 >
-                                    <TableCell className="font-medium">
-                                        {order.order_number}
-                                    </TableCell>
-                                    <TableCell>{order.customer}</TableCell>
-                                    <TableCell>
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p className="font-medium">
+                                                {order.order_number}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {order.customer}
+                                            </p>
+                                        </div>
                                         <Badge
                                             className={`border ${STATUS_COLORS[order.status] || 'bg-slate-100'} font-medium`}
                                         >
                                             {order.status}
                                         </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right font-bold">
-                                        {formatCurrency(order.total)}
-                                    </TableCell>
-                                    <TableCell className="flex items-center justify-end gap-1 text-right text-muted-foreground">
-                                        <Clock className="size-3" />{' '}
-                                        {order.date}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {recentOrders.length === 0 && (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={5}
-                                        className="h-24 text-center text-muted-foreground"
-                                    >
-                                        No hay pedidos registrados.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                                    </div>
+                                    <div className="mt-2 flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-1 text-muted-foreground">
+                                            <Clock className="size-3" />
+                                            {order.date}
+                                        </span>
+                                        <span className="font-bold">
+                                            {formatCurrency(order.total)}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </CardContent>
             </Card>
         </div>

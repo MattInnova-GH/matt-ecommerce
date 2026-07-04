@@ -197,6 +197,54 @@ export default function Users({ users, roles }: Props) {
         return colors[roleName] || 'bg-gray-100 text-gray-700';
     };
 
+    const UserActionsMenu = ({ user }: { user: User }) => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onClick={() => {
+                        setSelectedUser(user);
+                        setSelectedRole(user.roles[0]?.name || '');
+                        setShowRoleDialog(true);
+                    }}
+                >
+                    <Shield className="mr-2 h-4 w-4" />
+                    Cambiar Rol
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={() => setUserToBlock(user)}
+                    className="text-orange-600"
+                >
+                    {user.is_active ? (
+                        <>
+                            <Ban className="mr-2 h-4 w-4" /> Bloquear
+                            Usuario
+                        </>
+                    ) : (
+                        <>
+                            <RefreshCw className="mr-2 h-4 w-4" /> Desbloquear
+                            Usuario
+                        </>
+                    )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onClick={() => setUserToDelete(user)}
+                    className="text-red-600"
+                >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar Usuario
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -274,8 +322,8 @@ export default function Users({ users, roles }: Props) {
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="rounded-lg border bg-white">
+            {/* Table (desktop) */}
+            <div className="hidden overflow-x-auto rounded-lg border bg-white lg:block">
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-gray-50">
@@ -385,69 +433,98 @@ export default function Users({ users, roles }: Props) {
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    className="h-8 w-8 p-0"
-                                                >
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>
-                                                    Acciones
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onClick={() => {
-                                                        setSelectedUser(user);
-                                                        setSelectedRole(
-                                                            user.roles[0]
-                                                                ?.name || '',
-                                                        );
-                                                        setShowRoleDialog(true);
-                                                    }}
-                                                >
-                                                    <Shield className="mr-2 h-4 w-4" />
-                                                    Cambiar Rol
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() =>
-                                                        setUserToBlock(user)
-                                                    }
-                                                    className="text-orange-600"
-                                                >
-                                                    {user.is_active ? (
-                                                        <>
-                                                            <Ban className="mr-2 h-4 w-4" />{' '}
-                                                            Bloquear Usuario
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <RefreshCw className="mr-2 h-4 w-4" />{' '}
-                                                            Desbloquear Usuario
-                                                        </>
-                                                    )}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onClick={() =>
-                                                        setUserToDelete(user)
-                                                    }
-                                                    className="text-red-600"
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Eliminar Usuario
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <UserActionsMenu user={user} />
                                     </TableCell>
                                 </TableRow>
                             ))
                         )}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Cards (mobile) */}
+            <div className="grid gap-3 lg:hidden">
+                {filtered.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-lg border bg-white py-16 text-center text-gray-500">
+                        <UsersIcon className="mb-2 h-8 w-8" />
+                        <p>No se encontraron usuarios</p>
+                    </div>
+                ) : (
+                    filtered.map((user) => (
+                        <Card key={user.id}>
+                            <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage
+                                                src={user.avatar || undefined}
+                                            />
+                                            <AvatarFallback className="bg-indigo-100 text-indigo-600">
+                                                {getInitials(
+                                                    user.first_name,
+                                                    user.last_name,
+                                                )}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-medium text-gray-900">
+                                                {user.first_name}{' '}
+                                                {user.last_name}
+                                            </p>
+                                            {user.phone && (
+                                                <p className="text-xs text-gray-500">
+                                                    {user.phone}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <UserActionsMenu user={user} />
+                                </div>
+
+                                <div className="mt-3 flex items-center gap-2">
+                                    <Mail className="h-3 w-3 shrink-0 text-gray-400" />
+                                    <span className="truncate text-sm">
+                                        {user.email}
+                                    </span>
+                                    {user.email_verified_at && (
+                                        <CheckCircle className="h-3 w-3 shrink-0 text-green-500" />
+                                    )}
+                                </div>
+
+                                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                                    {user.roles.map((role) => (
+                                        <Badge
+                                            key={role.id}
+                                            className={getRoleBadgeColor(
+                                                role.name,
+                                            )}
+                                        >
+                                            {role.name === 'admin'
+                                                ? 'Administrador'
+                                                : role.name === 'seller'
+                                                  ? 'Vendedor'
+                                                  : 'Cliente'}
+                                        </Badge>
+                                    ))}
+                                    {user.is_active ? (
+                                        <Badge className="bg-green-100 text-green-700">
+                                            Activo
+                                        </Badge>
+                                    ) : (
+                                        <Badge className="bg-red-100 text-red-700">
+                                            Bloqueado
+                                        </Badge>
+                                    )}
+                                </div>
+
+                                <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                                    <Calendar className="h-3 w-3" />
+                                    {formatDate(user.created_at)}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
             </div>
 
             {/* Change Role Dialog */}

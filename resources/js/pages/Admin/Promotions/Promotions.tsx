@@ -165,7 +165,7 @@ function CreateModal({
                                 </div>
 
                                 {/* Tipo y valor de descuento */}
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700">
                                             Tipo de descuento{' '}
@@ -212,7 +212,7 @@ function CreateModal({
                                 </div>
 
                                 {/* Fechas */}
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700">
                                             Fecha inicio{' '}
@@ -442,7 +442,7 @@ function EditModal({
                                 </div>
 
                                 {/* Tipo y valor */}
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700">
                                             Tipo de descuento{' '}
@@ -493,7 +493,7 @@ function EditModal({
                                 </div>
 
                                 {/* Fechas */}
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700">
                                             Fecha inicio{' '}
@@ -781,8 +781,9 @@ export default function Promotions({ promotions, categories }: Props) {
                 </div>
             </div>
 
-            {/* Tabla */}
-            <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+            {/* Tabla (desktop) */}
+            <div className="hidden overflow-hidden rounded-2xl bg-white shadow-sm lg:block">
+                <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead className="border-b border-gray-200 bg-gray-50">
                         <tr>
@@ -910,7 +911,86 @@ export default function Promotions({ promotions, categories }: Props) {
                         ))}
                     </tbody>
                 </table>
+                </div>
+            </div>
 
+            {/* Cards (mobile) */}
+            <div className="grid gap-3 lg:hidden">
+                {filtered.map((promotion) => (
+                    <div
+                        key={promotion.id}
+                        className="rounded-2xl bg-white p-4 shadow-sm"
+                    >
+                        <div className="flex items-start gap-3">
+                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-pink-100">
+                                <Tag size={18} className="text-purple-600" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="font-medium text-gray-900">
+                                    {promotion.name}
+                                </p>
+                                {promotion.description && (
+                                    <p className="truncate text-xs text-gray-400">
+                                        {promotion.description}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="flex shrink-0 items-center gap-1">
+                                <button
+                                    onClick={() =>
+                                        setEditPromotion(promotion)
+                                    }
+                                    className="rounded-lg p-2 text-blue-400 hover:bg-blue-50"
+                                    title="Editar"
+                                >
+                                    <Edit size={16} />
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setDeletePromotion(promotion)
+                                    }
+                                    className="rounded-lg p-2 text-red-400 hover:bg-red-50"
+                                    title="Eliminar"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                                <FolderTree size={12} />
+                                {promotion.category?.name ?? '—'}
+                            </span>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-sm font-bold text-amber-700">
+                                {promotion.discount_type === 'percentage' ? (
+                                    <Percent size={14} />
+                                ) : (
+                                    <DollarSign size={14} />
+                                )}
+                                {promotion.discount_type === 'percentage'
+                                    ? `${promotion.discount_value}%`
+                                    : `S/ ${promotion.discount_value}`}
+                            </span>
+                            <button
+                                onClick={() =>
+                                    router.put(toggleStatus.url(promotion.id))
+                                }
+                                title="Click para cambiar estado"
+                            >
+                                <StatusBadge promotion={promotion} />
+                            </button>
+                        </div>
+                        <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-600">
+                            <Calendar size={13} className="text-gray-400" />
+                            <span>{formatDate(promotion.starts_at)}</span>
+                            <span className="text-gray-300">→</span>
+                            <span>{formatDate(promotion.ends_at)}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm lg:mt-0">
                 {filtered.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-16">
                         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-100">
@@ -933,12 +1013,12 @@ export default function Promotions({ promotions, categories }: Props) {
 
                 {/* Paginación */}
                 {promotions.links.length > 3 && (
-                    <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+                    <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row">
                         <span className="text-sm text-gray-500">
                             Mostrando {promotions.from}-{promotions.to} de{' '}
                             {promotions.total}
                         </span>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {promotions.links.map((link, i) => (
                                 <Link
                                     key={i}

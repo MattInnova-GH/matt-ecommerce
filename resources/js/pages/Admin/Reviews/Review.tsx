@@ -159,6 +159,36 @@ export default function Review({ reviews }: Props) {
         );
     };
 
+    const ReviewActionsMenu = ({ review }: { review: Review }) => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {!review.is_approved && (
+                    <DropdownMenuItem
+                        onClick={() => setReviewToApprove(review)}
+                        className="text-green-600"
+                    >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Aceptar Reseña
+                    </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                    onClick={() => setReviewToDelete(review)}
+                    className="text-red-600"
+                >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar Reseña
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+
     const handleDelete = () => {
         if (!reviewToDelete) {
             return;
@@ -350,8 +380,8 @@ export default function Review({ reviews }: Props) {
                 </Select>
             </div>
 
-            {/* Table */}
-            <div className="rounded-lg border bg-white">
+            {/* Table (desktop) */}
+            <div className="hidden overflow-x-auto rounded-lg border bg-white lg:block">
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-gray-50">
@@ -538,52 +568,176 @@ export default function Review({ reviews }: Props) {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    className="h-8 w-8 p-0"
-                                                >
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>
-                                                    Acciones
-                                                </DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                {!review.is_approved && (
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            setReviewToApprove(
-                                                                review,
-                                                            )
-                                                        }
-                                                        className="text-green-600"
-                                                    >
-                                                        <CheckCircle className="mr-2 h-4 w-4" />
-                                                        Aceptar Reseña
-                                                    </DropdownMenuItem>
-                                                )}
-                                                <DropdownMenuItem
-                                                    onClick={() =>
-                                                        setReviewToDelete(
-                                                            review,
-                                                        )
-                                                    }
-                                                    className="text-red-600"
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Eliminar Reseña
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        <ReviewActionsMenu review={review} />
                                     </TableCell>
                                 </TableRow>
                             ))
                         )}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Cards (mobile) */}
+            <div className="grid gap-3 lg:hidden">
+                {filtered.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-lg border bg-white py-16 text-center text-gray-500">
+                        <MessageCircle className="mb-2 h-8 w-8" />
+                        <p>No se encontraron reseñas</p>
+                    </div>
+                ) : (
+                    filtered.map((review) => (
+                        <Card key={review.id}>
+                            <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-2">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarImage
+                                                src={
+                                                    review.user.avatar ||
+                                                    undefined
+                                                }
+                                            />
+                                            <AvatarFallback className="bg-indigo-100 text-xs text-indigo-600">
+                                                {review.user.first_name.charAt(
+                                                    0,
+                                                )}
+                                                {review.user.last_name.charAt(
+                                                    0,
+                                                )}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                {review.user.first_name}{' '}
+                                                {review.user.last_name}
+                                            </p>
+                                            <p className="text-xs text-gray-500">
+                                                {review.user.email}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <ReviewActionsMenu review={review} />
+                                </div>
+
+                                <div className="mt-3 flex items-center gap-2">
+                                    {review.product.image ? (
+                                        <img
+                                            src={
+                                                '/storage/' +
+                                                review.product.image
+                                            }
+                                            alt={review.product.name}
+                                            className="h-10 w-10 shrink-0 rounded object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-gray-100">
+                                            <Package className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                    )}
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium">
+                                            {review.product.name}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            S/ {review.product.price}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-3 space-y-1">
+                                    {renderStars(review.rating)}
+                                    <p className="text-xs text-gray-500">
+                                        {review.rating} de 5 estrellas
+                                    </p>
+                                </div>
+
+                                <div className="mt-3">
+                                    <p className="line-clamp-3 text-sm text-gray-600">
+                                        {review.comment}
+                                    </p>
+                                    {review.comment.length > 100 && (
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    variant="link"
+                                                    className="h-auto p-0 text-xs"
+                                                >
+                                                    Ver más
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>
+                                                        Comentario completo
+                                                    </DialogTitle>
+                                                </DialogHeader>
+                                                <div className="mt-4">
+                                                    <div className="mb-4 flex items-center gap-2">
+                                                        <Avatar className="h-10 w-10">
+                                                            <AvatarImage
+                                                                src={
+                                                                    review.user
+                                                                        .avatar ||
+                                                                    undefined
+                                                                }
+                                                            />
+                                                            <AvatarFallback>
+                                                                {review.user.first_name.charAt(
+                                                                    0,
+                                                                )}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                        <div>
+                                                            <p className="font-medium">
+                                                                {
+                                                                    review.user
+                                                                        .first_name
+                                                                }{' '}
+                                                                {
+                                                                    review.user
+                                                                        .last_name
+                                                                }
+                                                            </p>
+                                                            <div className="flex items-center gap-2">
+                                                                {renderStars(
+                                                                    review.rating,
+                                                                )}
+                                                                <span className="text-xs text-gray-500">
+                                                                    {formatDate(
+                                                                        review.created_at,
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-gray-700">
+                                                        {review.comment}
+                                                    </p>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    )}
+                                </div>
+
+                                <div className="mt-3 flex items-center justify-between">
+                                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                                        <Calendar className="h-3 w-3" />
+                                        {formatDate(review.created_at)}
+                                    </div>
+                                    {review.is_approved ? (
+                                        <Badge className="bg-green-100 text-green-700">
+                                            Aprobada
+                                        </Badge>
+                                    ) : (
+                                        <Badge className="bg-yellow-100 text-yellow-700">
+                                            Pendiente
+                                        </Badge>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
             </div>
 
             {/* Delete Confirmation */}

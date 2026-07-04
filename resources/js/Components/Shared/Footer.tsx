@@ -30,7 +30,7 @@ export default function Footer() {
                                 <img
                                     src={settings.logo}
                                     alt={settings.site_name || 'Logo'}
-                                    className="h-10 w-auto object-contain brightness-0 invert"
+                                    className="h-10 w-auto rounded bg-white/95 object-contain p-1"
                                 />
                             ) : (
                                 <span className="text-xl font-bold tracking-tight text-white">

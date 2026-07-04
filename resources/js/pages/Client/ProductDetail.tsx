@@ -357,7 +357,7 @@ export default function ProductDetail({
                                 )}
                             </Dialog>
                             {allImages.length > 1 && (
-                                <div className="grid grid-cols-5 gap-2">
+                                <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
                                     {allImages.map((img, index) => {
                                         const imgUrl = img.image_url.startsWith(
                                             'http',

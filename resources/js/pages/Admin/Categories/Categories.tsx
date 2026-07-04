@@ -99,8 +99,9 @@ export default function Categories({
                 </div>
             </div>
 
-            {/* Tabla */}
-            <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+            {/* Tabla (desktop) */}
+            <div className="hidden overflow-hidden rounded-2xl bg-white shadow-sm lg:block">
+                <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead className="border-b border-gray-200 bg-gray-50">
                         <tr>
@@ -195,7 +196,82 @@ export default function Categories({
                         ))}
                     </tbody>
                 </table>
+                </div>
+            </div>
 
+            {/* Cards (mobile) */}
+            <div className="grid gap-3 lg:hidden">
+                {filtered.map((category) => (
+                    <div
+                        key={category.id}
+                        className="rounded-2xl bg-white p-4 shadow-sm"
+                    >
+                        <div className="flex items-start gap-3">
+                            {category.image ? (
+                                <img
+                                    src={'/storage/' + category.image}
+                                    className="h-12 w-12 shrink-0 rounded-lg object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                                    <FolderTree className="h-6 w-6 text-gray-400" />
+                                </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate font-medium text-gray-900">
+                                    {category.name}
+                                </p>
+                                <code className="mt-0.5 inline-block rounded bg-gray-100 px-2 py-0.5 text-xs">
+                                    {category.slug}
+                                </code>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-1">
+                                <button
+                                    onClick={() => setEditCategory(category)}
+                                    className="rounded-lg p-2 text-blue-400 hover:bg-blue-50"
+                                >
+                                    <Edit size={16} />
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setDeleteCategory(category)
+                                    }
+                                    className="rounded-lg p-2 text-red-400 hover:bg-red-50"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <button
+                                onClick={() =>
+                                    router.put(
+                                        admin.categories.toggleStatus(
+                                            category.id,
+                                        ),
+                                    )
+                                }
+                            >
+                                {category.is_active ? (
+                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
+                                        <CheckCircle size={12} /> Activo
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
+                                        <XCircle size={12} /> Inactivo
+                                    </span>
+                                )}
+                            </button>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700">
+                                <Package size={12} /> {category.products_count}{' '}
+                                productos
+                            </span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-sm lg:mt-0">
                 {filtered.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-12">
                         <FolderTree className="h-16 w-16 text-gray-300" />
@@ -213,12 +289,12 @@ export default function Categories({
 
                 {/* Paginación */}
                 {categories.links.length > 3 && (
-                    <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+                    <div className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row">
                         <span className="text-sm text-gray-500">
                             Mostrando {categories.from}-{categories.to} de{' '}
                             {categories.total}
                         </span>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {categories.links.map((link, i) => (
                                 <Link
                                     key={i}
