@@ -9,6 +9,7 @@ interface CartState {
     items: CartItemType[];
     openCart: () => void;
     closeCart: () => void;
+    toggleCart: () => void;
     addItem: (item: CartItemType) => void;
     removeItem: (id: number) => void;
     updateQty: (id: number, qty: number) => void;
@@ -32,6 +33,8 @@ export const useCartStore = create<CartState>()(
                 set({
                     isOpen: false,
                 }),
+
+            toggleCart: () => set({ isOpen: !get().isOpen }),
 
             addItem: (item: CartItemType) => {
                 const existingItem = get().items.find((i) => i.id === item.id);

@@ -274,7 +274,7 @@ export default function Chatbot() {
         <>
             {/* Backdrop móvil — solo visible en pantallas pequeñas */}
             <div
-                className={`fixed inset-0 z-1099 bg-black/50 transition-opacity duration-300 sm:hidden ${
+                className={`fixed inset-0 z-1010 bg-black/50 transition-opacity duration-300 sm:hidden ${
                     isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
                 onClick={() => setIsOpen(false)}
@@ -285,7 +285,7 @@ export default function Chatbot() {
                 Escritorio: panel flotante esquina inferior-derecha, ancho fijo
             */}
             <div
-                className={`fixed inset-x-0 bottom-0 z-1100 flex max-h-[90vh] flex-col rounded-t-2xl border border-gray-200 bg-white transition-all duration-300 sm:inset-auto sm:right-6 sm:bottom-24 sm:max-h-none sm:w-90 sm:rounded-2xl sm:shadow-2xl ${
+                className={`fixed inset-x-0 bottom-0 z-1020 flex max-h-[90vh] flex-col rounded-t-2xl border border-gray-200 bg-white transition-all duration-300 sm:inset-auto sm:right-6 sm:bottom-24 sm:max-h-none sm:w-90 sm:rounded-2xl sm:shadow-2xl ${
                     isOpen
                         ? 'translate-y-0 opacity-100'
                         : 'pointer-events-none translate-y-full opacity-0 sm:translate-y-3 sm:scale-95'
@@ -390,7 +390,7 @@ export default function Chatbot() {
             */}
             <button
                 onClick={() => setIsOpen((prev) => !prev)}
-                className={`fixed right-4 bottom-5 z-1100 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg shadow-black/20 transition-all hover:scale-105 active:scale-95 sm:right-6 sm:flex ${
+                className={`fixed right-4 bottom-5 z-30 h-14 w-14 items-center justify-center rounded-full bg-gray-900 shadow-lg shadow-black/20 transition-all hover:scale-105 active:scale-95 sm:right-6 sm:flex ${
                     isOpen ? 'hidden' : 'flex'
                 }`}
                 aria-label={isOpen ? 'Cerrar chat' : 'Abrir chat'}

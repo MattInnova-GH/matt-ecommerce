@@ -1,12 +1,25 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { Search, ShoppingCart, Menu, X } from 'lucide-react';
+import {
+    Search,
+    ShoppingCart,
+    Menu,
+    X,
+    Facebook,
+    Instagram,
+    MessageCircle,
+    Music,
+    Phone,
+    MapPin,
+} from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import UserMenu from './UserMenu';
 import SearchModal from './SearchModal';
 import NotificationBell from './NotificationBell';
 import CartDrawer from '@/Components/User/Cart';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthModalStore } from '@/stores/authModalStore';
+import { useBodyScrollLock } from '@/hooks/use-body-scroll-lock';
 import { products } from '@/routes';
 
 type AuthUser = {
@@ -24,7 +37,7 @@ export default function Navbar() {
     const { settings } = props as any;
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { openCart, totalItems } = useCartStore();
+    const { toggleCart, totalItems } = useCartStore();
     const openAuthModal = useAuthModalStore((state) => state.open);
     const cartCount = totalItems();
 
@@ -74,7 +87,7 @@ export default function Navbar() {
 
                             {/* CART BUTTON */}
                             <button
-                                onClick={openCart}
+                                onClick={toggleCart}
                                 className="relative transition hover:opacity-60"
                             >
                                 <ShoppingCart size={20} />
@@ -95,10 +108,21 @@ export default function Navbar() {
                             />
 
                             <button
-                                onClick={() => setIsMobileMenuOpen(true)}
+                                onClick={() =>
+                                    setIsMobileMenuOpen((prev) => !prev)
+                                }
+                                aria-label={
+                                    isMobileMenuOpen
+                                        ? 'Cerrar menú'
+                                        : 'Abrir menú'
+                                }
                                 className="rounded-lg p-2 transition hover:bg-gray-100 lg:hidden"
                             >
-                                <Menu size={22} />
+                                {isMobileMenuOpen ? (
+                                    <X size={22} />
+                                ) : (
+                                    <Menu size={22} />
+                                )}
                             </button>
                         </div>
                     </div>
@@ -155,6 +179,10 @@ function MobileDrawer({
     currentUrl: string;
 }) {
     const { settings } = usePage().props as any;
+    const currentYear = new Date().getFullYear();
+    const whatsappLink = settings?.whatsapp || 'https://wa.me/51992422219';
+
+    useBodyScrollLock(true);
     const menuItems = [
         {
             href: '/',
@@ -172,15 +200,22 @@ function MobileDrawer({
         },
     ];
 
+    const legalItems = [
+        { href: '/terminos-y-condiciones', label: 'Términos y Condiciones' },
+        { href: '/politica-de-privacidad', label: 'Política de Privacidad' },
+        { href: '/preguntas-frecuentes', label: 'Preguntas frecuentes' },
+        { href: '/libro-de-reclamaciones', label: 'Libro de Reclamaciones' },
+    ];
+
     return (
         <>
             <div
-                className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+                className="fixed inset-0 z-1010 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            <div className="fixed top-0 right-0 bottom-0 z-50 flex w-80 flex-col bg-white shadow-xl">
-                <div className="flex items-center justify-between border-b border-gray-100 p-4">
+            <div className="fixed top-0 right-0 bottom-0 z-1020 flex w-80 flex-col bg-white shadow-xl">
+                <div className="flex shrink-0 items-center justify-between border-b border-gray-100 p-4">
                     <img
                         src={settings?.logo || '/static/logo.webp'}
                         alt={settings?.site_name || 'Logo'}
@@ -194,21 +229,126 @@ function MobileDrawer({
                         <X size={22} />
                     </button>
                 </div>
-                <div className="space-y-1 p-4">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={onClose}
-                            className={`block rounded-lg px-3 py-3 transition ${
-                                currentUrl === item.href
-                                    ? 'bg-gray-100 text-black'
-                                    : 'text-gray-600 hover:bg-gray-50'
-                            }`}
+
+                <div className="flex-1 overflow-y-auto">
+                    <div className="space-y-1 p-4">
+                        {menuItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={onClose}
+                                className={`block rounded-lg px-3 py-3 transition ${
+                                    currentUrl === item.href
+                                        ? 'bg-gray-100 text-black'
+                                        : 'text-gray-600 hover:bg-gray-50'
+                                }`}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Datos del footer, al final del menú */}
+                    <div className="mt-2 space-y-5 border-t border-gray-100 p-4">
+                        <div className="flex gap-3">
+                            {settings?.facebook && (
+                                <a
+                                    href={settings.facebook}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition hover:bg-[#1877F2] hover:text-white"
+                                >
+                                    <Facebook size={18} />
+                                </a>
+                            )}
+                            {settings?.instagram && (
+                                <a
+                                    href={settings.instagram}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition hover:bg-[#E1306C] hover:text-white"
+                                >
+                                    <Instagram size={18} />
+                                </a>
+                            )}
+                            {settings?.whatsapp && (
+                                <a
+                                    href={settings.whatsapp}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition hover:bg-[#25D366] hover:text-white"
+                                >
+                                    <MessageCircle size={18} />
+                                </a>
+                            )}
+                            {settings?.tiktok && (
+                                <a
+                                    href={settings.tiktok}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition hover:bg-black hover:text-white"
+                                >
+                                    <Music size={18} />
+                                </a>
+                            )}
+                        </div>
+
+                        <a
+                            href={whatsappLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 rounded-lg bg-[#25D366]/10 px-3 py-2.5 text-sm font-medium text-[#1a9c4c] transition hover:bg-[#25D366] hover:text-white"
                         >
-                            {item.label}
-                        </Link>
-                    ))}
+                            <FaWhatsapp size={18} className="shrink-0" />
+                            Escríbenos por WhatsApp
+                        </a>
+
+                        <ul className="space-y-2.5 text-sm text-gray-600">
+                            {settings?.phone && (
+                                <li className="flex items-center gap-2.5">
+                                    <Phone
+                                        size={16}
+                                        className="shrink-0 text-gray-400"
+                                    />
+                                    <a
+                                        href={`tel:${settings.phone}`}
+                                        className="transition hover:text-black"
+                                    >
+                                        {settings.phone}
+                                    </a>
+                                </li>
+                            )}
+                            {settings?.address && (
+                                <li className="flex items-start gap-2.5">
+                                    <MapPin
+                                        size={16}
+                                        className="mt-0.5 shrink-0 text-gray-400"
+                                    />
+                                    <span>{settings.address}</span>
+                                </li>
+                            )}
+                        </ul>
+
+                        <ul className="space-y-2.5 text-sm text-gray-500">
+                            {legalItems.map((item) => (
+                                <li key={item.href}>
+                                    <Link
+                                        href={item.href}
+                                        onClick={onClose}
+                                        className="transition hover:text-black"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <p className="pt-2 text-xs text-gray-400">
+                            © {currentYear}{' '}
+                            {settings?.site_name || 'Matt Store'}. Todos los
+                            derechos reservados.
+                        </p>
+                    </div>
                 </div>
             </div>
         </>
