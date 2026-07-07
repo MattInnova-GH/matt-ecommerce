@@ -23,7 +23,7 @@ export function PaymentMethod() {
         {
             id: 'yape' as const,
             label: 'Yape',
-            description: 'Código o QR de pago',
+            description: 'QR o número de celular',
             icon: Smartphone,
         },
     ];

@@ -33,9 +33,12 @@ class SettingController extends Controller
             'instagram' => 'nullable|url|max:255',
             'whatsapp' => 'nullable|url|max:255',
             'tiktok' => 'nullable|url|max:255',
+            'yape_qr' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_yape_qr' => 'nullable|boolean',
+            'yape_number' => 'nullable|string|max:20',
         ]);
 
-        unset($validated['remove_logo'], $validated['remove_favicon']);
+        unset($validated['remove_logo'], $validated['remove_favicon'], $validated['remove_yape_qr']);
 
         $setting = Setting::first();
 
@@ -69,6 +72,20 @@ class SettingController extends Controller
                 unlink(public_path($setting->favicon));
             }
             $validated['favicon'] = null;
+        }
+
+        // Subir QR de Yape
+        if ($request->hasFile('yape_qr')) {
+            if ($setting->yape_qr && file_exists(public_path($setting->yape_qr))) {
+                unlink(public_path($setting->yape_qr));
+            }
+            $path = $request->file('yape_qr')->store('settings', 'public');
+            $validated['yape_qr'] = '/storage/'.$path;
+        } elseif ($request->boolean('remove_yape_qr')) {
+            if ($setting->yape_qr && file_exists(public_path($setting->yape_qr))) {
+                unlink(public_path($setting->yape_qr));
+            }
+            $validated['yape_qr'] = null;
         }
 
         $setting->fill($validated);

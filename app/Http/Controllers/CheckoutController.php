@@ -27,9 +27,6 @@ class CheckoutController extends Controller
             'deliveryMethod' => 'required|string|in:delivery,pickup',
             'deliveryAddress' => 'nullable|array',
             'selectedStore' => 'nullable|array',
-            'yapePhone' => 'nullable|string',
-            'yapeCode' => 'nullable|string',
-            'yapeMode' => 'nullable|string|in:code,qr',
         ]);
 
         if ($request->deliveryMethod === 'delivery' && empty($request->deliveryAddress)) {
@@ -89,9 +86,6 @@ class CheckoutController extends Controller
                     'amount' => $request->total,
                     'receipt_url' => $receiptUrl,
                     'status' => 'PENDING',
-                    'yape_phone' => $request->yapePhone,
-                    'yape_code' => $request->yapeCode,
-                    'yape_mode' => $request->yapeMode,
                 ]);
 
                 return $order;

@@ -21,9 +21,7 @@ export function CheckoutButton() {
         deliveryAddress,
         selectedStore,
         transferConfirmed,
-        yapePhone,
-        yapeCode,
-        yapeMode,
+        yapeConfirmed,
         voucherFile,
     } = useCheckoutStore();
 
@@ -41,10 +39,8 @@ export function CheckoutButton() {
                 return 'Debes subir el comprobante de la transferencia';
         }
         if (paymentMethod === 'yape') {
-            if (!yapePhone)
-                return 'Vincula tu número Yape haciendo clic en "Yape"';
-            if (yapeMode === 'code' && !yapeCode)
-                return 'Ingresa el código de aprobación Yape';
+            if (!yapeConfirmed)
+                return 'Completa los datos de pago haciendo clic en "Yape"';
             if (!voucherFile) return 'Debes subir el comprobante de pago Yape';
         }
         return null;
@@ -89,9 +85,6 @@ export function CheckoutButton() {
                     deliveryMethod === 'delivery' ? deliveryAddress : null,
                 selectedStore:
                     deliveryMethod === 'pickup' ? selectedStore : null,
-                yapePhone,
-                yapeCode,
-                yapeMode,
                 voucher: voucherFile,
                 total,
             } as any,

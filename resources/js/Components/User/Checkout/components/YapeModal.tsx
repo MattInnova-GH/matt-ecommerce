@@ -1,68 +1,27 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import {
-    X,
-    Smartphone,
-    Check,
-    ArrowRight,
-    QrCode,
-    KeyRound,
-    Upload,
-    FileText,
-    ChevronLeft,
-} from 'lucide-react';
+import { usePage } from '@inertiajs/react';
+import { X, Smartphone, Check, Copy, Upload, FileText } from 'lucide-react';
 import { useCheckoutStore } from '@/stores/checkoutStore';
-import type { YapeMode } from '@/stores/checkoutStore';
-
-type YapeStep = 'phone' | 'method' | 'code' | 'qr' | 'voucher' | 'saved';
 
 export function YapeModal() {
-    const {
-        closeYapeModal,
-        setYapePhone,
-        setYapeCode,
-        setYapeMode,
-        setVoucherFile,
-    } = useCheckoutStore();
+    const { closeYapeModal, setYapeConfirmed, setVoucherFile } =
+        useCheckoutStore();
+    const { settings } = usePage().props as any;
+    const yapeQr: string | null = settings?.yape_qr || null;
+    const yapeNumber: string | null = settings?.yape_number || null;
 
-    const [step, setStep] = useState<YapeStep>('phone');
-    const [phone, setPhone] = useState('');
-    const [phoneError, setPhoneError] = useState('');
-    const [approvalCode, setApprovalCode] = useState('');
-    const [codeError, setCodeError] = useState('');
-    const [selectedMode, setSelectedMode] = useState<YapeMode>('code');
+    const [copied, setCopied] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [confirmed, setConfirmed] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handlePhoneSubmit = () => {
-        if (phone.replace(/\s/g, '').length < 9) {
-            setPhoneError('Ingresa un número válido de 9 dígitos');
-            return;
-        }
-        setPhoneError('');
-        setYapePhone(phone);
-        setStep('method');
-    };
-
-    const handleMethodSelect = (mode: YapeMode) => {
-        setSelectedMode(mode);
-        setYapeMode(mode);
-        setStep(mode === 'code' ? 'code' : 'qr');
-    };
-
-    const handleCodeSubmit = () => {
-        if (approvalCode.trim().length < 4) {
-            setCodeError('Ingresa el código de aprobación de Yape');
-            return;
-        }
-        setCodeError('');
-        setYapeCode(approvalCode);
-        setStep('voucher');
-    };
-
-    const handleQrContinue = () => {
-        setStep('voucher');
+    const copyNumber = () => {
+        if (!yapeNumber) return;
+        navigator.clipboard.writeText(yapeNumber);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,23 +39,15 @@ export function YapeModal() {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    const handleVoucherConfirm = () => {
+    const handleConfirm = () => {
+        setYapeConfirmed(true);
         setVoucherFile(file);
-        setStep('saved');
-        setTimeout(() => closeYapeModal(), 2000);
-    };
-
-    const stepTitles: Record<YapeStep, string> = {
-        phone: 'Pagar con Yape',
-        method: 'Elige cómo confirmar',
-        code: 'Código de aprobación',
-        qr: 'QR de Yape',
-        voucher: 'Sube tu comprobante',
-        saved: '¡Pago registrado!',
+        setConfirmed(true);
+        setTimeout(() => closeYapeModal(), 1500);
     };
 
     return createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
             <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={closeYapeModal}
@@ -106,32 +57,11 @@ export function YapeModal() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        {(step === 'method' ||
-                            step === 'code' ||
-                            step === 'qr' ||
-                            step === 'voucher') && (
-                            <button
-                                onClick={() => {
-                                    if (step === 'method') setStep('phone');
-                                    if (step === 'code' || step === 'qr')
-                                        setStep('method');
-                                    if (step === 'voucher')
-                                        setStep(
-                                            selectedMode === 'code'
-                                                ? 'code'
-                                                : 'qr',
-                                        );
-                                }}
-                                className="rounded-lg p-1 hover:bg-gray-100"
-                            >
-                                <ChevronLeft size={18} />
-                            </button>
-                        )}
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#6C1AE0]">
                             <Smartphone size={16} className="text-white" />
                         </div>
                         <h3 className="text-base font-semibold text-gray-900">
-                            {stepTitles[step]}
+                            Pagar con Yape
                         </h3>
                     </div>
                     <button
@@ -142,241 +72,135 @@ export function YapeModal() {
                     </button>
                 </div>
 
-                {/* ── Step: Teléfono ── */}
-                {step === 'phone' && (
-                    <div className="space-y-4">
-                        <p className="text-center text-sm text-gray-500">
-                            Ingresa el número de celular vinculado a tu cuenta
-                            Yape.
+                {!confirmed ? (
+                    <>
+                        <p className="text-sm text-gray-500">
+                            Escanea el QR o yapea al número de abajo y sube
+                            tu comprobante para confirmar el pago.
                         </p>
-                        <div>
-                            <label className="mb-1 block text-xs font-medium text-gray-700">
-                                Número de celular
-                            </label>
-                            <div className="flex gap-2">
-                                <div className="flex shrink-0 items-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500">
-                                    🇵🇪 +51
-                                </div>
-                                <input
-                                    type="tel"
-                                    value={phone}
-                                    onChange={(e) =>
-                                        setPhone(
-                                            e.target.value
-                                                .replace(/\D/g, '')
-                                                .slice(0, 9),
-                                        )
-                                    }
-                                    placeholder="987 654 321"
-                                    className={`flex-1 rounded-xl border px-4 py-2.5 text-sm transition-colors focus:border-purple-500 focus:outline-none ${phoneError ? 'border-red-400' : 'border-gray-200'}`}
+
+                        {/* QR */}
+                        <div className="mx-auto flex h-48 w-48 items-center justify-center overflow-hidden rounded-2xl border-2 border-purple-100 bg-purple-50">
+                            {yapeQr ? (
+                                <img
+                                    src={yapeQr}
+                                    alt="QR de Yape"
+                                    className="h-full w-full object-contain"
                                 />
-                            </div>
-                            {phoneError && (
-                                <p className="mt-1 text-xs text-red-500">
-                                    {phoneError}
+                            ) : (
+                                <p className="px-4 text-center text-xs text-gray-400">
+                                    El QR de Yape aún no está configurado
                                 </p>
                             )}
                         </div>
-                        <button
-                            onClick={handlePhoneSubmit}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#6C1AE0] py-3 text-sm font-semibold text-white transition hover:bg-[#5a14c0]"
-                        >
-                            Continuar <ArrowRight size={16} />
-                        </button>
-                    </div>
-                )}
 
-                {/* ── Step: Método ── */}
-                {step === 'method' && (
-                    <div className="space-y-3">
-                        <p className="text-center text-sm text-gray-500">
-                            ¿Cómo deseas confirmar tu pago con Yape?
-                        </p>
-                        <button
-                            onClick={() => handleMethodSelect('code')}
-                            className="flex w-full items-center gap-4 rounded-xl border-2 border-gray-200 p-4 text-left transition hover:border-[#6C1AE0] hover:bg-purple-50"
-                        >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100">
-                                <KeyRound
-                                    size={20}
-                                    className="text-[#6C1AE0]"
-                                />
-                            </div>
+                        {/* Numero */}
+                        <div className="flex items-center justify-between rounded-xl border border-purple-100 bg-purple-50 p-4">
                             <div>
-                                <p className="text-sm font-semibold text-gray-900">
-                                    Código de aprobación
-                                </p>
                                 <p className="text-xs text-gray-500">
-                                    Ingresa el código que Yape te muestra al
-                                    pagar
+                                    Número Yape
+                                </p>
+                                <p className="font-medium text-gray-800">
+                                    {yapeNumber || 'No configurado'}
                                 </p>
                             </div>
-                        </button>
-                        <button
-                            onClick={() => handleMethodSelect('qr')}
-                            className="flex w-full items-center gap-4 rounded-xl border-2 border-gray-200 p-4 text-left transition hover:border-[#6C1AE0] hover:bg-purple-50"
-                        >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100">
-                                <QrCode size={20} className="text-[#6C1AE0]" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-semibold text-gray-900">
-                                    QR de Yape
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                    Escanea nuestro código QR desde la app de
-                                    Yape
-                                </p>
-                            </div>
-                        </button>
-                    </div>
-                )}
-
-                {/* ── Step: Código de aprobación ── */}
-                {step === 'code' && (
-                    <div className="space-y-4">
-                        <p className="text-center text-sm text-gray-500">
-                            Abre tu app Yape, realiza el pago y luego ingresa el
-                            código de aprobación que aparece en pantalla.
-                        </p>
-                        <div>
-                            <label className="mb-1 block text-xs font-medium text-gray-700">
-                                Código de aprobación Yape
-                            </label>
-                            <input
-                                type="text"
-                                value={approvalCode}
-                                onChange={(e) =>
-                                    setApprovalCode(
-                                        e.target.value
-                                            .replace(/\D/g, '')
-                                            .slice(0, 8),
-                                    )
-                                }
-                                placeholder="123456"
-                                className={`w-full rounded-xl border px-4 py-3 text-center text-xl font-bold tracking-widest transition-colors focus:border-purple-500 focus:outline-none ${codeError ? 'border-red-400' : 'border-gray-200'}`}
-                            />
-                            {codeError && (
-                                <p className="mt-1 text-xs text-red-500">
-                                    {codeError}
-                                </p>
-                            )}
-                        </div>
-                        <button
-                            onClick={handleCodeSubmit}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#6C1AE0] py-3 text-sm font-semibold text-white transition hover:bg-[#5a14c0]"
-                        >
-                            Continuar <ArrowRight size={16} />
-                        </button>
-                    </div>
-                )}
-
-                {/* ── Step: QR ── */}
-                {step === 'qr' && (
-                    <div className="space-y-4 text-center">
-                        <p className="text-sm text-gray-500">
-                            Escanea el QR con tu app de Yape para realizar el
-                            pago.
-                        </p>
-                        <div className="mx-auto flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-dashed border-purple-200 bg-purple-50">
-                            <div className="text-center">
-                                <QrCode
-                                    size={64}
-                                    className="mx-auto text-[#6C1AE0]"
-                                />
-                                <p className="mt-2 text-xs text-gray-400">
-                                    QR de pago
-                                </p>
-                            </div>
-                        </div>
-                        <p className="text-xs text-gray-400">
-                            Una vez realizado el pago, continúa para subir el
-                            comprobante.
-                        </p>
-                        <button
-                            onClick={handleQrContinue}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#6C1AE0] py-3 text-sm font-semibold text-white transition hover:bg-[#5a14c0]"
-                        >
-                            Ya realicé el pago <ArrowRight size={16} />
-                        </button>
-                    </div>
-                )}
-
-                {/* ── Step: Comprobante ── */}
-                {step === 'voucher' && (
-                    <div className="space-y-4">
-                        <p className="text-sm text-gray-500">
-                            Sube una captura de pantalla o foto de tu
-                            comprobante de pago Yape.
-                        </p>
-                        {!file ? (
-                            <div
-                                onClick={() => fileInputRef.current?.click()}
-                                className="flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-6 transition hover:border-purple-400 hover:bg-purple-50"
-                            >
-                                <Upload size={22} className="text-gray-400" />
-                                <div className="text-center">
-                                    <p className="text-sm font-medium text-gray-700">
-                                        Subir comprobante
-                                    </p>
-                                    <p className="mt-0.5 text-xs text-gray-400">
-                                        PNG, JPG o PDF (máx. 5MB)
-                                    </p>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-3 rounded-xl border border-gray-200 p-3">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
-                                    {previewUrl &&
-                                    file.type.startsWith('image/') ? (
-                                        <img
-                                            src={previewUrl}
-                                            alt="preview"
-                                            className="h-full w-full object-cover"
+                            {yapeNumber && (
+                                <button
+                                    onClick={copyNumber}
+                                    className="ml-2 rounded-lg p-1.5 text-gray-400 transition hover:bg-white hover:text-[#6C1AE0]"
+                                    title="Copiar"
+                                >
+                                    {copied ? (
+                                        <Check
+                                            size={16}
+                                            className="text-green-500"
                                         />
                                     ) : (
-                                        <FileText
-                                            size={20}
-                                            className="text-gray-400"
-                                        />
+                                        <Copy size={16} />
                                     )}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm font-medium text-gray-900">
-                                        {file.name}
-                                    </p>
-                                    <p className="text-xs text-gray-400">
-                                        {(file.size / 1024 / 1024).toFixed(2)}{' '}
-                                        MB
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={handleRemoveFile}
-                                    className="rounded-full p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500"
-                                >
-                                    <X size={16} />
                                 </button>
-                            </div>
-                        )}
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept="image/*,application/pdf"
-                            className="hidden"
-                        />
+                            )}
+                        </div>
+
+                        {/* Comprobante */}
+                        <div>
+                            <p className="mb-2 text-sm font-medium text-gray-700">
+                                Comprobante de pago
+                            </p>
+                            {!file ? (
+                                <div
+                                    onClick={() =>
+                                        fileInputRef.current?.click()
+                                    }
+                                    className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-6 transition-all hover:border-purple-400 hover:bg-purple-50"
+                                >
+                                    <Upload
+                                        size={22}
+                                        className="text-gray-400"
+                                    />
+                                    <div className="text-center">
+                                        <p className="text-sm font-medium text-gray-700">
+                                            Subir comprobante
+                                        </p>
+                                        <p className="mt-0.5 text-xs text-gray-400">
+                                            PNG, JPG o PDF (máx. 5MB)
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-3 rounded-xl border border-gray-200 p-3">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+                                        {previewUrl &&
+                                        file.type.startsWith('image/') ? (
+                                            <img
+                                                src={previewUrl}
+                                                alt="preview"
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <FileText
+                                                size={20}
+                                                className="text-gray-400"
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-medium text-gray-900">
+                                            {file.name}
+                                        </p>
+                                        <p className="text-xs text-gray-400">
+                                            {(file.size / 1024 / 1024).toFixed(
+                                                2,
+                                            )}{' '}
+                                            MB
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={handleRemoveFile}
+                                        className="rounded-full p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/*,application/pdf"
+                                className="hidden"
+                            />
+                        </div>
+
                         <button
-                            onClick={handleVoucherConfirm}
+                            onClick={handleConfirm}
                             disabled={!file}
                             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#6C1AE0] py-3 text-sm font-semibold text-white transition hover:bg-[#5a14c0] disabled:opacity-50"
                         >
                             <Check size={16} /> Confirmar pago
                         </button>
-                    </div>
-                )}
-
-                {/* ── Step: Guardado ── */}
-                {step === 'saved' && (
+                    </>
+                ) : (
                     <div className="flex flex-col items-center gap-3 py-6 text-center">
                         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
                             <Check size={32} className="text-[#6C1AE0]" />
@@ -385,7 +209,8 @@ export function YapeModal() {
                             ¡Pago registrado!
                         </p>
                         <p className="text-sm text-gray-500">
-                            +51 {phone} · Confirma tu pedido desde el resumen.
+                            Tu comprobante fue adjuntado. Confirma tu pedido
+                            desde el resumen.
                         </p>
                     </div>
                 )}

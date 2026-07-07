@@ -3,7 +3,6 @@ import { persist } from 'zustand/middleware';
 
 export type DeliveryMethod = 'delivery' | 'pickup';
 export type PaymentMethod = 'transfer' | 'yape' | 'card';
-export type YapeMode = 'code' | 'qr';
 
 export interface DeliveryAddress {
     lat: number;
@@ -37,10 +36,8 @@ interface CheckoutState {
     // Transferencia bancaria
     transferConfirmed: boolean;
 
-    // Yape
-    yapePhone: string | null;
-    yapeCode: string | null;
-    yapeMode: YapeMode;
+    // Yape (el cliente solo confirma que pagó al QR/numero de la tienda)
+    yapeConfirmed: boolean;
 
     // Comprobante (no persistido — File no es serializable)
     voucherFile: File | null;
@@ -61,9 +58,7 @@ interface CheckoutState {
 
     setTransferConfirmed: (value: boolean) => void;
 
-    setYapePhone: (phone: string) => void;
-    setYapeCode: (code: string) => void;
-    setYapeMode: (mode: YapeMode) => void;
+    setYapeConfirmed: (value: boolean) => void;
 
     setVoucherFile: (file: File | null) => void;
 
@@ -91,9 +86,7 @@ export const useCheckoutStore = create<CheckoutState>()(
 
             transferConfirmed: false,
 
-            yapePhone: null,
-            yapeCode: null,
-            yapeMode: 'code',
+            yapeConfirmed: false,
 
             voucherFile: null,
 
@@ -110,9 +103,7 @@ export const useCheckoutStore = create<CheckoutState>()(
 
             setTransferConfirmed: (value) => set({ transferConfirmed: value }),
 
-            setYapePhone: (phone) => set({ yapePhone: phone }),
-            setYapeCode: (code) => set({ yapeCode: code }),
-            setYapeMode: (mode) => set({ yapeMode: mode }),
+            setYapeConfirmed: (value) => set({ yapeConfirmed: value }),
 
             setVoucherFile: (file) => set({ voucherFile: file }),
 

@@ -18,6 +18,8 @@ import {
     Building2,
     Share2,
     CheckCircle2,
+    QrCode,
+    Smartphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +51,8 @@ interface SettingsData {
     instagram: string | null;
     whatsapp: string | null;
     tiktok: string | null;
+    yape_qr: string | null;
+    yape_number: string | null;
 }
 
 interface Props {
@@ -171,8 +175,10 @@ function ImageUploadField({
 export default function Settings({ settings }: Props) {
     const [previewLogo, setPreviewLogo] = useState<string | null>(null);
     const [previewFavicon, setPreviewFavicon] = useState<string | null>(null);
+    const [previewYapeQr, setPreviewYapeQr] = useState<string | null>(null);
     const [logoRemoved, setLogoRemoved] = useState(false);
     const [faviconRemoved, setFaviconRemoved] = useState(false);
+    const [yapeQrRemoved, setYapeQrRemoved] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [saved, setSaved] = useState(false);
 
@@ -187,6 +193,8 @@ export default function Settings({ settings }: Props) {
         instagram: settings?.instagram || '',
         whatsapp: settings?.whatsapp || '',
         tiktok: settings?.tiktok || '',
+        yape_qr: null as File | null,
+        yape_number: settings?.yape_number || '',
     });
 
     // ── Logic (unchanged) ──────────────────────────────────────────────────────
@@ -216,6 +224,14 @@ export default function Settings({ settings }: Props) {
         formData.append('instagram', data.instagram || '');
         formData.append('whatsapp', data.whatsapp || '');
         formData.append('tiktok', data.tiktok || '');
+
+        if (data.yape_qr) {
+            formData.append('yape_qr', data.yape_qr);
+        } else if (yapeQrRemoved) {
+            formData.append('remove_yape_qr', '1');
+        }
+        formData.append('yape_number', data.yape_number || '');
+
         formData.append('_method', 'PUT');
 
         router.post('/admin/settings', formData, {
@@ -224,6 +240,7 @@ export default function Settings({ settings }: Props) {
                 setSaved(true);
                 setLogoRemoved(false);
                 setFaviconRemoved(false);
+                setYapeQrRemoved(false);
                 setTimeout(() => setSaved(false), 3000);
                 setIsSubmitting(false);
             },
@@ -270,7 +287,9 @@ export default function Settings({ settings }: Props) {
                     <div className="h-px w-3 bg-border" />
                     <SectionStep number={3} label="Contacto" active />
                     <div className="h-px w-3 bg-border" />
-                    <SectionStep number={4} label="Redes" active />
+                    <SectionStep number={4} label="Yape" active />
+                    <div className="h-px w-3 bg-border" />
+                    <SectionStep number={5} label="Redes" active />
                 </div>
             </div>
 
@@ -478,7 +497,79 @@ export default function Settings({ settings }: Props) {
                     </CardContent>
                 </Card>
 
-                {/* ── SECTION 4 · Redes Sociales ──────────────────────────── */}
+                {/* ── SECTION 4 · Pagos con Yape ──────────────────────────── */}
+                <Card className="overflow-hidden">
+                    <CardHeader className="border-b bg-muted/30 px-6 py-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                                <Smartphone className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-sm font-semibold">
+                                    Pagos con Yape
+                                </CardTitle>
+                                <CardDescription className="text-xs">
+                                    QR y número que verán tus clientes al
+                                    pagar con Yape
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="divide-y px-6">
+                        <div className="py-5">
+                            <ImageUploadField
+                                id="yape_qr"
+                                label="QR de Yape"
+                                hint="PNG, JPG o WEBP · Captura el QR desde tu app Yape"
+                                preview={
+                                    yapeQrRemoved
+                                        ? null
+                                        : previewYapeQr ||
+                                          settings?.yape_qr ||
+                                          null
+                                }
+                                fallbackIcon={QrCode}
+                                avatarClass="h-20 w-20 rounded-xl"
+                                onFileChange={(file) => {
+                                    setData('yape_qr', file);
+                                    readPreview(file, setPreviewYapeQr);
+                                    setYapeQrRemoved(false);
+                                }}
+                                onClear={() => {
+                                    setPreviewYapeQr(null);
+                                    setData('yape_qr', null);
+                                    setYapeQrRemoved(true);
+                                }}
+                            />
+                        </div>
+
+                        <div className="max-w-sm space-y-1.5 py-5">
+                            <Label
+                                htmlFor="yape_number"
+                                className="flex items-center gap-1.5 text-sm"
+                            >
+                                <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
+                                Número de Yape
+                            </Label>
+                            <Input
+                                id="yape_number"
+                                value={data.yape_number}
+                                onChange={(e) =>
+                                    setData('yape_number', e.target.value)
+                                }
+                                placeholder="987 654 321"
+                                className="h-9"
+                            />
+                            {errors.yape_number && (
+                                <p className="text-xs text-destructive">
+                                    {errors.yape_number}
+                                </p>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* ── SECTION 5 · Redes Sociales ──────────────────────────── */}
                 <Card className="overflow-hidden">
                     <CardHeader className="border-b bg-muted/30 px-6 py-4">
                         <div className="flex items-center gap-3">
