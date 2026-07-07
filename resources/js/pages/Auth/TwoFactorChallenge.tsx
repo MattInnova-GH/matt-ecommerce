@@ -14,69 +14,77 @@ export default function TwoFactorChallenge() {
         <>
             <Head title="Verificación en dos pasos" />
 
-            <div className="mb-4 text-sm text-muted-foreground">
-                {useRecoveryCode
-                    ? 'Ingresa uno de tus códigos de recuperación de emergencia.'
-                    : 'Ingresa el código de 6 dígitos generado por tu aplicación de autenticación.'}
-            </div>
+            <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gray-50 px-4 py-12">
+                <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-2xl">
+                    <div className="mb-4 text-sm text-muted-foreground">
+                        {useRecoveryCode
+                            ? 'Ingresa uno de tus códigos de recuperación de emergencia.'
+                            : 'Ingresa el código de 6 dígitos generado por tu aplicación de autenticación.'}
+                    </div>
 
-            <Form
-                {...store.form()}
-                resetOnSuccess
-                className="flex flex-col gap-6"
-            >
-                {({ processing, errors }) => (
-                    <div className="grid gap-6">
-                        {useRecoveryCode ? (
-                            <div className="grid gap-2">
-                                <Label htmlFor="recovery_code">
-                                    Código de recuperación
-                                </Label>
-                                <Input
-                                    id="recovery_code"
-                                    name="recovery_code"
-                                    autoFocus
-                                    autoComplete="one-time-code"
-                                    placeholder="Código de recuperación"
-                                />
-                                <InputError message={errors.recovery_code} />
-                            </div>
-                        ) : (
-                            <div className="grid gap-2">
-                                <Label htmlFor="code">Código</Label>
-                                <Input
-                                    id="code"
-                                    name="code"
-                                    autoFocus
-                                    inputMode="numeric"
-                                    autoComplete="one-time-code"
-                                    placeholder="123456"
-                                />
-                                <InputError message={errors.code} />
+                    <Form
+                        {...store.form()}
+                        resetOnSuccess
+                        className="flex flex-col gap-6"
+                    >
+                        {({ processing, errors }) => (
+                            <div className="grid gap-6">
+                                {useRecoveryCode ? (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="recovery_code">
+                                            Código de recuperación
+                                        </Label>
+                                        <Input
+                                            id="recovery_code"
+                                            name="recovery_code"
+                                            autoFocus
+                                            autoComplete="one-time-code"
+                                            placeholder="Código de recuperación"
+                                        />
+                                        <InputError
+                                            message={errors.recovery_code}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="code">Código</Label>
+                                        <Input
+                                            id="code"
+                                            name="code"
+                                            autoFocus
+                                            inputMode="numeric"
+                                            autoComplete="one-time-code"
+                                            placeholder="123456"
+                                        />
+                                        <InputError message={errors.code} />
+                                    </div>
+                                )}
+
+                                <Button
+                                    type="submit"
+                                    className="w-full"
+                                    disabled={processing}
+                                >
+                                    {processing && <Spinner />}
+                                    Verificar
+                                </Button>
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setUseRecoveryCode((prev) => !prev)
+                                    }
+                                    className="text-center text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                                >
+                                    {useRecoveryCode
+                                        ? 'Usar código de autenticación'
+                                        : 'Usar código de recuperación'}
+                                </button>
                             </div>
                         )}
-
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={processing}
-                        >
-                            {processing && <Spinner />}
-                            Verificar
-                        </Button>
-
-                        <button
-                            type="button"
-                            onClick={() => setUseRecoveryCode((prev) => !prev)}
-                            className="text-center text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
-                        >
-                            {useRecoveryCode
-                                ? 'Usar código de autenticación'
-                                : 'Usar código de recuperación'}
-                        </button>
-                    </div>
-                )}
-            </Form>
+                    </Form>
+                </div>
+            </div>
         </>
     );
 }

@@ -13,6 +13,11 @@ function Toaster({ ...props }: ToasterProps) {
             theme={appearance}
             className="toaster group"
             position="top-right"
+            // El offset por defecto de sonner queda debajo del navbar fijo
+            // (h-16 en movil/tablet, h-20 desde lg), por eso se separa el
+            // toast para que no tape los iconos del navbar.
+            offset={{ top: '6rem' }}
+            mobileOffset={{ top: '5rem' }}
             style={
                 {
                     '--normal-bg': 'var(--popover)',

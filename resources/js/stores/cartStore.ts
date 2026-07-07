@@ -105,6 +105,9 @@ export const useCartStore = create<CartState>()(
         }),
         {
             name: 'cart-storage',
+            // isOpen no debe persistir: si no, el carrito reaparece abierto
+            // solo con recargar la pagina despues de haberlo abierto una vez.
+            partialize: (state) => ({ items: state.items }),
         },
     ),
 );
