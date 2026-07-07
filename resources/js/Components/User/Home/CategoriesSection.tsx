@@ -31,7 +31,7 @@ export default function CategoriesSection({
                     {categories.map((category) => (
                         <Link
                             key={category.id}
-                            href={`/productos?category=${category.slug}`}
+                            href={`/productos?category=${category.id}`}
                             className="group relative aspect-3/4 overflow-hidden rounded-2xl"
                         >
                             <img
@@ -45,16 +45,16 @@ export default function CategoriesSection({
 
                             <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
                             <div className="absolute right-0 bottom-0 left-0 p-6 text-white">
-                                <h3 className="mb-1 text-2xl font-bold">
+                                <h3 className="mb-1.5 text-2xl font-bold">
                                     {category.name}
                                 </h3>
                                 {category.productCount !== undefined && (
-                                    <p className="text-sm text-gray-200">
+                                    <p className="mb-3 text-sm text-gray-200">
                                         {category.productCount} productos
                                     </p>
                                 )}
-                                <div className="mt-2 flex items-center gap-1 text-sm font-medium opacity-0 transition-opacity group-hover:opacity-100">
-                                    Ver más <ArrowRight size={16} />
+                                <div className="flex items-center gap-1.5 text-sm font-medium opacity-0 transition-opacity group-hover:opacity-100">
+                                    Ver productos <ArrowRight size={16} />
                                 </div>
                             </div>
                         </Link>

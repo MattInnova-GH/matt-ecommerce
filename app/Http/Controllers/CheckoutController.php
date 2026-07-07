@@ -26,6 +26,12 @@ class CheckoutController extends Controller
             'voucher' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'deliveryMethod' => 'required|string|in:delivery,pickup',
             'deliveryAddress' => 'nullable|array',
+            'deliveryAddress.address' => 'required_if:deliveryMethod,delivery|string|max:500',
+            'deliveryAddress.district' => 'required_if:deliveryMethod,delivery|string|max:255',
+            'deliveryAddress.postalCode' => 'required_if:deliveryMethod,delivery|string|max:10',
+            'deliveryAddress.recipientName' => 'required_if:deliveryMethod,delivery|string|max:255',
+            'deliveryAddress.phone' => 'required_if:deliveryMethod,delivery|string|max:20',
+            'deliveryAddress.reference' => 'nullable|string|max:500',
             'selectedStore' => 'nullable|array',
         ]);
 

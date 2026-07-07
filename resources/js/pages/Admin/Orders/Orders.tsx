@@ -85,10 +85,11 @@ interface User {
 }
 interface Address {
     address: string;
-    city?: string;
-    state?: string;
-    zip?: string;
-    country?: string;
+    district?: string;
+    postalCode?: string;
+    reference?: string;
+    recipientName?: string;
+    phone?: string;
 }
 interface Order {
     id: number;
@@ -871,23 +872,52 @@ export default function Orders({ orders: initialOrders }: Props) {
                                                                     ?.address
                                                             }
                                                         </p>
-                                                        {selectedOrder
+                                                        {(selectedOrder
                                                             .shipping_address
-                                                            ?.city && (
+                                                            ?.district ||
+                                                            selectedOrder
+                                                                .shipping_address
+                                                                ?.postalCode) && (
                                                             <p className="text-xs text-muted-foreground">
                                                                 {
                                                                     selectedOrder
                                                                         .shipping_address
-                                                                        .city
+                                                                        ?.district
                                                                 }
                                                                 {selectedOrder
                                                                     .shipping_address
-                                                                    ?.state &&
-                                                                    `, ${selectedOrder.shipping_address.state}`}
+                                                                    ?.postalCode &&
+                                                                    ` — C.P. ${selectedOrder.shipping_address.postalCode}`}
+                                                            </p>
+                                                        )}
+                                                        {selectedOrder
+                                                            .shipping_address
+                                                            ?.reference && (
+                                                            <p className="text-xs text-muted-foreground">
+                                                                Ref:{' '}
+                                                                {
+                                                                    selectedOrder
+                                                                        .shipping_address
+                                                                        .reference
+                                                                }
+                                                            </p>
+                                                        )}
+                                                        {(selectedOrder
+                                                            .shipping_address
+                                                            ?.recipientName ||
+                                                            selectedOrder
+                                                                .shipping_address
+                                                                ?.phone) && (
+                                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                                {
+                                                                    selectedOrder
+                                                                        .shipping_address
+                                                                        ?.recipientName
+                                                                }
                                                                 {selectedOrder
                                                                     .shipping_address
-                                                                    ?.zip &&
-                                                                    ` ${selectedOrder.shipping_address.zip}`}
+                                                                    ?.phone &&
+                                                                    ` · ${selectedOrder.shipping_address.phone}`}
                                                             </p>
                                                         )}
                                                     </div>

@@ -8,6 +8,7 @@ import type {
 import { SettingsSidebar } from '@/Components/User/Configuration/SettingsSidebar';
 import { ProfileSection } from '@/Components/User/Configuration/ProfileSection';
 import { PasswordSection } from '@/Components/User/Configuration/PasswordSection';
+import { TwoFactorSection } from '@/Components/User/Configuration/TwoFactorSection';
 import { AddressesSection } from '@/Components/User/Configuration/AddressesSection';
 import { OrderSection } from '@/Components/User/Configuration/OrderSection';
 import { FavoritesSection } from '@/Components/User/Configuration/FavoritesSection';
@@ -17,11 +18,13 @@ export default function SettingsPage({
     addresses,
     orders,
     favorites,
+    twoFactorEnabled,
     flash,
 }: SettingsProps) {
     const VALID_SECTIONS: Section[] = [
         'profile',
         'password',
+        'security',
         'addresses',
         'orders',
         'favorites',
@@ -54,6 +57,7 @@ export default function SettingsPage({
     const sectionLabels: Record<Section, string> = {
         profile: 'Mi Perfil',
         password: 'Configuración',
+        security: 'Seguridad',
         addresses: 'Direcciones',
         orders: 'Mis Pedidos',
         favorites: 'Favoritos',
@@ -96,6 +100,11 @@ export default function SettingsPage({
                                 )}
                                 {activeSection === 'password' && (
                                     <PasswordSection flash={flash?.success} />
+                                )}
+                                {activeSection === 'security' && (
+                                    <TwoFactorSection
+                                        enabled={twoFactorEnabled}
+                                    />
                                 )}
                                 {activeSection === 'addresses' && (
                                     <AddressesSection

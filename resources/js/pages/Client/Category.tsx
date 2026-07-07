@@ -78,8 +78,8 @@ export default function Category({ categories }: CategoryProps) {
                                     </div>
                                 </div>
 
-                                <CardContent className="p-4">
-                                    <div className="mb-4 flex items-center gap-1 text-sm text-muted-foreground">
+                                <CardContent className="p-5">
+                                    <div className="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">
                                         <Package className="h-4 w-4" />
                                         <span>
                                             {category.products_count} productos
@@ -90,7 +90,7 @@ export default function Category({ categories }: CategoryProps) {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="w-full gap-2"
+                                            className="w-full gap-2 py-5"
                                         >
                                             Ver productos
                                             <ChevronRight className="h-3 w-3" />

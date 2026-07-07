@@ -1,8 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePage } from '@inertiajs/react';
+import { toast } from 'sonner';
 import { X, Smartphone, Check, Copy, Upload, FileText } from 'lucide-react';
 import { useCheckoutStore } from '@/stores/checkoutStore';
+
+const MAX_VOUCHER_SIZE_MB = 5;
 
 export function YapeModal() {
     const { closeYapeModal, setYapeConfirmed, setVoucherFile } =
@@ -27,6 +30,13 @@ export function YapeModal() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = e.target.files?.[0];
         if (!selected) return;
+        if (selected.size > MAX_VOUCHER_SIZE_MB * 1024 * 1024) {
+            toast.error(
+                `El comprobante no debe pesar más de ${MAX_VOUCHER_SIZE_MB}MB.`,
+            );
+            e.target.value = '';
+            return;
+        }
         setFile(selected);
         const reader = new FileReader();
         reader.onloadend = () => setPreviewUrl(reader.result as string);

@@ -26,10 +26,15 @@ export default function VerifyEmail({ status }: Props) {
                         Verifica tu correo
                     </h1>
 
-                    <p className="mb-6 text-sm text-gray-500">
+                    <p className="mb-2 text-sm text-gray-500">
                         Antes de continuar, verifica tu correo haciendo clic
                         en el enlace que te acabamos de enviar. Si no lo
                         recibiste, con gusto te enviamos otro.
+                    </p>
+                    <p className="mb-6 text-xs text-gray-400">
+                        Recuerda revisar también tu carpeta de{' '}
+                        <span className="font-medium">spam o correo no deseado</span>
+                        , el mensaje a veces llega ahí.
                     </p>
 
                     {verificationLinkSent && (

@@ -66,7 +66,7 @@ class ProductController extends Controller
         }
 
         // ✅ CORREGIDO: Ahora incluimos todos los datos de descuento
-        $products = $query->paginate(12)->through(fn ($product) => [
+        $products = $query->paginate(12)->withQueryString()->through(fn ($product) => [
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,

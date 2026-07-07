@@ -6,6 +6,7 @@ import {
     ShoppingBag,
     ChevronRight,
     Heart,
+    ShieldCheck,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -31,6 +32,7 @@ const navItems: {
     { id: 'orders', label: 'Mis Pedidos', icon: ShoppingBag },
     { id: 'favorites', label: 'Favoritos', icon: Heart },
     { id: 'password', label: 'Configuración', icon: Settings },
+    { id: 'security', label: 'Seguridad', icon: ShieldCheck },
     { id: 'logout', label: 'Cerrar sesión', icon: LogOut },
 ];
 

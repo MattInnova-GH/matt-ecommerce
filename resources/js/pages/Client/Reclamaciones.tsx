@@ -218,7 +218,11 @@ export default function Reclamaciones() {
                                 La formulación de una reclamación no impide
                                 acudir a otras vías de solución de controversias
                                 ni es requisito previo para interponer una
-                                denuncia ante el INDECOPI.
+                                denuncia ante el INDECOPI. Conforme al Código de
+                                Protección y Defensa del Consumidor – Ley N°
+                                29571, tenemos un plazo máximo de{' '}
+                                <strong>30 días calendario</strong> para dar
+                                respuesta a tu reclamo o queja.
                             </p>
                         </div>
 

@@ -11,12 +11,51 @@ import {
     Shield,
     Headphones,
     Star,
+    Check,
+    X,
 } from 'lucide-react';
 import register from '@/routes/register';
+
+const PASSWORD_RULES: { label: string; test: (v: string) => boolean }[] = [
+    { label: 'Mínimo 12 caracteres', test: (v) => v.length >= 12 },
+    { label: 'Una letra mayúscula', test: (v) => /[A-Z]/.test(v) },
+    { label: 'Una letra minúscula', test: (v) => /[a-z]/.test(v) },
+    { label: 'Un número', test: (v) => /[0-9]/.test(v) },
+    {
+        label: 'Un símbolo (ej: ! @ # $ %)',
+        test: (v) => /[^A-Za-z0-9]/.test(v),
+    },
+];
+
+function PasswordRequirements({ password }: { password: string }) {
+    return (
+        <ul className="mt-2 grid gap-1 rounded-lg bg-gray-50 p-3 text-xs">
+            {PASSWORD_RULES.map((rule) => {
+                const passed = password.length > 0 && rule.test(password);
+                return (
+                    <li
+                        key={rule.label}
+                        className={`flex items-center gap-1.5 ${
+                            passed ? 'text-green-600' : 'text-gray-500'
+                        }`}
+                    >
+                        {passed ? (
+                            <Check className="h-3.5 w-3.5 shrink-0" />
+                        ) : (
+                            <X className="h-3.5 w-3.5 shrink-0 text-gray-300" />
+                        )}
+                        {rule.label}
+                    </li>
+                );
+            })}
+        </ul>
+    );
+}
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [password, setPassword] = useState('');
 
     return (
         <>
@@ -137,6 +176,13 @@ export default function Register() {
                                                                     : 'password'
                                                             }
                                                             name="password"
+                                                            value={password}
+                                                            onChange={(e) =>
+                                                                setPassword(
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
                                                             className="w-full rounded-lg border border-gray-300 py-2.5 pr-12 pl-10 transition-all focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 focus:outline-none"
                                                             placeholder="••••••••"
                                                             autoComplete="new-password"
@@ -157,6 +203,9 @@ export default function Register() {
                                                             )}
                                                         </button>
                                                     </div>
+                                                    <PasswordRequirements
+                                                        password={password}
+                                                    />
                                                     {errors.password && (
                                                         <p className="mt-1 text-sm text-red-500">
                                                             {errors.password}

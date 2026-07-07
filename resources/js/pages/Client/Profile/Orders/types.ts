@@ -17,6 +17,8 @@ export interface OrderItem {
 
 export interface ShippingAddress {
     address: string;
+    district?: string;
+    postalCode?: string;
     reference?: string;
     recipientName: string;
     phone: string;

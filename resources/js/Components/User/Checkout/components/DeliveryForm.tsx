@@ -10,22 +10,35 @@ export function DeliveryForm() {
 
     const [coords, setCoords] = useState({ lat: -12.0464, lng: -77.0428 });
     const [address, setAddress] = useState('');
+    const [district, setDistrict] = useState('');
+    const [postalCode, setPostalCode] = useState('');
     const [reference, setReference] = useState('');
     const [phone, setPhone] = useState('');
     const [recipientName, setRecipientName] = useState('');
 
     useEffect(() => {
-        if (address && phone && recipientName) {
+        if (address && district && postalCode && phone && recipientName) {
             setDeliveryAddress({
                 lat: coords.lat,
                 lng: coords.lng,
                 address,
+                district,
+                postalCode,
                 reference,
                 phone,
                 recipientName,
             });
         }
-    }, [coords, address, reference, phone, recipientName, setDeliveryAddress]);
+    }, [
+        coords,
+        address,
+        district,
+        postalCode,
+        reference,
+        phone,
+        recipientName,
+        setDeliveryAddress,
+    ]);
 
     return (
         <div className="space-y-5 border-t border-gray-100 pt-4">
@@ -66,6 +79,40 @@ export function DeliveryForm() {
                         placeholder="Ej: Av. Javier Prado 1234, San Isidro"
                         className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-colors focus:border-gray-900 focus:outline-none"
                     />
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                        <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Distrito *
+                        </label>
+                        <input
+                            type="text"
+                            value={district}
+                            onChange={(e) => setDistrict(e.target.value)}
+                            placeholder="Ej: San Isidro"
+                            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-colors focus:border-gray-900 focus:outline-none"
+                        />
+                    </div>
+                    <div>
+                        <label className="mb-1 block text-xs font-medium text-gray-700">
+                            Código postal *
+                        </label>
+                        <input
+                            type="text"
+                            value={postalCode}
+                            onChange={(e) =>
+                                setPostalCode(
+                                    e.target.value
+                                        .replace(/\D/g, '')
+                                        .slice(0, 5),
+                                )
+                            }
+                            inputMode="numeric"
+                            placeholder="Ej: 15046"
+                            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-colors focus:border-gray-900 focus:outline-none"
+                        />
+                    </div>
                 </div>
 
                 <div>

@@ -7,6 +7,7 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -64,6 +65,7 @@ class ProfileController extends Controller
             'addresses' => $addresses,
             'orders' => $orders,
             'favorites' => $favorites,
+            'twoFactorEnabled' => $user->hasEnabledTwoFactorAuthentication(),
         ]);
     }
 
@@ -90,7 +92,7 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'current_password' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', Password::defaults(), 'confirmed'],
         ]);
 
         if (! Hash::check($validated['current_password'], $user->password)) {

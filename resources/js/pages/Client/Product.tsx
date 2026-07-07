@@ -165,18 +165,7 @@ export default function Product({
     const handleSortChange = (value: string) => {
         const newFilters = { ...localFilters, sort: value };
         setLocalFilters(newFilters);
-        const params = new URLSearchParams();
-
-        if (newFilters.search) params.append('search', newFilters.search);
-        if (newFilters.category) params.append('category', newFilters.category);
-        if (newFilters.brand) params.append('brand', newFilters.brand);
-        if (newFilters.min_price)
-            params.append('min_price', newFilters.min_price);
-        if (newFilters.max_price)
-            params.append('max_price', newFilters.max_price);
-        if (value !== 'latest') params.append('sort', value);
-
-        router.get(`/productos?${params.toString()}`);
+        router.get(`/productos?${buildParams({ sort: value })}`);
     };
 
     const handleSearch = (e: React.FormEvent) => {

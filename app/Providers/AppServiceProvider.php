@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
                 ->greeting('¡Hola'.($notifiable->first_name ? ' '.$notifiable->first_name : '').'!')
                 ->line('Gracias por registrarte en Matt Store. Para completar tu registro y poder realizar compras, confirma que este correo es tuyo.')
                 ->action('Verificar mi correo', $url)
+                ->line('¿No ves este correo en tu bandeja de entrada? Revisa también tu carpeta de spam o correo no deseado.')
                 ->line('Si tú no creaste esta cuenta, puedes ignorar este mensaje sin problema.')
                 ->salutation('Saludos, el equipo de Matt Store');
         });

@@ -37,7 +37,7 @@
                             @elseif ($order->status === 'REJECTED')
                                 <p style="margin:0 0 16px; font-size:14px; line-height:1.5;">
                                     No pudimos verificar el pago de tu pedido. Si crees que esto es un error,
-                                    contáctanos respondiendo a este correo.
+                                    escríbenos por WhatsApp.
                                 </p>
                             @elseif ($order->status === 'CANCELLED')
                                 <p style="margin:0 0 16px; font-size:14px; line-height:1.5;">
@@ -85,7 +85,7 @@
                     </tr>
                     <tr>
                         <td style="background-color:#f9fafb; padding:16px 32px; font-size:12px; color:#9ca3af;">
-                            Si tienes alguna duda, escríbenos por WhatsApp o responde a este correo.
+                            Este es un correo informativo, no lo respondas. Si tienes alguna duda, escríbenos por WhatsApp.
                         </td>
                     </tr>
                 </table>

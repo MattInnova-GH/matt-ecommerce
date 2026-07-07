@@ -43,7 +43,9 @@
                             <p style="margin:0 0 16px; font-size:13px; line-height:1.5; background:#f9fafb; border-radius:8px; padding:12px;">{{ $complaint->problem_description }}</p>
 
                             <p style="margin:0; font-size:13px; color:#6b7280;">
-                                Nos pondremos en contacto contigo dentro de los próximos días hábiles para darle seguimiento.
+                                Conforme al Código de Protección y Defensa del Consumidor, tenemos un plazo máximo de
+                                <strong>30 días calendario</strong> para dar respuesta a tu {{ strtolower($complaint->complaint_type) }}.
+                                Nos pondremos en contacto contigo antes de ese plazo para darle seguimiento.
                             </p>
                         </td>
                     </tr>

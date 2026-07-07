@@ -57,7 +57,7 @@
                     </tr>
                     <tr>
                         <td style="background-color:#f9fafb; padding:16px 32px; font-size:12px; color:#9ca3af;">
-                            Si tienes alguna duda, escríbenos por WhatsApp o responde a este correo.
+                            Este es un correo informativo, no lo respondas. Si tienes alguna duda, escríbenos por WhatsApp.
                         </td>
                     </tr>
                 </table>

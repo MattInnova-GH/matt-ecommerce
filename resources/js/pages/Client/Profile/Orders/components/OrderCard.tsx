@@ -221,6 +221,20 @@ export default function OrderCard({ order }: { order: Order }) {
                                                         .address
                                                 }
                                             </p>
+                                            {(order.shipping_address
+                                                .district ||
+                                                order.shipping_address
+                                                    .postalCode) && (
+                                                <p>
+                                                    {
+                                                        order.shipping_address
+                                                            .district
+                                                    }
+                                                    {order.shipping_address
+                                                        .postalCode &&
+                                                        ` — C.P. ${order.shipping_address.postalCode}`}
+                                                </p>
+                                            )}
                                             <p>
                                                 {
                                                     order.shipping_address

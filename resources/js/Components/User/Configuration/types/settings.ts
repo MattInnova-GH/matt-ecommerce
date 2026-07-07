@@ -65,6 +65,7 @@ export interface SettingsProps {
     addresses: Address[];
     orders: Order[];
     favorites: Favorite[];
+    twoFactorEnabled: boolean;
     flash?: {
         success?: string;
     };
@@ -73,6 +74,7 @@ export interface SettingsProps {
 export type Section =
     | 'profile'
     | 'password'
+    | 'security'
     | 'addresses'
     | 'orders'
     | 'favorites';

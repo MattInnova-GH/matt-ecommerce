@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     Users,
     Package,
@@ -7,6 +7,8 @@ import {
     AlertTriangle,
     MessageSquare,
     ArrowUpRight,
+    ArrowDownRight,
+    Sparkles,
     Clock,
     DollarSign,
 } from 'lucide-react';
@@ -28,7 +30,9 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import admin from '@/routes/admin';
 import {
     AreaChart,
     Area,
@@ -39,6 +43,18 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 
+type Period = 'daily' | 'weekly' | 'monthly';
+
+interface StatChange {
+    percent: number | null;
+    isNew: boolean;
+}
+
+interface StatMetric {
+    value: number;
+    change: StatChange;
+}
+
 interface LowStockProduct {
     id: number;
     name: string;
@@ -46,9 +62,9 @@ interface LowStockProduct {
 }
 
 interface DashboardStats {
-    totalRevenue: number;
-    totalOrders: number;
-    totalCustomers: number;
+    revenue: StatMetric;
+    orders: StatMetric;
+    customers: StatMetric;
     lowStockCount: number;
     pendingReviewsCount: number;
     lowStockProducts: LowStockProduct[];
@@ -76,10 +92,71 @@ interface TopProduct {
 }
 
 interface Props {
+    period: Period;
     stats: DashboardStats;
     salesData: SalesDataItem[];
     recentOrders: RecentOrder[];
     topProducts: TopProduct[];
+}
+
+const PERIOD_LABELS: Record<Period, string> = {
+    daily: 'Hoy',
+    weekly: 'Esta semana',
+    monthly: 'Este mes',
+};
+
+const PERIOD_COMPARISON_LABELS: Record<Period, string> = {
+    daily: 'respecto a ayer',
+    weekly: 'respecto a la semana pasada',
+    monthly: 'respecto al mes anterior',
+};
+
+function ChangeIndicator({
+    change,
+    period,
+}: {
+    change: StatChange;
+    period: Period;
+}) {
+    if (change.percent === null) {
+        if (change.isNew) {
+            return (
+                <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1 font-medium text-emerald-500">
+                        <Sparkles className="size-3" /> Nuevo
+                    </span>
+                    sin datos del periodo anterior
+                </p>
+            );
+        }
+        return (
+            <p className="mt-1 text-xs text-muted-foreground">
+                Sin datos aún para comparar
+            </p>
+        );
+    }
+
+    const isPositive = change.percent >= 0;
+
+    return (
+        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+            <span
+                className={cn(
+                    'flex items-center font-medium',
+                    isPositive ? 'text-emerald-500' : 'text-red-500',
+                )}
+            >
+                {isPositive ? (
+                    <ArrowUpRight className="size-3" />
+                ) : (
+                    <ArrowDownRight className="size-3" />
+                )}
+                {isPositive ? '+' : ''}
+                {change.percent}%
+            </span>
+            {PERIOD_COMPARISON_LABELS[period]}
+        </p>
+    );
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -99,21 +176,45 @@ function formatCurrency(amount: number) {
 }
 
 export default function Dashboard({
+    period,
     stats,
     salesData,
     recentOrders,
     topProducts,
 }: Props) {
+    const changePeriod = (value: string) => {
+        router.get(
+            admin.dashboard.url(),
+            { period: value },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
+
     return (
         <div className="animate-in space-y-8 duration-700 fade-in">
             <Head title="Panel de Control" />
 
-            <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                <p className="text-muted-foreground">
-                    Bienvenido de nuevo. Aquí tienes un resumen del estado de tu
-                    tienda.
-                </p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-2">
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Dashboard
+                    </h1>
+                    <p className="text-muted-foreground">
+                        Bienvenido de nuevo. Aquí tienes un resumen del estado
+                        de tu tienda —{' '}
+                        <span className="font-medium">
+                            {PERIOD_LABELS[period]}
+                        </span>
+                        .
+                    </p>
+                </div>
+                <Tabs value={period} onValueChange={changePeriod}>
+                    <TabsList>
+                        <TabsTrigger value="daily">Día</TabsTrigger>
+                        <TabsTrigger value="weekly">Semana</TabsTrigger>
+                        <TabsTrigger value="monthly">Mes</TabsTrigger>
+                    </TabsList>
+                </Tabs>
             </div>
 
             {/* Tarjetas de Estadísticas Principales */}
@@ -121,7 +222,7 @@ export default function Dashboard({
                 <Card className="overflow-hidden border-none bg-white shadow-md">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Ingresos Totales
+                            Ingresos ({PERIOD_LABELS[period]})
                         </CardTitle>
                         <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600">
                             <DollarSign className="size-4" />
@@ -129,21 +230,19 @@ export default function Dashboard({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {formatCurrency(stats.totalRevenue)}
+                            {formatCurrency(stats.revenue.value)}
                         </div>
-                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                            <span className="flex items-center font-medium text-emerald-500">
-                                <ArrowUpRight className="size-3" /> +12%
-                            </span>
-                            respecto al mes anterior
-                        </p>
+                        <ChangeIndicator
+                            change={stats.revenue.change}
+                            period={period}
+                        />
                     </CardContent>
                 </Card>
 
                 <Card className="overflow-hidden border-none bg-white shadow-md">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Pedidos
+                            Pedidos ({PERIOD_LABELS[period]})
                         </CardTitle>
                         <div className="rounded-lg bg-blue-50 p-2 text-blue-600">
                             <ShoppingCart className="size-4" />
@@ -151,21 +250,19 @@ export default function Dashboard({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {stats.totalOrders}
+                            {stats.orders.value}
                         </div>
-                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                            <span className="flex items-center font-medium text-emerald-500">
-                                <ArrowUpRight className="size-3" /> +5%
-                            </span>
-                            ventas hoy
-                        </p>
+                        <ChangeIndicator
+                            change={stats.orders.change}
+                            period={period}
+                        />
                     </CardContent>
                 </Card>
 
                 <Card className="overflow-hidden border-none bg-white shadow-md">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Clientes
+                            Clientes nuevos ({PERIOD_LABELS[period]})
                         </CardTitle>
                         <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600">
                             <Users className="size-4" />
@@ -173,14 +270,12 @@ export default function Dashboard({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {stats.totalCustomers}
+                            {stats.customers.value}
                         </div>
-                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                            <span className="flex items-center font-medium text-emerald-500">
-                                <ArrowUpRight className="size-3" /> +18
-                            </span>
-                            registros nuevos
-                        </p>
+                        <ChangeIndicator
+                            change={stats.customers.change}
+                            period={period}
+                        />
                     </CardContent>
                 </Card>
 
@@ -300,7 +395,12 @@ export default function Dashboard({
                             Rendimiento de Ventas
                         </CardTitle>
                         <CardDescription>
-                            Resumen de los últimos 7 días
+                            {period === 'daily' &&
+                                'Ingresos de los últimos 14 días'}
+                            {period === 'weekly' &&
+                                'Ingresos de las últimas 8 semanas'}
+                            {period === 'monthly' &&
+                                'Ingresos de los últimos 6 meses'}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="h-[350px] pl-2">
@@ -374,7 +474,8 @@ export default function Dashboard({
                     <CardHeader>
                         <CardTitle className="text-lg">Más Vendidos</CardTitle>
                         <CardDescription>
-                            Productos con mayor demanda
+                            Productos con mayor demanda —{' '}
+                            {PERIOD_LABELS[period].toLowerCase()}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

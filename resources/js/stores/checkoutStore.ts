@@ -8,6 +8,8 @@ export interface DeliveryAddress {
     lat: number;
     lng: number;
     address: string;
+    district: string;
+    postalCode: string;
     reference?: string;
     phone: string;
     recipientName: string;

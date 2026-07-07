@@ -1,7 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
 import { X, Banknote, Copy, Check, Upload, FileText } from 'lucide-react';
 import { useCheckoutStore } from '@/stores/checkoutStore';
+
+const MAX_VOUCHER_SIZE_MB = 5;
 
 const BANK_INFO = {
     bankName: 'BCP',
@@ -30,6 +33,13 @@ export function TransferModal() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = e.target.files?.[0];
         if (!selected) return;
+        if (selected.size > MAX_VOUCHER_SIZE_MB * 1024 * 1024) {
+            toast.error(
+                `El comprobante no debe pesar más de ${MAX_VOUCHER_SIZE_MB}MB.`,
+            );
+            e.target.value = '';
+            return;
+        }
         setFile(selected);
         const reader = new FileReader();
         reader.onloadend = () => setPreviewUrl(reader.result as string);
