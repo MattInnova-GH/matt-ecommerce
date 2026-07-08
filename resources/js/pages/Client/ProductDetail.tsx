@@ -344,7 +344,7 @@ export default function ProductDetail({
                                 onOpenChange={setIsImageDialogOpen}
                             >
                                 <DialogTrigger asChild>
-                                    <div className="relative aspect-square cursor-pointer overflow-hidden rounded-lg border bg-muted">
+                                    <div className="relative aspect-square cursor-pointer overflow-hidden rounded-lg border bg-white">
                                         {selectedImage ? (
                                             <img
                                                 src={selectedImage}
@@ -785,7 +785,7 @@ export default function ProductDetail({
                                             <a
                                                 href={`/productos/${related.slug}`}
                                             >
-                                                <div className="relative aspect-square overflow-hidden bg-muted">
+                                                <div className="relative aspect-square overflow-hidden bg-white">
                                                     {related.thumbnail ? (
                                                         <img
                                                             src={`/storage/${related.thumbnail}`}

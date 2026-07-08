@@ -73,7 +73,7 @@ export default function CategoryProducts({
 
                 {/* Header con imagen de categoría */}
                 {category.image ? (
-                    <div className="relative h-48 w-full overflow-hidden rounded-xl bg-muted/50">
+                    <div className="relative h-48 w-full overflow-hidden rounded-xl bg-white">
                         <img
                             src={`/storage/${category.image}`}
                             alt={category.name}
@@ -120,7 +120,7 @@ export default function CategoryProducts({
                                     key={product.id}
                                     className="group overflow-hidden border shadow-sm transition-all hover:shadow-md"
                                 >
-                                    <div className="relative h-48 overflow-hidden bg-muted/50">
+                                    <div className="relative h-48 overflow-hidden bg-white">
                                         {product.thumbnail ? (
                                             <img
                                                 src={`/storage/${product.thumbnail}`}

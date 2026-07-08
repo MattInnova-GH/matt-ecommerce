@@ -56,7 +56,7 @@ export default function Category({ categories }: CategoryProps) {
                                 key={category.id}
                                 className="group overflow-hidden border shadow-sm transition-all hover:shadow-md"
                             >
-                                <div className="relative h-40 overflow-hidden bg-muted/50">
+                                <div className="relative h-40 overflow-hidden bg-white">
                                     {category.image ? (
                                         <img
                                             src={`/storage/${category.image}`}

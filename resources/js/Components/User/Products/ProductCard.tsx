@@ -34,7 +34,7 @@ function OptimizedImage({
     return (
         <div
             className={cn(
-                'relative h-full w-full overflow-hidden bg-muted/50',
+                'relative h-full w-full overflow-hidden bg-white',
                 className,
             )}
         >
@@ -96,7 +96,7 @@ export default function ProductCard({ product }: Props) {
     return (
         <div className="group relative flex flex-col gap-2">
             <Link href={`/productos/${product.slug}`} className="block">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-muted">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-gray-100 bg-white">
                     {product.imageUrl ? (
                         <OptimizedImage
                             src={product.imageUrl}
