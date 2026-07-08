@@ -20,6 +20,7 @@ import {
     CheckCircle2,
     QrCode,
     Smartphone,
+    Banknote,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,6 +54,11 @@ interface SettingsData {
     tiktok: string | null;
     yape_qr: string | null;
     yape_number: string | null;
+    bank_name: string | null;
+    bank_account_number: string | null;
+    bank_cci: string | null;
+    bank_holder: string | null;
+    bank_currency: string | null;
 }
 
 interface Props {
@@ -195,6 +201,11 @@ export default function Settings({ settings }: Props) {
         tiktok: settings?.tiktok || '',
         yape_qr: null as File | null,
         yape_number: settings?.yape_number || '',
+        bank_name: settings?.bank_name || '',
+        bank_account_number: settings?.bank_account_number || '',
+        bank_cci: settings?.bank_cci || '',
+        bank_holder: settings?.bank_holder || '',
+        bank_currency: settings?.bank_currency || '',
     });
 
     // ── Logic (unchanged) ──────────────────────────────────────────────────────
@@ -231,6 +242,12 @@ export default function Settings({ settings }: Props) {
             formData.append('remove_yape_qr', '1');
         }
         formData.append('yape_number', data.yape_number || '');
+
+        formData.append('bank_name', data.bank_name || '');
+        formData.append('bank_account_number', data.bank_account_number || '');
+        formData.append('bank_cci', data.bank_cci || '');
+        formData.append('bank_holder', data.bank_holder || '');
+        formData.append('bank_currency', data.bank_currency || '');
 
         formData.append('_method', 'PUT');
 
@@ -289,7 +306,9 @@ export default function Settings({ settings }: Props) {
                     <div className="h-px w-3 bg-border" />
                     <SectionStep number={4} label="Yape" active />
                     <div className="h-px w-3 bg-border" />
-                    <SectionStep number={5} label="Redes" active />
+                    <SectionStep number={5} label="Transferencia" active />
+                    <div className="h-px w-3 bg-border" />
+                    <SectionStep number={6} label="Redes" active />
                 </div>
             </div>
 
@@ -569,7 +588,137 @@ export default function Settings({ settings }: Props) {
                     </CardContent>
                 </Card>
 
-                {/* ── SECTION 5 · Redes Sociales ──────────────────────────── */}
+                {/* ── SECTION 5 · Transferencia bancaria ──────────────────── */}
+                <Card className="overflow-hidden">
+                    <CardHeader className="border-b bg-muted/30 px-6 py-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                                <Banknote className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-sm font-semibold">
+                                    Transferencia bancaria
+                                </CardTitle>
+                                <CardDescription className="text-xs">
+                                    Cuenta que verán tus clientes al pagar por
+                                    transferencia o depósito bancario
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 px-6 py-5 sm:grid-cols-2">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="bank_name" className="text-sm">
+                                Banco
+                            </Label>
+                            <Input
+                                id="bank_name"
+                                value={data.bank_name}
+                                onChange={(e) =>
+                                    setData('bank_name', e.target.value)
+                                }
+                                placeholder="BCP"
+                                className="h-9"
+                            />
+                            {errors.bank_name && (
+                                <p className="text-xs text-destructive">
+                                    {errors.bank_name}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label
+                                htmlFor="bank_currency"
+                                className="text-sm"
+                            >
+                                Moneda
+                            </Label>
+                            <Input
+                                id="bank_currency"
+                                value={data.bank_currency}
+                                onChange={(e) =>
+                                    setData('bank_currency', e.target.value)
+                                }
+                                placeholder="Soles (PEN)"
+                                className="h-9"
+                            />
+                            {errors.bank_currency && (
+                                <p className="text-xs text-destructive">
+                                    {errors.bank_currency}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label
+                                htmlFor="bank_account_number"
+                                className="text-sm"
+                            >
+                                N° de cuenta
+                            </Label>
+                            <Input
+                                id="bank_account_number"
+                                value={data.bank_account_number}
+                                onChange={(e) =>
+                                    setData(
+                                        'bank_account_number',
+                                        e.target.value,
+                                    )
+                                }
+                                placeholder="191-12345678-0-12"
+                                className="h-9"
+                            />
+                            {errors.bank_account_number && (
+                                <p className="text-xs text-destructive">
+                                    {errors.bank_account_number}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label htmlFor="bank_cci" className="text-sm">
+                                CCI interbancario
+                            </Label>
+                            <Input
+                                id="bank_cci"
+                                value={data.bank_cci}
+                                onChange={(e) =>
+                                    setData('bank_cci', e.target.value)
+                                }
+                                placeholder="002-191-001234567812-34"
+                                className="h-9"
+                            />
+                            {errors.bank_cci && (
+                                <p className="text-xs text-destructive">
+                                    {errors.bank_cci}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5 sm:col-span-2">
+                            <Label htmlFor="bank_holder" className="text-sm">
+                                Titular de la cuenta
+                            </Label>
+                            <Input
+                                id="bank_holder"
+                                value={data.bank_holder}
+                                onChange={(e) =>
+                                    setData('bank_holder', e.target.value)
+                                }
+                                placeholder="Mi Empresa S.A.C."
+                                className="h-9"
+                            />
+                            {errors.bank_holder && (
+                                <p className="text-xs text-destructive">
+                                    {errors.bank_holder}
+                                </p>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* ── SECTION 6 · Redes Sociales ──────────────────────────── */}
                 <Card className="overflow-hidden">
                     <CardHeader className="border-b bg-muted/30 px-6 py-4">
                         <div className="flex items-center gap-3">

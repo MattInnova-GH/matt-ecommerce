@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -221,22 +222,26 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        return DB::transaction(function () use ($product) {
-            // Eliminar thumbnail
-            if ($product->thumbnail) {
-                Storage::disk('public')->delete($product->thumbnail);
-            }
+        try {
+            DB::transaction(function () use ($product) {
+                // Eliminar producto (las variantes se eliminan por cascade)
+                $product->delete();
+            });
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'No se puede eliminar el producto "'.$product->name.'" porque ya tiene pedidos o carritos asociados.');
+        }
 
-            // Eliminar imágenes de galería
-            foreach ($product->images as $image) {
-                Storage::disk('public')->delete($image->image_url);
-            }
+        // Eliminar thumbnail
+        if ($product->thumbnail) {
+            Storage::disk('public')->delete($product->thumbnail);
+        }
 
-            // Eliminar producto (las variantes se eliminan por cascade)
-            $product->delete();
+        // Eliminar imágenes de galería
+        foreach ($product->images as $image) {
+            Storage::disk('public')->delete($image->image_url);
+        }
 
-            return redirect()->back()->with('success', 'Producto eliminado correctamente.');
-        });
+        return redirect()->back()->with('success', 'Producto eliminado correctamente.');
     }
 
     public function toggleStatus(Product $product)
