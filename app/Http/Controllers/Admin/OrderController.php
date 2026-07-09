@@ -14,12 +14,32 @@ use Inertia\Inertia;
 class OrderController extends Controller
 {
     public const STATUS_NOTIFICATIONS = [
-        'ACCEPTED' => 'Tu pedido :number fue aceptado y ya lo estamos preparando.',
-        'REJECTED' => 'Tu pedido :number fue rechazado.',
-        'SHIPPED' => 'Tu pedido :number ya fue enviado.',
-        'DELIVERED' => 'Tu pedido :number fue entregado. ¡Gracias por tu compra!',
-        'CANCELLED' => 'Tu pedido :number fue cancelado.',
+        'ACCEPTED' => 'Tu pedido de :product fue aceptado y ya lo estamos preparando.',
+        'REJECTED' => 'Tu pedido de :product fue rechazado.',
+        'SHIPPED' => 'Tu pedido de :product ya fue enviado.',
+        'DELIVERED' => 'Tu pedido de :product fue entregado. ¡Gracias por tu compra!',
+        'CANCELLED' => 'Tu pedido de :product fue cancelado.',
     ];
+
+    /**
+     * Nombre de producto legible para mostrar en notificaciones al cliente
+     * en vez del order_number (un código sin significado para el usuario).
+     */
+    private function productSummary(Order $order): string
+    {
+        $items = $order->items;
+
+        if ($items->isEmpty()) {
+            return $order->order_number;
+        }
+
+        $first = $items->first()->product_name;
+        $remaining = $items->count() - 1;
+
+        return $remaining > 0
+            ? "{$first} y {$remaining} producto".($remaining > 1 ? 's' : '').' más'
+            : $first;
+    }
 
     public function index()
     {
@@ -66,7 +86,7 @@ class OrderController extends Controller
                     'user_id' => $order->user_id,
                     'order_id' => $order->id,
                     'title' => 'Pedido '.strtolower(OrderStatusUpdated::STATUS_LABELS[$order->status] ?? $order->status),
-                    'message' => strtr(self::STATUS_NOTIFICATIONS[$order->status], [':number' => $order->order_number]),
+                    'message' => strtr(self::STATUS_NOTIFICATIONS[$order->status], [':product' => $this->productSummary($order)]),
                 ]);
             }
 
@@ -80,7 +100,7 @@ class OrderController extends Controller
                     'user_id' => $order->user_id,
                     'order_id' => $order->id,
                     'title' => 'Reembolso pendiente',
-                    'message' => "Tu pedido {$order->order_number} fue ".
+                    'message' => "Tu pedido de {$this->productSummary($order)} fue ".
                         ($order->status === 'CANCELLED' ? 'cancelado' : 'rechazado').
                         '. Ingresa tu número de Yape para procesar tu reembolso.',
                     'action' => 'refund_yape_phone',

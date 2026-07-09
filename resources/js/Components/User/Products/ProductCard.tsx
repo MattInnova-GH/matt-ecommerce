@@ -1,8 +1,9 @@
 import { Link, router } from '@inertiajs/react';
-import { Heart, Package } from 'lucide-react';
+import { Heart, Package, ShoppingCart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useCartStore } from '@/stores/cartStore';
 import type { PublicProduct } from './types';
 
 type Props = {
@@ -76,11 +77,14 @@ export function ProductCardSkeleton() {
 
 export default function ProductCard({ product }: Props) {
     const [liked, setLiked] = useState(product.is_favorited ?? false);
+    const { addItem, openCart } = useCartStore();
 
     // ✅ Determinar qué precio mostrar
     const displayPrice = product.has_discount
         ? product.final_price
         : product.price;
+
+    const isOutOfStock = product.stock === 0;
 
     const toggleFavorite = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -91,6 +95,25 @@ export default function ProductCard({ product }: Props) {
             {},
             { preserveScroll: true },
         );
+    };
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isOutOfStock) {
+            return;
+        }
+
+        addItem({
+            id: product.id,
+            name: product.name,
+            price: displayPrice,
+            quantity: 1,
+            image: product.imageUrl || '',
+            category: product.category,
+        });
+        openCart();
     };
 
     return (
@@ -185,6 +208,23 @@ export default function ProductCard({ product }: Props) {
                     )}
                 </div>
             </Link>
+
+            <div className="px-1">
+                <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    disabled={isOutOfStock}
+                    className={cn(
+                        'flex w-full items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold tracking-wide transition-colors',
+                        isOutOfStock
+                            ? 'cursor-not-allowed bg-muted text-muted-foreground'
+                            : 'bg-foreground text-background hover:bg-primary',
+                    )}
+                >
+                    <ShoppingCart size={14} />
+                    {isOutOfStock ? 'Agotado' : 'Agregar al carrito'}
+                </button>
+            </div>
         </div>
     );
 }

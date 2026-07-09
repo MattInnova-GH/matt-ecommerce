@@ -42,7 +42,7 @@ const sections = [
         id: 'derechos',
         title: '7. Tus derechos (ARCO)',
         content:
-            'De conformidad con la Ley N° 29733 – Ley de Protección de Datos Personales del Perú, tienes los siguientes derechos sobre tus datos personales: Acceso: conocer qué datos personales tuyos tenemos almacenados. Rectificación: corregir datos inexactos o incompletos. Cancelación: solicitar la eliminación de tus datos cuando ya no sean necesarios. Oposición: oponerte al tratamiento de tus datos en determinadas circunstancias. Para ejercer estos derechos, envíanos un correo a privacidad@empresa.com.',
+            'De conformidad con la Ley N° 29733 – Ley de Protección de Datos Personales del Perú, tienes los siguientes derechos sobre tus datos personales: Acceso: conocer qué datos personales tuyos tenemos almacenados. Rectificación: corregir datos inexactos o incompletos. Cancelación: solicitar la eliminación de tus datos cuando ya no sean necesarios. Oposición: oponerte al tratamiento de tus datos en determinadas circunstancias. Para ejercer estos derechos, envíanos un correo a contacto@makitoolsperu.com.',
     },
     {
         id: 'menores',
@@ -66,7 +66,7 @@ const sections = [
         id: 'contacto',
         title: '11. Contacto',
         content:
-            'Si tienes preguntas o comentarios sobre esta Política de Privacidad, o si deseas ejercer tus derechos ARCO, puedes contactarnos a través de: correo electrónico: privacidad@empresa.com | teléfono: +51 XXX XXX XXX | dirección postal: [Dirección de la empresa], Lima – Perú. Atenderemos tu solicitud en un plazo máximo de 20 días hábiles.',
+            'Si tienes preguntas o comentarios sobre esta Política de Privacidad, o si deseas ejercer tus derechos ARCO, puedes contactarnos a través de: correo electrónico: contacto@makitoolsperu.com | teléfono: +51 XXX XXX XXX | dirección postal: [Dirección de la empresa], Lima – Perú. Atenderemos tu solicitud en un plazo máximo de 20 días hábiles.',
     },
 ];
 
@@ -152,7 +152,7 @@ export default function PoliticaPrivacidad() {
                                 <p className="text-sm text-gray-500">
                                     ¿Deseas ejercer tus derechos o tienes dudas?{' '}
                                     <a
-                                        href="mailto:privacidad@empresa.com"
+                                        href="mailto:contacto@makitoolsperu.com"
                                         className="font-medium text-emerald-600 hover:underline"
                                     >
                                         Escríbenos

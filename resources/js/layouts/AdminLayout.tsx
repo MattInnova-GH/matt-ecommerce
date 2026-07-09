@@ -16,6 +16,7 @@ import {
     PanelLeftClose,
     PanelLeftOpen,
     TicketPercent,
+    FileWarning,
 } from 'lucide-react';
 import admin from '@/routes/admin';
 
@@ -375,6 +376,11 @@ export default function AdminLayout({
             name: 'Promociones',
             href: admin.promotions.index().url,
             icon: TicketPercent,
+        },
+        {
+            name: 'Reclamos',
+            href: admin.complaints.index().url,
+            icon: FileWarning,
         },
         {
             name: 'Configuración',

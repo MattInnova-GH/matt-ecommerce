@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Complaint extends Model
 {
     protected $fillable = [
-        'code', 'first_name', 'last_name', 'document_number', 'phone',
+        'user_id', 'code', 'first_name', 'last_name', 'document_number', 'phone',
         'email', 'address', 'asset_type', 'asset_description',
         'claimed_amount', 'complaint_type', 'problem_description',
         'consumer_request', 'status',
@@ -16,4 +16,9 @@ class Complaint extends Model
     protected $casts = [
         'claimed_amount' => 'decimal:2',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

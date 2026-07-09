@@ -262,6 +262,36 @@ export default function Chatbot() {
     const inputRef = useRef<HTMLInputElement>(null);
     const nextId = useRef(1);
 
+    // Deslizar hacia abajo para cerrar el chat en móvil (bottom sheet).
+    // Solo se activa desde la manija/cabecera, nunca desde la lista de
+    // mensajes, para no interferir con su scroll interno.
+    const [dragOffset, setDragOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartY = useRef<number | null>(null);
+    const DISMISS_THRESHOLD = 80;
+
+    const handleDragStart = (e: React.TouchEvent) => {
+        dragStartY.current = e.touches[0].clientY;
+        setIsDragging(true);
+    };
+
+    const handleDragMove = (e: React.TouchEvent) => {
+        if (dragStartY.current === null) return;
+        const delta = e.touches[0].clientY - dragStartY.current;
+        if (delta > 0) {
+            setDragOffset(delta);
+        }
+    };
+
+    const handleDragEnd = () => {
+        if (dragOffset > DISMISS_THRESHOLD) {
+            setIsOpen(false);
+        }
+        setDragOffset(0);
+        setIsDragging(false);
+        dragStartY.current = null;
+    };
+
     const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
     if (isOpen !== prevIsOpen) {
         setPrevIsOpen(isOpen);
@@ -335,19 +365,36 @@ export default function Chatbot() {
                 Escritorio: panel flotante esquina inferior-derecha, ancho fijo
             */}
             <div
-                className={`fixed inset-x-0 bottom-0 z-1020 flex max-h-[90vh] flex-col rounded-t-2xl border border-gray-200 bg-white transition-all duration-300 sm:inset-auto sm:right-6 sm:bottom-24 sm:max-h-none sm:w-90 sm:rounded-2xl sm:shadow-2xl ${
+                className={`fixed inset-x-0 bottom-0 z-1020 flex max-h-[90vh] flex-col rounded-t-2xl border border-gray-200 bg-white sm:inset-auto sm:right-6 sm:bottom-24 sm:max-h-none sm:w-90 sm:rounded-2xl sm:shadow-2xl ${
+                    isDragging ? '' : 'transition-all duration-300'
+                } ${
                     isOpen
                         ? 'translate-y-0 opacity-100'
                         : 'pointer-events-none translate-y-full opacity-0 sm:translate-y-3 sm:scale-95'
                 } `}
+                style={
+                    isDragging && dragOffset > 0
+                        ? { transform: `translateY(${dragOffset}px)` }
+                        : undefined
+                }
             >
-                {/* Tirador visual para móvil */}
-                <div className="flex justify-center pt-2 pb-1 sm:hidden">
+                {/* Tirador visual para móvil — deslizar hacia abajo cierra el chat */}
+                <div
+                    className="flex justify-center pt-2 pb-1 sm:hidden"
+                    onTouchStart={handleDragStart}
+                    onTouchMove={handleDragMove}
+                    onTouchEnd={handleDragEnd}
+                >
                     <span className="h-1 w-10 rounded-full bg-gray-300" />
                 </div>
 
-                {/* Cabecera */}
-                <div className="flex shrink-0 items-center justify-between rounded-t-2xl bg-gray-900 px-4 py-3.5">
+                {/* Cabecera — también se puede deslizar hacia abajo para cerrar en móvil */}
+                <div
+                    className="flex shrink-0 items-center justify-between rounded-t-2xl bg-gray-900 px-4 py-3.5"
+                    onTouchStart={handleDragStart}
+                    onTouchMove={handleDragMove}
+                    onTouchEnd={handleDragEnd}
+                >
                     <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
                             <Sparkles className="h-4 w-4 text-white" />

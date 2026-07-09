@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PaymentController;
@@ -50,6 +51,9 @@ Route::middleware(['auth', 'role:admin'])
         // COMENTARIOS DE PRODUCTOS
         Route::resource('reviews', ReviewController::class)->only(['index', 'destroy']);
         Route::post('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+
+        // LIBRO DE RECLAMACIONES
+        Route::resource('complaints', ComplaintController::class)->only(['index', 'update']);
 
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');

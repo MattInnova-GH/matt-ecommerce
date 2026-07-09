@@ -146,7 +146,7 @@ export default function TerminosCondiciones() {
                                     ¿Tienes preguntas sobre nuestros Términos y
                                     Condiciones?{' '}
                                     <a
-                                        href="mailto:legal@empresa.com"
+                                        href="mailto:contacto@makitoolsperu.com"
                                         className="font-medium text-indigo-600 hover:underline"
                                     >
                                         Contáctanos
