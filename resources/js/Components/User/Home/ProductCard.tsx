@@ -11,7 +11,7 @@ export default function ProductCard({ product }: { product: Product }) {
     return (
         <div className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white transition-shadow duration-300 hover:shadow-lg">
             {/* Imagen */}
-            <div className="relative aspect-square overflow-hidden bg-gray-50">
+            <div className="relative aspect-square overflow-hidden bg-white">
                 <img
                     src={product.imageUrl || '/img/placeholder.png'}
                     alt={product.name}

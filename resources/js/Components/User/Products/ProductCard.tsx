@@ -33,7 +33,10 @@ function OptimizedImage({
 
     return (
         <div
-            className={cn('relative h-full w-full overflow-hidden', className)}
+            className={cn(
+                'relative h-full w-full overflow-hidden bg-white',
+                className,
+            )}
         >
             {isLoading && (
                 <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
@@ -43,7 +46,7 @@ function OptimizedImage({
                     src={src}
                     alt={alt}
                     className={cn(
-                        'h-full w-full object-cover transition-all duration-700',
+                        'h-full w-full object-contain p-4 transition-all duration-700',
                         isLoading
                             ? 'scale-110 opacity-0 blur-sm'
                             : 'blur-0 scale-100 opacity-100',
@@ -93,7 +96,7 @@ export default function ProductCard({ product }: Props) {
     return (
         <div className="group relative flex flex-col gap-2">
             <Link href={`/productos/${product.slug}`} className="block">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-muted">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-gray-100 bg-white">
                     {product.imageUrl ? (
                         <OptimizedImage
                             src={product.imageUrl}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { router, useForm, Head } from '@inertiajs/react';
+import { router, useForm, usePage, Head } from '@inertiajs/react';
 import {
     ShoppingCart,
     Star,
@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { useCartStore } from '@/stores/cartStore';
+import { useAuthModalStore } from '@/stores/authModalStore';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -238,6 +239,8 @@ export default function ProductDetail({
     const [selectedVariant, setSelectedVariant] =
         useState<ProductVariant | null>(null);
     const { addItem, openCart } = useCartStore();
+    const { auth } = usePage().props as any;
+    const openAuthModal = useAuthModalStore((state) => state.open);
 
     // ✅ CORREGIDO: Precio base con descuento del producto
     const basePrice = product.has_discount
@@ -296,6 +299,15 @@ export default function ProductDetail({
             image: productImage,
             category: product.category?.name || 'General',
         });
+
+        if (!auth?.user) {
+            toast.error('Debes iniciar sesión para continuar con la compra');
+            openAuthModal({
+                onSuccess: () => router.get('/checkout'),
+            });
+            return;
+        }
+
         router.get('/checkout');
     };
 
@@ -332,12 +344,12 @@ export default function ProductDetail({
                                 onOpenChange={setIsImageDialogOpen}
                             >
                                 <DialogTrigger asChild>
-                                    <div className="relative aspect-square cursor-pointer overflow-hidden rounded-lg border bg-muted">
+                                    <div className="relative aspect-square cursor-pointer overflow-hidden rounded-lg border bg-white">
                                         {selectedImage ? (
                                             <img
                                                 src={selectedImage}
                                                 alt={product.name}
-                                                className="h-full w-full object-cover transition-transform hover:scale-105"
+                                                className="h-full w-full object-contain p-6 transition-transform hover:scale-105"
                                             />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center">
@@ -380,7 +392,7 @@ export default function ProductDetail({
                                                     <img
                                                         src={imgUrl}
                                                         alt={`${product.name} - ${index + 1}`}
-                                                        className="h-full w-full object-cover"
+                                                        className="h-full w-full object-contain p-1.5"
                                                     />
                                                 </button>
                                             </div>
@@ -773,12 +785,12 @@ export default function ProductDetail({
                                             <a
                                                 href={`/productos/${related.slug}`}
                                             >
-                                                <div className="relative aspect-square overflow-hidden bg-muted">
+                                                <div className="relative aspect-square overflow-hidden bg-white">
                                                     {related.thumbnail ? (
                                                         <img
                                                             src={`/storage/${related.thumbnail}`}
                                                             alt={related.name}
-                                                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                                                            className="h-full w-full object-contain p-4 transition-transform group-hover:scale-105"
                                                         />
                                                     ) : (
                                                         <div className="flex h-full w-full items-center justify-center">

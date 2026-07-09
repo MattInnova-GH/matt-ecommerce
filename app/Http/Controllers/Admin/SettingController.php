@@ -36,6 +36,11 @@ class SettingController extends Controller
             'yape_qr' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'remove_yape_qr' => 'nullable|boolean',
             'yape_number' => 'nullable|string|max:20',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_account_number' => 'nullable|string|max:50',
+            'bank_cci' => 'nullable|string|max:50',
+            'bank_holder' => 'nullable|string|max:255',
+            'bank_currency' => 'nullable|string|max:50',
         ]);
 
         unset($validated['remove_logo'], $validated['remove_favicon'], $validated['remove_yape_qr']);

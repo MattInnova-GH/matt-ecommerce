@@ -55,8 +55,7 @@ export default function EditModal({ category, onClose }: Props) {
                 </div>
 
                 <Form
-                    action={admin.categories.update(category.id)}
-                    method="post"
+                    {...admin.categories.update.form(category.id)}
                     encType="multipart/form-data"
                     className="space-y-5 p-6"
                 >

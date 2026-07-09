@@ -37,8 +37,8 @@ export default function EditModal({ brand, onClose }: Props) {
                 </DialogHeader>
 
                 <Form
-                    action={admin.brands.update(brand.id)}
-                    method="post"
+                    {...admin.brands.update.form(brand.id)}
+                    encType="multipart/form-data"
                     className="space-y-5"
                 >
                     {({ errors, processing, wasSuccessful }) => {

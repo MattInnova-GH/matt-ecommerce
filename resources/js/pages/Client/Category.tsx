@@ -56,12 +56,12 @@ export default function Category({ categories }: CategoryProps) {
                                 key={category.id}
                                 className="group overflow-hidden border shadow-sm transition-all hover:shadow-md"
                             >
-                                <div className="relative h-40 overflow-hidden bg-muted/50">
+                                <div className="relative h-40 overflow-hidden bg-white">
                                     {category.image ? (
                                         <img
                                             src={`/storage/${category.image}`}
                                             alt={category.name}
-                                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                            className="h-full w-full object-contain p-4 transition-transform duration-300 group-hover:scale-105"
                                         />
                                     ) : (
                                         <div className="flex h-full w-full items-center justify-center">

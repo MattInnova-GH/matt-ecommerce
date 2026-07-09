@@ -73,11 +73,11 @@ export default function CategoryProducts({
 
                 {/* Header con imagen de categoría */}
                 {category.image ? (
-                    <div className="relative h-48 w-full overflow-hidden rounded-xl">
+                    <div className="relative h-48 w-full overflow-hidden rounded-xl bg-white">
                         <img
                             src={`/storage/${category.image}`}
                             alt={category.name}
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-contain p-6"
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute bottom-4 left-6">
@@ -120,12 +120,12 @@ export default function CategoryProducts({
                                     key={product.id}
                                     className="group overflow-hidden border shadow-sm transition-all hover:shadow-md"
                                 >
-                                    <div className="relative h-48 overflow-hidden bg-muted/50">
+                                    <div className="relative h-48 overflow-hidden bg-white">
                                         {product.thumbnail ? (
                                             <img
                                                 src={`/storage/${product.thumbnail}`}
                                                 alt={product.name}
-                                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                className="h-full w-full object-contain p-4 transition-transform duration-300 group-hover:scale-105"
                                             />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center">

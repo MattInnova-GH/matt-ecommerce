@@ -32,7 +32,7 @@ export default function CategoriesSection({
                         <Link
                             key={category.id}
                             href={`/productos?category=${category.id}`}
-                            className="group relative aspect-3/4 overflow-hidden rounded-2xl"
+                            className="group relative aspect-3/4 overflow-hidden rounded-2xl border border-gray-100 bg-white"
                         >
                             <img
                                 src={
@@ -40,7 +40,7 @@ export default function CategoriesSection({
                                     '/img/placeholder-category.jpg'
                                 }
                                 alt={category.name}
-                                className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-110"
+                                className="absolute inset-0 h-full w-full object-contain p-8 transition-transform duration-700 ease-out group-hover:scale-110"
                             />
 
                             <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />

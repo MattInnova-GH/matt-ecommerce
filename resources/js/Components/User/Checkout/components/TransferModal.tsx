@@ -1,22 +1,22 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { X, Banknote, Copy, Check, Upload, FileText } from 'lucide-react';
 import { useCheckoutStore } from '@/stores/checkoutStore';
 
 const MAX_VOUCHER_SIZE_MB = 5;
 
-const BANK_INFO = {
-    bankName: 'BCP',
-    accountNumber: '191-XXXXXXXX-0-XX',
-    cci: '002-191-00XXXXXXXXXX-XX',
-    holder: 'EMPRESA S.A.C.',
-    currency: 'Soles (PEN)',
-};
-
 export function TransferModal() {
     const { closeTransferModal, setTransferConfirmed, setVoucherFile } =
         useCheckoutStore();
+    const { settings } = usePage().props as any;
+    const bankName: string | null = settings?.bank_name || null;
+    const accountNumber: string | null = settings?.bank_account_number || null;
+    const cci: string | null = settings?.bank_cci || null;
+    const holder: string | null = settings?.bank_holder || null;
+    const currency: string = settings?.bank_currency || 'Soles (PEN)';
+    const isConfigured = Boolean(bankName || accountNumber || cci || holder);
 
     const [copiedField, setCopiedField] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
@@ -93,42 +93,59 @@ export function TransferModal() {
                         </p>
 
                         {/* Datos bancarios */}
-                        <div className="space-y-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
-                            <BankField
-                                label="Banco"
-                                value={BANK_INFO.bankName}
-                                fieldKey="bank"
-                                copiedField={copiedField}
-                                onCopy={copyToClipboard}
-                            />
-                            <BankField
-                                label="N° de cuenta"
-                                value={BANK_INFO.accountNumber}
-                                fieldKey="account"
-                                copiedField={copiedField}
-                                onCopy={copyToClipboard}
-                            />
-                            <BankField
-                                label="CCI interbancario"
-                                value={BANK_INFO.cci}
-                                fieldKey="cci"
-                                copiedField={copiedField}
-                                onCopy={copyToClipboard}
-                            />
-                            <BankField
-                                label="Titular"
-                                value={BANK_INFO.holder}
-                                fieldKey="holder"
-                                copiedField={copiedField}
-                                onCopy={copyToClipboard}
-                            />
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-500">Moneda</span>
-                                <span className="font-medium text-gray-800">
-                                    {BANK_INFO.currency}
-                                </span>
+                        {isConfigured ? (
+                            <div className="space-y-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                                {bankName && (
+                                    <BankField
+                                        label="Banco"
+                                        value={bankName}
+                                        fieldKey="bank"
+                                        copiedField={copiedField}
+                                        onCopy={copyToClipboard}
+                                    />
+                                )}
+                                {accountNumber && (
+                                    <BankField
+                                        label="N° de cuenta"
+                                        value={accountNumber}
+                                        fieldKey="account"
+                                        copiedField={copiedField}
+                                        onCopy={copyToClipboard}
+                                    />
+                                )}
+                                {cci && (
+                                    <BankField
+                                        label="CCI interbancario"
+                                        value={cci}
+                                        fieldKey="cci"
+                                        copiedField={copiedField}
+                                        onCopy={copyToClipboard}
+                                    />
+                                )}
+                                {holder && (
+                                    <BankField
+                                        label="Titular"
+                                        value={holder}
+                                        fieldKey="holder"
+                                        copiedField={copiedField}
+                                        onCopy={copyToClipboard}
+                                    />
+                                )}
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-500">
+                                        Moneda
+                                    </span>
+                                    <span className="font-medium text-gray-800">
+                                        {currency}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-center text-xs text-gray-400">
+                                Los datos de la cuenta bancaria aún no están
+                                configurados
+                            </div>
+                        )}
 
                         {/* Comprobante */}
                         <div>

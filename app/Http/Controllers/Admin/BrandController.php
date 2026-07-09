@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -62,12 +63,16 @@ class BrandController extends Controller
 
     public function destroy(Brand $brand)
     {
+        try {
+            $brand->delete();
+        } catch (QueryException $e) {
+            return redirect()->back()->with('error', 'No se puede eliminar la marca "'.$brand->name.'" porque tiene productos asociados. Reasigna o elimina esos productos primero.');
+        }
+
         if ($brand->logo) {
             Storage::disk('public')->delete($brand->logo);
         }
 
-        $brand->delete();
-
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Marca eliminada correctamente.');
     }
 }
