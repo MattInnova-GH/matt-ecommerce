@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import axios from 'axios';
 import {
     AlertTriangle,
@@ -87,7 +88,7 @@ const QUICK_QUESTIONS = [
 
 const WELCOME: Message = {
     id: 0,
-    text: '¡Hola! Bienvenido a nuestra tienda. Estoy aquí para ayudarte con dudas sobre productos, envíos, pagos y más.\n\n¿En qué puedo ayudarte?',
+    text: '¡Hola! Bienvenido a nuestra tienda. Estoy aquí para ayudarte con dudas sobre productos, envíos, pagos y más.\n\n¿En qué puedo ayudarte? También puedes escribirme el nombre de un producto, categoría o marca y te digo el precio y stock actual.',
     sender: 'bot',
     icon: 'sparkles',
     timestamp: new Date(),
@@ -98,6 +99,58 @@ function BotIcon({ name, size = 14 }: { name?: string; size?: number }) {
     return <Icon size={size} />;
 }
 
+// Convierte una línea de texto en nodos React, soportando:
+// - **negrita**
+// - rutas internas /productos/... y /categorias/... (como Link de Inertia)
+// - URLs externas http(s)://...
+function renderLineWithLinksAndBold(line: string, keyPrefix: string) {
+    const tokenRegex =
+        /(\*\*[^*]+\*\*|https?:\/\/[^\s]+|\/productos\/[^\s]+|\/categorias\/[^\s]+)/g;
+    const parts = line
+        .split(tokenRegex)
+        .filter((p) => p !== undefined && p !== '');
+
+    return parts.map((part, i) => {
+        const key = `${keyPrefix}-${i}`;
+
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return (
+                <strong key={key} className="font-semibold">
+                    {part.slice(2, -2)}
+                </strong>
+            );
+        }
+
+        if (part.startsWith('/productos/') || part.startsWith('/categorias/')) {
+            return (
+                <Link
+                    key={key}
+                    href={part}
+                    className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
+                >
+                    Ver más
+                </Link>
+            );
+        }
+
+        if (part.startsWith('http://') || part.startsWith('https://')) {
+            return (
+                <a
+                    key={key}
+                    href={part}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800"
+                >
+                    Ver más
+                </a>
+            );
+        }
+
+        return <span key={key}>{part}</span>;
+    });
+}
+
 function MessageBubble({ msg }: { msg: Message }) {
     const isUser = msg.sender === 'user';
 
@@ -106,18 +159,9 @@ function MessageBubble({ msg }: { msg: Message }) {
             if (line === '')
                 return <span key={lineIdx} className="block h-1.5" />;
 
-            const parts = line.split(/(\*\*[^*]+\*\*)/g);
             return (
                 <span key={lineIdx} className="block">
-                    {parts.map((part, i) =>
-                        part.startsWith('**') && part.endsWith('**') ? (
-                            <strong key={i} className="font-semibold">
-                                {part.slice(2, -2)}
-                            </strong>
-                        ) : (
-                            <span key={i}>{part}</span>
-                        ),
-                    )}
+                    {renderLineWithLinksAndBold(line, `l${lineIdx}`)}
                 </span>
             );
         });
@@ -210,6 +254,10 @@ export default function Chatbot() {
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
+    // Controla el panel de "preguntas frecuentes / menú principal".
+    // Empieza visible y el usuario puede reabrirlo cuando quiera con el
+    // botón "Menú principal" que está siempre disponible arriba del input.
+    const [showQuickQuestions, setShowQuickQuestions] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const nextId = useRef(1);
@@ -244,6 +292,10 @@ export default function Chatbot() {
         addMessage(trimmed, 'user');
         setInputValue('');
         setIsLoading(true);
+        // Al enviar cualquier mensaje (escrito o desde una pregunta rápida)
+        // colapsamos el panel para dejar ver la conversación; el usuario
+        // puede volver a abrirlo con el botón "Menú principal".
+        setShowQuickQuestions(false);
 
         try {
             const { data } = await axios.post<{
@@ -267,8 +319,6 @@ export default function Chatbot() {
         e.preventDefault();
         sendMessage(inputValue);
     };
-
-    const showQuickQuestions = messages.length <= 2 && !isLoading;
 
     return (
         <>
@@ -338,12 +388,21 @@ export default function Chatbot() {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Preguntas rápidas */}
+                {/* Preguntas rápidas / menú principal */}
                 {showQuickQuestions && (
                     <div className="shrink-0 border-t border-gray-100 px-4 py-3">
-                        <p className="mb-2 text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
-                            Preguntas frecuentes
-                        </p>
+                        <div className="mb-2 flex items-center justify-between">
+                            <p className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+                                Preguntas frecuentes
+                            </p>
+                            <button
+                                onClick={() => setShowQuickQuestions(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                                aria-label="Ocultar menú"
+                            >
+                                <X className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
                         <div className="grid grid-cols-1 gap-1.5 sm:flex sm:flex-col">
                             {QUICK_QUESTIONS.map((q) => (
                                 <button
@@ -355,6 +414,19 @@ export default function Chatbot() {
                                 </button>
                             ))}
                         </div>
+                    </div>
+                )}
+
+                {/* Barra de acceso rápido: siempre visible para volver al menú principal */}
+                {!showQuickQuestions && (
+                    <div className="shrink-0 border-t border-gray-100 px-4 py-2">
+                        <button
+                            onClick={() => setShowQuickQuestions(true)}
+                            className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-[11px] font-medium text-gray-600 transition hover:border-gray-400 hover:bg-gray-50"
+                        >
+                            <LayoutGrid className="h-3 w-3" />
+                            Menú principal
+                        </button>
                     </div>
                 )}
 

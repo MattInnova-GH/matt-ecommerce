@@ -6,21 +6,31 @@ use App\Http\Data\ChatbotDataset;
 
 class ChatbotResponseFinder
 {
-    private TextNormalizer $normalizer;
-
-    public function __construct(TextNormalizer $normalizer)
-    {
-        $this->normalizer = $normalizer;
-    }
+    public function __construct(
+        private TextNormalizer $normalizer,
+        private ChatbotProductMatcher $productMatcher,
+    ) {}
 
     /**
-     * Encuentra la mejor respuesta según el mensaje del usuario
+     * Encuentra la mejor respuesta según el mensaje del usuario.
+     *
+     * Orden de prioridad:
+     * 1. ¿Menciona un producto / categoría / marca real de la tienda?
+     *    -> responde con datos actuales (precio, stock, descuento).
+     * 2. Si no, busca en el dataset estático de preguntas frecuentes.
+     * 3. Si nada coincide, respuesta por defecto.
      *
      * @return array{response: string, icon: string}
      */
     public function findBestResponse(string $message): array
     {
         $normalizedMessage = $this->normalizer->normalize($message);
+
+        $dynamicResponse = $this->productMatcher->match($normalizedMessage);
+        if ($dynamicResponse !== null) {
+            return $dynamicResponse;
+        }
+
         $dataset = ChatbotDataset::get();
 
         $bestMatch = null;
@@ -72,7 +82,7 @@ class ChatbotResponseFinder
     {
         return [
             'icon' => 'help-circle',
-            'response' => "No estoy seguro de cómo ayudarte con eso. Puedo orientarte sobre:\n\n• Productos y categorías\n• Envíos y tiempos de entrega\n• Métodos de pago (Yape, transferencia)\n• Estado de pedidos\n• Devoluciones y cambios\n• Tu cuenta y perfil\n\n¿Puedes reformular tu pregunta?",
+            'response' => "No estoy seguro de cómo ayudarte con eso. Puedo orientarte sobre:\n\n• Productos, precios y stock (escribe el nombre del producto)\n• Categorías y marcas disponibles\n• Envíos y tiempos de entrega\n• Métodos de pago (Yape, transferencia)\n• Estado de pedidos\n• Devoluciones y cambios\n• Tu cuenta y perfil\n\n¿Puedes reformular tu pregunta?",
         ];
     }
 }
