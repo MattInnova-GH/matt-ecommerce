@@ -93,14 +93,14 @@ export default function HeroSection({ banners }: Props) {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-2xl text-white">
                         <h1 className="animate-fade-in-up mb-4 text-3xl leading-tight font-bold sm:text-4xl md:text-6xl lg:text-7xl">
-                            Encuentra todo
+                            Todo lo que
                             <span className="block bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                                en un solo lugar
+                                necesitas en un solo lugar
                             </span>
                         </h1>
                         <p className="animate-fade-in-up animation-delay-100 mb-6 max-w-lg text-base text-gray-200 sm:text-lg md:text-xl">
-                            Miles de productos, mejores precios y envíos
-                            rápidos. Descubre las mejores ofertas hoy mismo.
+                            Herramientas de calidad, mejores precios y envío
+                            rápido a todo el Perú.
                         </p>
 
                         <div className="animate-fade-in-up animation-delay-200 flex flex-col gap-4 sm:flex-row">

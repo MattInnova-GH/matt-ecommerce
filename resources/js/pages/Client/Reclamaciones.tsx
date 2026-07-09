@@ -527,17 +527,15 @@ export default function Reclamaciones() {
                             <div className="space-y-3 text-sm text-gray-600">
                                 <div className="flex items-center gap-3">
                                     <Phone className="h-4 w-4 shrink-0 text-gray-400" />
-                                    <span>+51 992 422 219</span>
+                                    <span>+51 953 260 120</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Mail className="h-4 w-4 shrink-0 text-gray-400" />
-                                    <span>contacto@mattinnovasolution.com</span>
+                                    <span>contacto@makitoolsperu.com</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <MapPin className="h-4 w-4 shrink-0 text-gray-400" />
-                                    <span>
-                                        Dirección de la empresa, Cañete – Perú
-                                    </span>
+                                    <span>Av. La Esperanza 543 Ate -Lima</span>
                                 </div>
                             </div>
                         </div>

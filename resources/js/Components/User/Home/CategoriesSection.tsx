@@ -28,7 +28,7 @@ export default function CategoriesSection({
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {categories.map((category) => (
+                    {categories.slice(0, 6).map((category) => (
                         <Link
                             key={category.id}
                             href={`/productos?category=${category.id}`}

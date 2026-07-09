@@ -39,8 +39,8 @@ export default function Footer() {
                             )}
                         </Link>
                         <p className="mb-6 text-sm leading-relaxed text-gray-400">
-                            Tu tienda online de confianza. Encuentra todo lo que
-                            necesitas con los mejores precios y envíos rápidos.
+                            Tu tienda de herramientas de confianza. Calidad,
+                            buenos precios y envío rápido.
                         </p>
                         <div className="flex gap-4">
                             {settings?.facebook && (
