@@ -69,10 +69,10 @@ function CreateModal({
     onClose: () => void;
 }) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
+            <div className="my-8 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-100 p-6">
+                <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl border-b border-gray-100 bg-white p-6">
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-900">
                             <Tag className="h-5 w-5 text-white" />
@@ -341,10 +341,10 @@ function EditModal({
     onClose: () => void;
 }) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm">
+            <div className="my-8 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-100 p-6">
+                <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl border-b border-gray-100 bg-white p-6">
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
                             <Edit className="h-5 w-5 text-white" />
@@ -784,133 +784,146 @@ export default function Promotions({ promotions, categories }: Props) {
             {/* Tabla (desktop) */}
             <div className="hidden overflow-hidden rounded-2xl bg-white shadow-sm lg:block">
                 <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead className="border-b border-gray-200 bg-gray-50">
-                        <tr>
-                            {[
-                                'Campaña',
-                                'Categoría',
-                                'Descuento',
-                                'Período',
-                                'Estado',
-                                'Acciones',
-                            ].map((h) => (
-                                <th
-                                    key={h}
-                                    className="px-6 py-4 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                                >
-                                    {h}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {filtered.map((promotion) => (
-                            <tr key={promotion.id} className="hover:bg-gray-50">
-                                {/* Campaña */}
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-pink-100">
-                                            <Tag
-                                                size={18}
-                                                className="text-purple-600"
-                                            />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-gray-900">
-                                                {promotion.name}
-                                            </p>
-                                            {promotion.description && (
-                                                <p className="max-w-[200px] truncate text-xs text-gray-400">
-                                                    {promotion.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </td>
-
-                                {/* Categoría */}
-                                <td className="px-6 py-4">
-                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-                                        <FolderTree size={12} />
-                                        {promotion.category?.name ?? '—'}
-                                    </span>
-                                </td>
-
-                                {/* Descuento */}
-                                <td className="px-6 py-4">
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-sm font-bold text-amber-700">
-                                        {promotion.discount_type ===
-                                        'percentage' ? (
-                                            <Percent size={14} />
-                                        ) : (
-                                            <DollarSign size={14} />
-                                        )}
-                                        {promotion.discount_type ===
-                                        'percentage'
-                                            ? `${promotion.discount_value}%`
-                                            : `S/ ${promotion.discount_value}`}
-                                    </span>
-                                </td>
-
-                                {/* Período */}
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-1.5 text-xs text-gray-600">
-                                        <Calendar
-                                            size={13}
-                                            className="text-gray-400"
-                                        />
-                                        <span>
-                                            {formatDate(promotion.starts_at)}
-                                        </span>
-                                        <span className="text-gray-300">→</span>
-                                        <span>
-                                            {formatDate(promotion.ends_at)}
-                                        </span>
-                                    </div>
-                                </td>
-
-                                {/* Estado */}
-                                <td className="px-6 py-4">
-                                    <button
-                                        onClick={() =>
-                                            router.put(
-                                                toggleStatus.url(promotion.id),
-                                            )
-                                        }
-                                        title="Click para cambiar estado"
+                    <table className="w-full">
+                        <thead className="border-b border-gray-200 bg-gray-50">
+                            <tr>
+                                {[
+                                    'Campaña',
+                                    'Categoría',
+                                    'Descuento',
+                                    'Período',
+                                    'Estado',
+                                    'Acciones',
+                                ].map((h) => (
+                                    <th
+                                        key={h}
+                                        className="px-6 py-4 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
                                     >
-                                        <StatusBadge promotion={promotion} />
-                                    </button>
-                                </td>
-
-                                {/* Acciones */}
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                        <button
-                                            onClick={() =>
-                                                setEditPromotion(promotion)
-                                            }
-                                            className="rounded-lg p-2 text-blue-400 hover:bg-blue-50"
-                                            title="Editar"
-                                        >
-                                            <Edit size={16} />
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                setDeletePromotion(promotion)
-                                            }
-                                            className="rounded-lg p-2 text-red-400 hover:bg-red-50"
-                                            title="Eliminar"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </td>
+                                        {h}
+                                    </th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {filtered.map((promotion) => (
+                                <tr
+                                    key={promotion.id}
+                                    className="hover:bg-gray-50"
+                                >
+                                    {/* Campaña */}
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-pink-100">
+                                                <Tag
+                                                    size={18}
+                                                    className="text-purple-600"
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900">
+                                                    {promotion.name}
+                                                </p>
+                                                {promotion.description && (
+                                                    <p className="max-w-[200px] truncate text-xs text-gray-400">
+                                                        {promotion.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    {/* Categoría */}
+                                    <td className="px-6 py-4">
+                                        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                                            <FolderTree size={12} />
+                                            {promotion.category?.name ?? '—'}
+                                        </span>
+                                    </td>
+
+                                    {/* Descuento */}
+                                    <td className="px-6 py-4">
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-sm font-bold text-amber-700">
+                                            {promotion.discount_type ===
+                                            'percentage' ? (
+                                                <Percent size={14} />
+                                            ) : (
+                                                <DollarSign size={14} />
+                                            )}
+                                            {promotion.discount_type ===
+                                            'percentage'
+                                                ? `${promotion.discount_value}%`
+                                                : `S/ ${promotion.discount_value}`}
+                                        </span>
+                                    </td>
+
+                                    {/* Período */}
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                            <Calendar
+                                                size={13}
+                                                className="text-gray-400"
+                                            />
+                                            <span>
+                                                {formatDate(
+                                                    promotion.starts_at,
+                                                )}
+                                            </span>
+                                            <span className="text-gray-300">
+                                                →
+                                            </span>
+                                            <span>
+                                                {formatDate(promotion.ends_at)}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    {/* Estado */}
+                                    <td className="px-6 py-4">
+                                        <button
+                                            onClick={() =>
+                                                router.put(
+                                                    toggleStatus.url(
+                                                        promotion.id,
+                                                    ),
+                                                )
+                                            }
+                                            title="Click para cambiar estado"
+                                        >
+                                            <StatusBadge
+                                                promotion={promotion}
+                                            />
+                                        </button>
+                                    </td>
+
+                                    {/* Acciones */}
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() =>
+                                                    setEditPromotion(promotion)
+                                                }
+                                                className="rounded-lg p-2 text-blue-400 hover:bg-blue-50"
+                                                title="Editar"
+                                            >
+                                                <Edit size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    setDeletePromotion(
+                                                        promotion,
+                                                    )
+                                                }
+                                                className="rounded-lg p-2 text-red-400 hover:bg-red-50"
+                                                title="Eliminar"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -937,9 +950,7 @@ export default function Promotions({ promotions, categories }: Props) {
                             </div>
                             <div className="flex shrink-0 items-center gap-1">
                                 <button
-                                    onClick={() =>
-                                        setEditPromotion(promotion)
-                                    }
+                                    onClick={() => setEditPromotion(promotion)}
                                     className="rounded-lg p-2 text-blue-400 hover:bg-blue-50"
                                     title="Editar"
                                 >

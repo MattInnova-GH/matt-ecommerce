@@ -6,13 +6,11 @@ import {
     MoreHorizontal,
     Trash2,
     Shield,
-    Ban,
     CheckCircle,
     Mail,
     Calendar,
     UserCheck,
     UserX,
-    RefreshCw,
     Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -86,7 +84,6 @@ export default function Users({ users, roles }: Props) {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [showRoleDialog, setShowRoleDialog] = useState(false);
     const [selectedRole, setSelectedRole] = useState<string>('');
-    const [userToBlock, setUserToBlock] = useState<User | null>(null);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -159,34 +156,6 @@ export default function Users({ users, roles }: Props) {
         );
     };
 
-    const handleToggleBlock = () => {
-        if (!userToBlock) {
-            return;
-        }
-
-        const user = userToBlock; // capturar antes
-        const wasActive = user.is_active;
-        setIsProcessing(true);
-
-        router.post(
-            admin.users.toggleBlock(user.id),
-            {},
-            {
-                onSuccess: () => {
-                    setUserToBlock(null);
-                    toast.success(
-                        `Usuario ${wasActive ? 'desbloqueado' : 'bloqueado'} exitosamente`,
-                    );
-                    setIsProcessing(false);
-                },
-                onError: () => {
-                    toast.error('Error al cambiar el estado del usuario');
-                    setIsProcessing(false);
-                },
-            },
-        );
-    };
-
     const getRoleBadgeColor = (roleName: string) => {
         const colors: Record<string, string> = {
             admin: 'bg-red-100 text-red-700',
@@ -217,22 +186,7 @@ export default function Users({ users, roles }: Props) {
                     <Shield className="mr-2 h-4 w-4" />
                     Cambiar Rol
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                    onClick={() => setUserToBlock(user)}
-                    className="text-orange-600"
-                >
-                    {user.is_active ? (
-                        <>
-                            <Ban className="mr-2 h-4 w-4" /> Bloquear
-                            Usuario
-                        </>
-                    ) : (
-                        <>
-                            <RefreshCw className="mr-2 h-4 w-4" /> Desbloquear
-                            Usuario
-                        </>
-                    )}
-                </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                     onClick={() => setUserToDelete(user)}
@@ -599,60 +553,6 @@ export default function Users({ users, roles }: Props) {
                 </DialogContent>
             </Dialog>
 
-            {/* Block/Unblock Confirmation */}
-            <AlertDialog
-                open={!!userToBlock}
-                onOpenChange={() => setUserToBlock(null)}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            {userToBlock?.is_active
-                                ? 'Bloquear Usuario'
-                                : 'Desbloquear Usuario'}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {userToBlock?.is_active ? (
-                                <>
-                                    ¿Estás seguro de desbloquear a{' '}
-                                    <strong>
-                                        {userToBlock?.first_name}{' '}
-                                        {userToBlock?.last_name}
-                                    </strong>
-                                    ? El usuario podrá acceder nuevamente a la
-                                    plataforma.
-                                </>
-                            ) : (
-                                <>
-                                    ¿Estás seguro de bloquear a{' '}
-                                    <strong>
-                                        {userToBlock?.first_name}{' '}
-                                        {userToBlock?.last_name}
-                                    </strong>
-                                    ? El usuario no podrá acceder a la
-                                    plataforma.
-                                </>
-                            )}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleToggleBlock}
-                            className={
-                                userToBlock?.is_active
-                                    ? 'bg-red-600 hover:bg-red-700'
-                                    : 'bg-green-600 hover:bg-green-700'
-                            }
-                        >
-                            {userToBlock?.is_active
-                                ? 'Bloquear'
-                                : 'Desbloquear'}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
             {/* Delete Confirmation */}
             <AlertDialog
                 open={!!userToDelete}
@@ -667,10 +567,10 @@ export default function Users({ users, roles }: Props) {
                                 {userToDelete?.first_name}{' '}
                                 {userToDelete?.last_name}
                             </strong>
-                            ? Esta acción es irreversible y eliminará sus
-                            datos (direcciones, reseñas, carrito, etc.). Si
-                            tiene pedidos registrados, no podrá eliminarse
-                            (bloquéalo en su lugar).
+                            ? Esta acción es irreversible y eliminará sus datos
+                            (direcciones, reseñas, carrito, etc.). Si tiene
+                            pedidos registrados, no podrá eliminarse (bloquéalo
+                            en su lugar).
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

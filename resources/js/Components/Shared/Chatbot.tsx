@@ -435,10 +435,13 @@ export default function Chatbot() {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Preguntas rápidas / menú principal */}
+                {/* Preguntas rápidas / menú principal
+                    Fila horizontal con scroll (chips) en vez de lista apilada,
+                    para que ocupe poco alto sin importar cuántas preguntas haya.
+                */}
                 {showQuickQuestions && (
-                    <div className="shrink-0 border-t border-gray-100 px-4 py-3">
-                        <div className="mb-2 flex items-center justify-between">
+                    <div className="shrink-0 border-t border-gray-100 py-2.5 pl-4">
+                        <div className="mb-1.5 flex items-center justify-between pr-4">
                             <p className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
                                 Preguntas frecuentes
                             </p>
@@ -450,12 +453,12 @@ export default function Chatbot() {
                                 <X className="h-3.5 w-3.5" />
                             </button>
                         </div>
-                        <div className="grid grid-cols-1 gap-1.5 sm:flex sm:flex-col">
+                        <div className="flex gap-1.5 overflow-x-auto pr-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                             {QUICK_QUESTIONS.map((q) => (
                                 <button
                                     key={q}
                                     onClick={() => sendMessage(q)}
-                                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-xs text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
+                                    className="shrink-0 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-left text-xs whitespace-nowrap text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
                                 >
                                     {q}
                                 </button>

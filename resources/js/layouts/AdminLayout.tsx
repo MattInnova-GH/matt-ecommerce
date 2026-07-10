@@ -113,7 +113,7 @@ function SidebarContent({
             >
                 {(isSidebarOpen || mobile) && (
                     <Link
-                        href="/admin"
+                        href="/"
                         className="flex min-w-0 items-center gap-2.5"
                     >
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
@@ -275,14 +275,37 @@ function SidebarContent({
 
             {/* Footer: User + Logout */}
             <div className="border-t p-3">
-                <Button
-                    className="flex w-full"
-                    variant={'destructive'}
-                    onClick={() => router.post('/logout')}
-                >
-                    <LogOut className="mr-1 h-4 w-4" />
-                    Cerrar sesión
-                </Button>
+                {isSidebarOpen || mobile ? (
+                    <Button
+                        className="flex w-full"
+                        variant="destructive"
+                        onClick={() => router.post('/logout')}
+                    >
+                        <LogOut className="mr-1 h-4 w-4" />
+                        Cerrar sesión
+                    </Button>
+                ) : (
+                    <TooltipProvider delayDuration={100}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    className="mx-auto flex h-10 w-10"
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => router.post('/logout')}
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent
+                                side="right"
+                                className="text-xs font-medium"
+                            >
+                                Cerrar sesión
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
             </div>
         </div>
     );
