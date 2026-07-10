@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Promotion;
+use App\Observers\BrandObserver;
+use App\Observers\CategoryObserver;
+use App\Observers\ProductObserver;
+use App\Observers\PromotionObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -29,6 +37,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Product::observe(ProductObserver::class);
+        Category::observe(CategoryObserver::class);
+        Brand::observe(BrandObserver::class);
+        Promotion::observe(PromotionObserver::class);
 
         Event::listen(Registered::class, SendEmailVerificationNotification::class);
 
