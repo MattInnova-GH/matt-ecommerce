@@ -217,11 +217,26 @@ function MobileDrawer({
 
             <div className="fixed top-0 right-0 bottom-0 z-1020 flex w-80 flex-col bg-white shadow-xl">
                 <div className="flex shrink-0 items-center justify-between border-b border-gray-100 p-4">
-                    <img
-                        src={settings?.logo || '/static/logo.webp'}
-                        alt={settings?.site_name || 'Logo'}
-                        className="h-8 w-auto object-contain"
-                    />
+                    <div className="flex items-center gap-2.5">
+                        <img
+                            src={settings?.logo || '/static/logo.webp'}
+                            alt={settings?.site_name || 'Logo'}
+                            className="h-8 w-8 object-contain"
+                        />
+                        <div className="h-6 w-px bg-gray-200" />
+                        <a
+                            href="https://mattinnovasolution.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Desarrollado por MATT INNOVA SOLUTION"
+                        >
+                            <img
+                                src="/static/matt-innova-logo.jpeg"
+                                alt="MATT INNOVA SOLUTION"
+                                className="h-8 w-8 object-contain"
+                            />
+                        </a>
+                    </div>
 
                     <button
                         onClick={onClose}
@@ -346,8 +361,17 @@ function MobileDrawer({
 
                         <p className="pt-2 text-xs text-gray-400">
                             © {currentYear}{' '}
-                            {settings?.site_name || 'Matt Store'}. Todos los
-                            derechos reservados.
+                            {settings?.site_name || 'Matt Store'} | producto
+                            exclusivo de{' '}
+                            <a
+                                href="https://mattinnovasolution.com/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-medium text-gray-600 underline underline-offset-2 transition hover:text-black"
+                            >
+                                MATT INNOVA SOLUTION
+                            </a>
+                            . Todos los derechos reservados.
                         </p>
                     </div>
                 </div>

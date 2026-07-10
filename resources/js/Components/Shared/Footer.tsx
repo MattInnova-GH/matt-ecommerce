@@ -25,19 +25,37 @@ export default function Footer() {
             <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     <div>
-                        <Link href="/" className="mb-6 inline-block">
-                            {settings?.logo ? (
+                        <div className="mb-6 flex items-center gap-3">
+                            <Link href="/" className="shrink-0">
+                                {settings?.logo ? (
+                                    <img
+                                        src={settings.logo}
+                                        alt={settings.site_name || 'Logo'}
+                                        className="h-12 w-12 rounded bg-white/95 object-contain p-1"
+                                    />
+                                ) : (
+                                    <span className="text-xl font-bold tracking-tight text-white">
+                                        {settings?.site_name || 'Matt Store'}
+                                    </span>
+                                )}
+                            </Link>
+
+                            {/* Aliado tecnológico */}
+                            <div className="h-10 w-px bg-gray-700" />
+                            <a
+                                href="https://mattinnovasolution.com/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="shrink-0"
+                                title="Desarrollado por MATT INNOVA SOLUTION"
+                            >
                                 <img
-                                    src={settings.logo}
-                                    alt={settings.site_name || 'Logo'}
-                                    className="h-10 w-auto rounded bg-white/95 object-contain p-1"
+                                    src="/static/matt-innova-logo.jpeg"
+                                    alt="MATT INNOVA SOLUTION"
+                                    className="h-12 w-12 rounded bg-white/95 object-contain p-1"
                                 />
-                            ) : (
-                                <span className="text-xl font-bold tracking-tight text-white">
-                                    {settings?.site_name || 'Matt Store'}
-                                </span>
-                            )}
-                        </Link>
+                            </a>
+                        </div>
                         <p className="mb-6 text-sm leading-relaxed text-gray-400">
                             Tu tienda de herramientas de confianza. Calidad,
                             buenos precios y envío rápido.
@@ -233,16 +251,26 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row">
+                <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row sm:pr-20">
                     <div className="flex gap-4">
                         <CreditCard size={24} className="text-gray-500" />
                         <span className="flex items-center text-xs text-gray-500">
                             Yape • Transferencia bancaria
                         </span>
                     </div>
-                    <p className="text-xs text-gray-500">
-                        © {currentYear} {settings?.site_name || 'Matt Store'}.
-                        Todos los derechos reservados.
+                    <p className="max-w-md text-center text-xs text-gray-500 sm:text-right">
+                        © {currentYear}{' '}
+                        {settings?.site_name || 'Matt Store'} | producto
+                        exclusivo de{' '}
+                        <a
+                            href="https://mattinnovasolution.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-gray-400 underline underline-offset-2 transition hover:text-white"
+                        >
+                            MATT INNOVA SOLUTION
+                        </a>
+                        . Todos los derechos reservados.
                     </p>
                 </div>
             </div>
