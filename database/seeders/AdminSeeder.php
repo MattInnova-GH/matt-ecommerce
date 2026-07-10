@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-
 class AdminSeeder extends Seeder
 {
     /**
@@ -14,7 +13,7 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-         $users = [
+        $users = [
             [
                 'first_name' => 'Matt',
                 'last_name' => 'Admin',

@@ -80,7 +80,8 @@ export default function Navbar() {
                         <div className="flex items-center space-x-4 lg:space-x-6">
                             <button
                                 onClick={() => setIsSearchOpen(true)}
-                                className="hidden transition hover:opacity-60 sm:block"
+                                aria-label="Buscar productos"
+                                className="transition hover:opacity-60"
                             >
                                 <Search size={20} />
                             </button>

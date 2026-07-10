@@ -1087,7 +1087,7 @@ export default function Orders({ orders: initialOrders }: Props) {
                                                                 className="max-h-32 w-full cursor-zoom-in rounded-lg border object-contain"
                                                                 onClick={() =>
                                                                     window.open(
-                                                                        `/storage/${selectedOrder.payment.receipt_url}`,
+                                                                        `/storage/${selectedOrder.payment?.receipt_url}`,
                                                                         '_blank',
                                                                     )
                                                                 }

@@ -14,9 +14,13 @@ namespace App\Http\Services;
 class ChatbotProductMatcher
 {
     private const MIN_PRODUCT_WORD_LENGTH = 3;
+
     private const MIN_CATEGORY_NAME_LENGTH = 4;
+
     private const MIN_BRAND_NAME_LENGTH = 3;
+
     private const MAX_LIST_ITEMS = 5;
+
     private const EXACT_MATCH_SCORE = 1000;
 
     public function __construct(

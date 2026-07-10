@@ -10,6 +10,9 @@ interface Product {
     id: number;
     name: string;
     price: number;
+    final_price: number;
+    has_discount: boolean;
+    discount_badge?: string;
     imageUrl?: string | null;
     slug: string;
     category?: string;

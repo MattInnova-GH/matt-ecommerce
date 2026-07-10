@@ -46,6 +46,9 @@ interface Product {
     name: string;
     slug: string;
     price: number;
+    final_price: number;
+    has_discount: boolean;
+    discount_badge?: string;
     stock: number;
     category: string;
     imageUrl: string | null;

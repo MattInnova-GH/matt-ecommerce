@@ -207,7 +207,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                             {categories.map((cat) => (
                                                 <Link
                                                     key={cat.id}
-                                                    href={`/productos?category=${cat.slug}`}
+                                                    href={`/productos?category=${cat.id}`}
                                                     onClick={handleClose}
                                                     className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 transition-colors hover:bg-gray-50"
                                                 >
