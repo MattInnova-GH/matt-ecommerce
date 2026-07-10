@@ -73,7 +73,7 @@ export default function Register() {
                                             Crear cuenta
                                         </h1>
                                         <p className="mt-2 text-gray-500">
-                                            Únete a ZonaRetail y comienza a
+                                            Únete a MakiTools Perú y comienza a
                                             comprar
                                         </p>
                                     </div>
