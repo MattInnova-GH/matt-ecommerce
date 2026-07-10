@@ -31,7 +31,7 @@ export default function Footer() {
                                     <img
                                         src={settings.logo}
                                         alt={settings.site_name || 'Logo'}
-                                        className="h-12 w-12 rounded bg-white/95 object-contain p-1"
+                                        className="h-20 w-20 rounded bg-white/95 object-contain p-1.5"
                                     />
                                 ) : (
                                     <span className="text-xl font-bold tracking-tight text-white">
@@ -41,7 +41,7 @@ export default function Footer() {
                             </Link>
 
                             {/* Aliado tecnológico */}
-                            <div className="h-10 w-px bg-gray-700" />
+                            <div className="h-16 w-px bg-gray-700" />
                             <a
                                 href="https://mattinnovasolution.com/"
                                 target="_blank"
@@ -52,7 +52,7 @@ export default function Footer() {
                                 <img
                                     src="/static/matt-innova-logo.jpeg"
                                     alt="MATT INNOVA SOLUTION"
-                                    className="h-12 w-12 rounded bg-white/95 object-contain p-1"
+                                    className="h-20 w-20 rounded bg-white/95 object-contain p-1.5"
                                 />
                             </a>
                         </div>

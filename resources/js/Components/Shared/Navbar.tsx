@@ -217,13 +217,13 @@ function MobileDrawer({
 
             <div className="fixed top-0 right-0 bottom-0 z-1020 flex w-80 flex-col bg-white shadow-xl">
                 <div className="flex shrink-0 items-center justify-between border-b border-gray-100 p-4">
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-3">
                         <img
                             src={settings?.logo || '/static/logo.webp'}
                             alt={settings?.site_name || 'Logo'}
-                            className="h-8 w-8 object-contain"
+                            className="h-12 w-12 object-contain"
                         />
-                        <div className="h-6 w-px bg-gray-200" />
+                        <div className="h-9 w-px bg-gray-200" />
                         <a
                             href="https://mattinnovasolution.com/"
                             target="_blank"
@@ -233,7 +233,7 @@ function MobileDrawer({
                             <img
                                 src="/static/matt-innova-logo.jpeg"
                                 alt="MATT INNOVA SOLUTION"
-                                className="h-8 w-8 object-contain"
+                                className="h-12 w-12 object-contain"
                             />
                         </a>
                     </div>
