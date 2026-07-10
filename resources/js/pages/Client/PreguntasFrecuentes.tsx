@@ -260,7 +260,7 @@ export default function PreguntasFrecuentes() {
                                 <p className="text-sm text-gray-500">
                                     ¿Tienes otra consulta?{' '}
                                     <a
-                                        href="/contacto"
+                                        href="mailto:contacto@makitoolsperu.com"
                                         className="font-medium text-sky-600 hover:underline"
                                     >
                                         Contáctanos

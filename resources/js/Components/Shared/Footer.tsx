@@ -258,19 +258,23 @@ export default function Footer() {
                             Yape • Transferencia bancaria
                         </span>
                     </div>
-                    <p className="max-w-md text-center text-xs text-gray-500 sm:text-right">
-                        © {currentYear}{' '}
-                        {settings?.site_name || 'Matt Store'} | producto
-                        exclusivo de{' '}
-                        <a
-                            href="https://mattinnovasolution.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-medium text-gray-400 underline underline-offset-2 transition hover:text-white"
-                        >
-                            MATT INNOVA SOLUTION
-                        </a>
-                        . Todos los derechos reservados.
+                    <p className="text-center text-xs text-gray-500">
+                        <span className="block">
+                            © {currentYear}{' '}
+                            {settings?.site_name || 'Matt Store'} | producto
+                            exclusivo de{' '}
+                            <a
+                                href="https://mattinnovasolution.com/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-medium text-gray-400 underline underline-offset-2 transition hover:text-white"
+                            >
+                                MATT INNOVA SOLUTION
+                            </a>
+                        </span>
+                        <span className="block">
+                            Todos los derechos reservados.
+                        </span>
                     </p>
                 </div>
             </div>
