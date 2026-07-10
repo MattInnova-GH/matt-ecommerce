@@ -1,9 +1,11 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Heart, Package, ShoppingCart } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cartStore';
+import { useAuthModalStore } from '@/stores/authModalStore';
 import type { PublicProduct } from './types';
 
 type Props = {
@@ -78,6 +80,8 @@ export function ProductCardSkeleton() {
 export default function ProductCard({ product }: Props) {
     const [liked, setLiked] = useState(product.is_favorited ?? false);
     const { addItem, openCart } = useCartStore();
+    const { auth } = usePage().props as any;
+    const openAuthModal = useAuthModalStore((state) => state.open);
 
     // ✅ Determinar qué precio mostrar
     const displayPrice = product.has_discount
@@ -89,6 +93,22 @@ export default function ProductCard({ product }: Props) {
     const toggleFavorite = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (!auth?.user) {
+            toast.error('Debes iniciar sesión para agregar a favoritos');
+            openAuthModal({
+                onSuccess: () => {
+                    setLiked(true);
+                    router.post(
+                        `/favoritos/toggle/${product.id}`,
+                        {},
+                        { preserveScroll: true },
+                    );
+                },
+            });
+            return;
+        }
+
         setLiked(!liked);
         router.post(
             `/favoritos/toggle/${product.id}`,
