@@ -6,7 +6,9 @@ use App\Http\Controllers\Client\ProductController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PublicProductController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/productos', [ProductController::class, 'index'])->name('products');
@@ -33,6 +35,6 @@ require __DIR__.'/admin.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/client.php';
 
-Route::fallback(function () {
-    return redirect()->back()->with('error', 'La página que buscas no existe o no tienes acceso.');
+Route::fallback(function (Request $request) {
+    return Inertia::render('Errors/NotFound')->toResponse($request)->setStatusCode(404);
 });

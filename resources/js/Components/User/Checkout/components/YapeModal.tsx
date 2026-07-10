@@ -53,6 +53,7 @@ export function YapeModal() {
         setYapeConfirmed(true);
         setVoucherFile(file);
         setConfirmed(true);
+        toast.success('Comprobante de Yape registrado correctamente.');
         setTimeout(() => closeYapeModal(), 1500);
     };
 

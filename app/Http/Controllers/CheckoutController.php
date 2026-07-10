@@ -12,6 +12,12 @@ use Inertia\Inertia;
 
 class CheckoutController extends Controller
 {
+    /**
+     * Costo de envio a domicilio. Debe coincidir con DELIVERY_COST en
+     * resources/js/Components/User/Checkout/utils/checkout.utils.ts.
+     */
+    private const DELIVERY_COST = 15.00;
+
     public function index()
     {
         return Inertia::render('Client/Checkout');
@@ -21,7 +27,9 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'items' => 'required|array',
-            'total' => 'required|numeric',
+            'items.*.id' => 'required|integer',
+            'items.*.price' => 'required|numeric|min:0',
+            'items.*.quantity' => 'required|integer|min:1',
             'paymentMethod' => 'required|string|in:transfer,yape',
             'voucher' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'deliveryMethod' => 'required|string|in:delivery,pickup',
@@ -52,14 +60,22 @@ class CheckoutController extends Controller
             $receiptUrl = $request->file('voucher')->store('vouchers', 'public');
         }
 
+        // El subtotal y el envio se calculan aqui (no se confia en el total
+        // que manda el navegador) para que la orden guarde el monto real.
+        $subtotal = collect($request->items)
+            ->sum(fn ($item) => (float) $item['price'] * (int) $item['quantity']);
+        $shippingCost = $request->deliveryMethod === 'delivery' ? self::DELIVERY_COST : 0.0;
+        $total = $subtotal + $shippingCost;
+
         try {
-            $order = DB::transaction(function () use ($request, $notes, $receiptUrl) {
+            $order = DB::transaction(function () use ($request, $notes, $receiptUrl, $subtotal, $shippingCost, $total) {
                 $order = Order::create([
                     'user_id' => auth()->id(),
                     'order_number' => 'ORD-'.strtoupper(uniqid()),
-                    'subtotal' => $request->total,
+                    'subtotal' => $subtotal,
+                    'shipping_cost' => $shippingCost,
                     'tax' => 0,
-                    'total' => $request->total,
+                    'total' => $total,
                     'status' => 'PENDING',
                     'shipping_address' => $request->deliveryMethod === 'delivery' ? $request->deliveryAddress : null,
                     'notes' => $notes,
@@ -89,7 +105,7 @@ class CheckoutController extends Controller
 
                 $order->payment()->create([
                     'method' => $request->paymentMethod,
-                    'amount' => $request->total,
+                    'amount' => $total,
                     'receipt_url' => $receiptUrl,
                     'status' => 'PENDING',
                 ]);

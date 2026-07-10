@@ -56,6 +56,7 @@ export function TransferModal() {
         setTransferConfirmed(true);
         setVoucherFile(file);
         setConfirmed(true);
+        toast.success('Comprobante de transferencia registrado correctamente.');
         setTimeout(() => closeTransferModal(), 1500);
     };
 

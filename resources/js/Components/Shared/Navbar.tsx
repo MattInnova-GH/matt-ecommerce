@@ -195,8 +195,8 @@ function MobileDrawer({
         },
 
         {
-            href: '/tiendas',
-            label: 'Tiendas',
+            href: '/categorias',
+            label: 'Categorías',
         },
     ];
 

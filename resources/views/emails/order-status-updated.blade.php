@@ -61,6 +61,7 @@
                                     <tr>
                                         <th align="left" style="font-size:12px; color:#6b7280; padding:8px 0; border-bottom:1px solid #e5e7eb;">Producto</th>
                                         <th align="center" style="font-size:12px; color:#6b7280; padding:8px 0; border-bottom:1px solid #e5e7eb;">Cant.</th>
+                                        <th align="right" style="font-size:12px; color:#6b7280; padding:8px 0; border-bottom:1px solid #e5e7eb;">Precio unit.</th>
                                         <th align="right" style="font-size:12px; color:#6b7280; padding:8px 0; border-bottom:1px solid #e5e7eb;">Subtotal</th>
                                     </tr>
                                 </thead>
@@ -69,18 +70,54 @@
                                         <tr>
                                             <td style="font-size:14px; padding:8px 0; border-bottom:1px solid #f3f4f6;">{{ $item->product_name }}</td>
                                             <td align="center" style="font-size:14px; padding:8px 0; border-bottom:1px solid #f3f4f6;">{{ $item->quantity }}</td>
+                                            <td align="right" style="font-size:14px; padding:8px 0; border-bottom:1px solid #f3f4f6;">S/ {{ number_format($item->product_price, 2) }}</td>
                                             <td align="right" style="font-size:14px; padding:8px 0; border-bottom:1px solid #f3f4f6;">S/ {{ number_format($item->subtotal, 2) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
 
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
                                 <tr>
-                                    <td style="font-size:15px; font-weight:bold; padding:8px 0;">Total</td>
-                                    <td align="right" style="font-size:15px; font-weight:bold; padding:8px 0;">S/ {{ number_format($order->total, 2) }}</td>
+                                    <td style="font-size:13px; color:#6b7280; padding:4px 0;">Subtotal</td>
+                                    <td align="right" style="font-size:13px; color:#6b7280; padding:4px 0;">S/ {{ number_format($order->subtotal, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size:13px; color:#6b7280; padding:4px 0;">Envío</td>
+                                    <td align="right" style="font-size:13px; color:#6b7280; padding:4px 0;">
+                                        {{ $order->shipping_cost > 0 ? 'S/ '.number_format($order->shipping_cost, 2) : 'Recojo en tienda' }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-size:15px; font-weight:bold; padding:8px 0; border-top:1px solid #e5e7eb;">Total</td>
+                                    <td align="right" style="font-size:15px; font-weight:bold; padding:8px 0; border-top:1px solid #e5e7eb;">S/ {{ number_format($order->total, 2) }}</td>
                                 </tr>
                             </table>
+
+                            @if ($order->shipping_address)
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9fafb; border-radius:8px; margin-bottom:8px;">
+                                    <tr>
+                                        <td style="padding:14px 16px;">
+                                            <p style="margin:0 0 6px; font-size:12px; font-weight:bold; color:#374151; text-transform:uppercase;">Dirección de entrega</p>
+                                            <p style="margin:0; font-size:13px; line-height:1.6; color:#4b5563;">
+                                                {{ $order->shipping_address['recipientName'] ?? '' }}<br>
+                                                {{ $order->shipping_address['address'] ?? '' }}
+                                                @if (!empty($order->shipping_address['district']))
+                                                    , {{ $order->shipping_address['district'] }}
+                                                @endif
+                                                @if (!empty($order->shipping_address['postalCode']))
+                                                    (C.P. {{ $order->shipping_address['postalCode'] }})
+                                                @endif
+                                                <br>
+                                                @if (!empty($order->shipping_address['reference']))
+                                                    Referencia: {{ $order->shipping_address['reference'] }}<br>
+                                                @endif
+                                                Teléfono: {{ $order->shipping_address['phone'] ?? '' }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            @endif
                         </td>
                     </tr>
                     <tr>

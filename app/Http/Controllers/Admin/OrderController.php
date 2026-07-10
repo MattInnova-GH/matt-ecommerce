@@ -14,11 +14,11 @@ use Inertia\Inertia;
 class OrderController extends Controller
 {
     public const STATUS_NOTIFICATIONS = [
-        'ACCEPTED' => 'Tu pedido de :product fue aceptado y ya lo estamos preparando.',
-        'REJECTED' => 'Tu pedido de :product fue rechazado.',
-        'SHIPPED' => 'Tu pedido de :product ya fue enviado.',
-        'DELIVERED' => 'Tu pedido de :product fue entregado. ¡Gracias por tu compra!',
-        'CANCELLED' => 'Tu pedido de :product fue cancelado.',
+        'ACCEPTED' => 'Tu pedido :number de :product (S/ :total) fue aceptado y ya lo estamos preparando.',
+        'REJECTED' => 'Tu pedido :number de :product (S/ :total) fue rechazado.',
+        'SHIPPED' => 'Tu pedido :number de :product (S/ :total) ya fue enviado.',
+        'DELIVERED' => 'Tu pedido :number de :product (S/ :total) fue entregado. ¡Gracias por tu compra!',
+        'CANCELLED' => 'Tu pedido :number de :product (S/ :total) fue cancelado.',
     ];
 
     /**
@@ -86,7 +86,11 @@ class OrderController extends Controller
                     'user_id' => $order->user_id,
                     'order_id' => $order->id,
                     'title' => 'Pedido '.strtolower(OrderStatusUpdated::STATUS_LABELS[$order->status] ?? $order->status),
-                    'message' => strtr(self::STATUS_NOTIFICATIONS[$order->status], [':product' => $this->productSummary($order)]),
+                    'message' => strtr(self::STATUS_NOTIFICATIONS[$order->status], [
+                        ':product' => $this->productSummary($order),
+                        ':number' => $order->order_number,
+                        ':total' => number_format((float) $order->total, 2),
+                    ]),
                 ]);
             }
 
